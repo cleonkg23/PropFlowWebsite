@@ -66,21 +66,29 @@
 
     // --- Scroll reveal with light stagger ---
     var reveals = document.querySelectorAll(".reveal");
-    var revealObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry, idx) {
-        if (entry.isIntersecting) {
-          var el = entry.target;
-          // light stagger using parent index
-          var parent = el.parentElement;
-          var siblings = parent ? Array.prototype.indexOf.call(parent.children, el) : 0;
-          var delay = Math.min(siblings, 6) * 70;
-          setTimeout(function () { el.classList.add("is-visible"); }, delay);
-          revealObs.unobserve(el);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
 
-    reveals.forEach(function (el) { revealObs.observe(el); });
+    // If page loaded with a hash (anchor jump) or user prefers reduced motion,
+    // skip the staged reveal — show everything immediately.
+    var prefersReducedMotion = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (window.location.hash || prefersReducedMotion) {
+      reveals.forEach(function (el) { el.classList.add("is-visible"); });
+    } else {
+      var revealObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var parent = el.parentElement;
+            var siblings = parent ? Array.prototype.indexOf.call(parent.children, el) : 0;
+            var delay = Math.min(siblings, 6) * 70;
+            setTimeout(function () { el.classList.add("is-visible"); }, delay);
+            revealObs.unobserve(el);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+      reveals.forEach(function (el) { revealObs.observe(el); });
+    }
   }
   // No IntersectionObserver fallback needed: CSS gates .reveal on .js,
   // and we still want content visible — so mark all visible immediately.

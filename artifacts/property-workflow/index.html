@@ -75,11 +75,11 @@
           </p>
         </div>
 
-        <aside class="workflow-card reveal" aria-label="Example workflow">
+        <aside class="workflow-card reveal" aria-label="Live workflow snapshot">
           <header class="wf-header">
             <span class="wf-dot" aria-hidden="true"></span>
-            <span class="wf-title">Live workflow</span>
-            <span class="wf-time">10:42</span>
+            <span class="wf-title">Workflow &middot; today</span>
+            <span class="wf-meta">Updated 10:42</span>
           </header>
 
           <ol class="wf-steps">
@@ -87,45 +87,40 @@
               <span class="wf-num" aria-hidden="true">1</span>
               <div class="wf-body">
                 <span class="wf-label">Enquiry received</span>
-                <span class="wf-detail">Sarah J. &mdash; 14 Park Road</span>
+                <span class="wf-detail">Sarah J. &middot; 14 Park Road</span>
               </div>
-              <span class="wf-tag tag-tenant">Tenant</span>
+              <span class="chip chip-tenant">Tenant</span>
             </li>
             <li class="wf-step is-done">
               <span class="wf-num" aria-hidden="true">2</span>
               <div class="wf-body">
-                <span class="wf-label">Categorised automatically</span>
+                <span class="wf-label">Categorised</span>
                 <span class="wf-detail">Intent: viewing request</span>
               </div>
-              <span class="wf-tag wf-tag-muted">Auto</span>
+              <span class="chip chip-viewing">Viewing</span>
             </li>
-            <li class="wf-step is-active">
+            <li class="wf-step is-done">
               <span class="wf-num" aria-hidden="true">3</span>
               <div class="wf-body">
-                <span class="wf-label">Draft response prepared</span>
-                <span class="wf-detail">Awaiting team review</span>
+                <span class="wf-label">Owner assigned</span>
+                <span class="wf-detail">Alex &middot; due in 4h</span>
               </div>
-              <span class="wf-tag wf-tag-active">Now</span>
+              <span class="chip chip-muted">Auto</span>
             </li>
-            <li class="wf-step is-pending">
+            <li class="wf-step is-active">
               <span class="wf-num" aria-hidden="true">4</span>
               <div class="wf-body">
-                <span class="wf-label">Follow-up task created</span>
-                <span class="wf-detail">Owner: Alex &middot; due in 4h</span>
+                <span class="wf-label">Draft reply ready</span>
+                <span class="wf-detail">Awaiting team review</span>
               </div>
-            </li>
-            <li class="wf-step is-pending">
-              <span class="wf-num" aria-hidden="true">5</span>
-              <div class="wf-body">
-                <span class="wf-label">Status visible across the team</span>
-                <span class="wf-detail">Open &rarr; In progress</span>
-              </div>
+              <span class="chip chip-active">Now</span>
             </li>
           </ol>
 
           <footer class="wf-foot">
-            <span class="wf-foot-dot" aria-hidden="true"></span>
-            From inbox to assigned task in under a minute
+            <span class="wf-stat"><strong>38s</strong><span>inbox &rarr; assigned</span></span>
+            <span class="wf-stat"><strong>5</strong><span>open today</span></span>
+            <span class="wf-stat"><strong>0</strong><span>overdue</span></span>
           </footer>
         </aside>
       </div>
@@ -264,27 +259,27 @@
                 </div>
                 <div class="mock-row">
                   <div class="mock-cell-name">Sarah J. &mdash; 14 Park Road<small>Enquiry &middot; received 09:42</small></div>
-                  <span class="tag tag-tenant">Tenant</span>
+                  <span class="chip chip-tenant">Tenant</span>
                   <span class="status status-new">New</span>
                 </div>
                 <div class="mock-row">
                   <div class="mock-cell-name">Boiler issue &mdash; Flat 3B<small>Maintenance &middot; SLA 4h</small></div>
-                  <span class="tag tag-maint">Maintenance</span>
+                  <span class="chip chip-maint">Maintenance</span>
                   <span class="status status-progress">In progress</span>
                 </div>
                 <div class="mock-row">
                   <div class="mock-cell-name">Viewing &mdash; James W.<small>Follow-up due today</small></div>
-                  <span class="tag tag-viewing">Viewing</span>
+                  <span class="chip chip-viewing">Viewing</span>
                   <span class="status status-followup">Follow-up due</span>
                 </div>
                 <div class="mock-row">
                   <div class="mock-cell-name">Landlord statement Q4<small>Sent &middot; 15:18</small></div>
-                  <span class="tag tag-landlord">Landlord</span>
+                  <span class="chip chip-landlord">Landlord</span>
                   <span class="status status-done">Completed</span>
                 </div>
                 <div class="mock-row">
                   <div class="mock-cell-name">Reference chase &mdash; M. Patel<small>Auto-chase &middot; reminder 2 of 3</small></div>
-                  <span class="tag tag-tenant">Tenant</span>
+                  <span class="chip chip-tenant">Tenant</span>
                   <span class="status status-progress">In progress</span>
                 </div>
               </div>
@@ -336,20 +331,25 @@
     <section class="section section-contact" id="contact">
       <div class="container">
         <div class="contact-card reveal">
-          <p class="eyebrow">Get in touch</p>
-          <h2>Tell me where the admin hurts most. I&rsquo;ll tell you honestly if I can help.</h2>
-          <p>No pitch deck. No long sales process. A short, specific conversation about your workflow &mdash; and whether automation is the right answer.</p>
+          <p class="eyebrow">&sect; 05 &mdash; Next step</p>
+          <h2>Send me one bottleneck. I&rsquo;ll tell you within a week if it&rsquo;s worth automating.</h2>
+          <p>One short reply. No deck, no proposal cycle &mdash; just a clear yes, no, or where to start.</p>
 
           <div class="contact-actions">
-            <!-- TODO: replace email below -->
-            <a class="btn btn-primary" href="mailto:your@email.com">
-              Email me
+            <!-- TODO: replace email below (used in both href and visible label) -->
+            <a class="btn btn-primary contact-cta" href="mailto:your@email.com?subject=Workflow%20bottleneck">
+              <span class="contact-cta-stack">
+                <span class="contact-cta-kicker">Email</span>
+                <span class="contact-cta-addr">your@email.com</span>
+              </span>
               <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
 
             <!-- TODO: replace LinkedIn URL below -->
-            <a class="btn btn-ghost" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">Connect on LinkedIn</a>
+            <a class="btn btn-ghost" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">Or message on LinkedIn</a>
           </div>
+
+          <p class="contact-meta"><span class="contact-meta-dot" aria-hidden="true"></span>Replies within 1 working day &middot; UK hours</p>
         </div>
       </div>
     </section>
