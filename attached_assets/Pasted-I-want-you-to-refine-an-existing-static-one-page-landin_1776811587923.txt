@@ -1,0 +1,182 @@
+I want you to refine an existing static one-page landing page for my workflow automation service for small UK property teams.
+
+The page is already structurally much better than before, but it still feels a bit too wordy and visually busy in places.
+
+I do NOT want a redesign from scratch.
+I want a simplification pass based on progressive disclosure.
+
+GOAL
+Reduce visual clutter and visible copy density so the page feels lighter, cleaner, and easier to scan.
+
+I still want the page to communicate clearly, but I want less information visible at once.
+The page should reveal secondary detail through lightweight interaction.
+
+IMPORTANT STRATEGY
+Do NOT solve this by hiding important content behind hover-only interactions.
+Instead use progressive disclosure properly:
+
+- key message stays visible
+- secondary detail is hidden by default where appropriate
+- detail reveals on hover/focus for desktop
+- detail reveals on tap/click for mobile
+- critical understanding must not depend on hover
+- interactions must remain accessible
+
+TECH CONSTRAINTS
+This site must stay:
+- static
+- lightweight
+- GitHub Pages friendly
+- plain HTML
+- plain CSS
+- vanilla JavaScript only
+- no framework
+- no Tailwind
+- no libraries
+- no heavy animation system
+
+ANIMATION / INTERACTION PRINCIPLES
+Use CSS transitions first.
+Use JS only where state management is needed.
+
+Allowed interaction patterns:
+- card expand/collapse
+- hover/focus reveal
+- tap-to-expand on mobile
+- accordion-style detail reveal
+- scenario switchers / chips / tabs
+- subtle opacity / translate / border / shadow transitions
+- icon rotation or arrow movement
+- smooth but restrained expand/collapse
+
+Not allowed:
+- parallax
+- floating decorative motion
+- long entrance animations
+- big reveal theatrics
+- motion that feels like a trendy template
+- hiding core meaning inside hover states only
+
+CORE DESIGN OBJECTIVE
+I want the page to feel:
+- simpler
+- lighter
+- more scannable
+- cleaner
+- less text-heavy
+- still premium
+- still credible
+- still operationally sharp
+
+I do NOT want it to feel:
+- vague
+- clever for the sake of it
+- over-interactive
+- gimmicky
+- empty
+
+CURRENT PAGE STRUCTURE
+Hero
+Problem
+What I do
+Proof strip
+Demo
+Process
+Contact
+
+I want you to review this structure and identify where progressive disclosure should be used to reduce clutter without harming clarity.
+
+WHAT I SUSPECT
+I think the “What I do” area is the best place for this.
+The cards may currently take up too much space because they show too much copy upfront.
+
+I think some of that detail could be revealed on interaction instead.
+
+I also think the process section and possibly some explanatory text in other sections may benefit from lightweight reveal behaviour.
+
+YOUR JOB
+Please respond in this exact order:
+
+1. Blunt diagnosis
+Tell me where the current page is still too wordy or visually cluttered.
+Be direct.
+
+2. Progressive disclosure strategy
+Tell me exactly which sections should:
+- stay fully visible
+- become shorter by default
+- reveal detail on hover/focus
+- reveal detail on click/tap
+- remain static for clarity
+
+3. Best interaction patterns by section
+For each major section, tell me the best interaction approach.
+
+Specifically evaluate:
+- Hero
+- Problem
+- What I do
+- Proof strip
+- Demo
+- Process
+- Contact
+
+I want to know where to use:
+- hover reveal
+- click-to-expand
+- accordion
+- chips/tabs
+- inline detail reveal
+- no interaction at all
+
+4. UX rules
+Set the rules for what should never be hidden.
+Also explain how to make all of this work well on mobile, where hover does not exist.
+
+5. Visual simplification recommendations
+Tell me how to reduce clutter through UI changes, not just interaction.
+Examples:
+- less visible body copy
+- tighter card heights
+- stronger typography hierarchy
+- less repeated explanatory text
+- better use of spacing
+- cleaner grouping
+- fewer always-visible details
+- more disciplined dividers and labels
+
+6. Animation recommendations
+Tell me exactly what motion to use and where.
+Keep it minimal and tasteful.
+Focus on transitions that support understanding.
+
+7. Implementation plan
+Give me a practical implementation plan for the existing static site.
+
+8. Final implementation prompt
+Write a precise prompt I can use to update the existing HTML/CSS/JS codebase.
+
+This implementation prompt should instruct the system to:
+- preserve the current aesthetic direction
+- reduce visible copy density
+- reduce visual clutter
+- use progressive disclosure where appropriate
+- use hover/focus on desktop and click/tap on mobile
+- keep all essential meaning visible
+- remain accessible
+- remain lightweight
+- remain GitHub Pages friendly
+
+VERY IMPORTANT CONTENT RULES
+- Do not hide the hero headline or key value proposition
+- Do not hide the CTA
+- Do not make the page dependent on hover to be understood
+- Do not use interaction just to seem clever
+- Do not add more sections
+- Do not add more content
+- Do not make it look like SaaS
+- Do not remove the premium restraint of the design
+
+TARGET RESULT
+The page should feel like it says less at first glance, while still revealing enough substance when someone engages with it.
+It should feel simpler, sharper, and more controlled.
