@@ -19,7 +19,7 @@ run = "pnpm --filter @workspace/property-workflow run dev"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/property-workflow", "run", "build" ]
-publicDir = "artifacts/property-workflow/dist/public"
+publicDir = "artifacts/property-workflow/dist"
 serve = "static"
 
 [[services.production.rewrites]]
@@ -28,4 +28,3 @@ to = "/index.html"
 
 [services.env]
 PORT = "24073"
-BASE_PATH = "/"
