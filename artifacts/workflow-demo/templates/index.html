@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Property Workflow — live demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --cream:#f3eee4; --ink:#1f2a24; --green:#2f6b53; --rule:#dcd3c0; }
+    body { background: var(--cream); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+    .serif { font-family: 'Fraunces', Georgia, serif; letter-spacing: -0.01em; }
+    .panel { background: #fdfbf6; border: 1px solid var(--rule); }
+    .pill { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; letter-spacing: 0.02em; }
+    .pill-urgent { background:#fdecea; color:#b3402b; }
+    .pill-high   { background:#fdf2dc; color:#9a6300; }
+    .pill-normal { background:#e8efe9; color:#2f6b53; }
+    .col-head { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color:#6b7268; }
+    .scenario-btn { background:#1f2a24; color:#fdfbf6; }
+    .scenario-btn:hover { background:#2f6b53; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b" style="border-color:var(--rule)">
+    <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="serif text-xl font-medium">Property Workflow</span>
+        <span class="text-xs uppercase tracking-widest" style="color:#6b7268">Live demo</span>
+      </div>
+      <button id="reset-btn" class="text-xs uppercase tracking-widest hover:underline" style="color:#6b7268">Reset demo</button>
+    </div>
+  </header>
+
+  <main class="max-w-[1400px] mx-auto px-6 py-8 space-y-8">
+    <!-- Scenario triggers -->
+    <section>
+      <h1 class="serif text-3xl md:text-4xl font-medium mb-1">Trigger a scenario</h1>
+      <p class="text-sm mb-4" style="color:#5a6259">Click any button — watch it move from inbox → classified → on the board, with a draft reply ready.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {% for key, s in scenarios.items() %}
+        <button data-scenario="{{ key }}" class="scenario-btn rounded-md px-4 py-3 text-left text-sm font-medium transition">
+          <span class="block text-[0.65rem] uppercase tracking-widest opacity-60 mb-1">{{ s.type.replace('_',' ') }}</span>
+          {{ s.label }}
+        </button>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Three-panel working area -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Inbox -->
+      <div class="panel rounded-md lg:col-span-4 p-4">
+        <div class="flex items-baseline justify-between mb-3">
+          <h2 class="serif text-lg font-medium">Inbox</h2>
+          <span class="col-head" id="inbox-count">0 items</span>
+        </div>
+        <ul id="inbox-list" class="divide-y" style="border-color:var(--rule)">
+          <li class="py-6 text-sm text-center" style="color:#6b7268">No items yet — trigger a scenario above.</li>
+        </ul>
+      </div>
+
+      <!-- Detail -->
+      <div class="panel rounded-md lg:col-span-4 p-4">
+        <h2 class="serif text-lg font-medium mb-3">Classification &amp; routing</h2>
+        <div id="detail-panel" class="text-sm" style="color:#5a6259">
+          Select an item from the inbox to see how it was classified.
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div class="panel rounded-md lg:col-span-4 p-4">
+        <h2 class="serif text-lg font-medium mb-3">Task &amp; draft reply</h2>
+        <div id="action-panel" class="text-sm" style="color:#5a6259">
+          The created task and a draft response will appear here.
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflow board -->
+    <section>
+      <div class="flex items-baseline justify-between mb-3">
+        <h2 class="serif text-2xl font-medium">Workflow board</h2>
+        <span class="col-head">Status across the team</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="panel rounded-md p-3">
+          <div class="col-head mb-2">New</div>
+          <ul data-status="new" class="space-y-2 min-h-[80px]"></ul>
+        </div>
+        <div class="panel rounded-md p-3">
+          <div class="col-head mb-2">In progress</div>
+          <ul data-status="in_progress" class="space-y-2 min-h-[80px]"></ul>
+        </div>
+        <div class="panel rounded-md p-3">
+          <div class="col-head mb-2">Awaiting reply</div>
+          <ul data-status="awaiting_reply" class="space-y-2 min-h-[80px]"></ul>
+        </div>
+        <div class="panel rounded-md p-3">
+          <div class="col-head mb-2">Done</div>
+          <ul data-status="done" class="space-y-2 min-h-[80px]"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-[1400px] mx-auto px-6 py-8 text-xs" style="color:#6b7268">
+    Demo system · classification rules in <code>workflow.py</code> · storage in <code>data/store.json</code>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
