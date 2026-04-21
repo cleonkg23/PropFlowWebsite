@@ -1,0 +1,342 @@
+Build me a lightweight, static, single-page marketing website for my workflow automation service for small property businesses in the UK.
+
+This site is intended to be hosted on GitHub Pages, so you must respect GitHub Pages constraints from the start.
+
+NON-NEGOTIABLE TECH CONSTRAINTS
+- Use only plain HTML, CSS, and vanilla JavaScript.
+- Do not use React, Next.js, Vue, Svelte, Tailwind, Bootstrap, jQuery, or any heavy framework.
+- Do not use a backend.
+- Do not use server-side rendering.
+- Do not use authentication, databases, APIs, forms that require backend handling, or any build step that is necessary to run the site.
+- The final site must be deployable by uploading static files directly to a GitHub repository.
+- Include a .nojekyll file in the root so GitHub Pages serves the site cleanly as a static site.
+- Use relative paths for all assets, CSS, JS, images, and links so the site works both on:
+  1. a root GitHub Pages domain like username.github.io
+  2. a project site like username.github.io/repository-name/
+- Keep it fast and lightweight:
+  - minimal JavaScript
+  - no unnecessary animations
+  - no large image libraries
+  - no video backgrounds
+  - no heavy font dependencies
+  - prefer system fonts
+  - use SVG where sensible
+- Make the code clean, modular, readable, and easy for me to edit later.
+- Output only static front-end files.
+
+PRIMARY PURPOSE OF THE WEBSITE
+This is not a SaaS app. It is a lean client acquisition website for my service business.
+
+The purpose is to help small estate agents and property managers quickly understand:
+1. what I do
+2. who I help
+3. what workflows I can automate
+4. what the demo shows
+5. why they should contact me
+
+TARGET AUDIENCE
+- Small estate agencies
+- Letting agents
+- Property managers
+- Small property operations teams
+- Typically 1–50 employees
+- Businesses still relying on spreadsheets, email, WhatsApp, and manual follow-ups
+- Businesses with messy admin, poor visibility, inconsistent follow-ups, and too much repetitive work
+
+CORE OFFER
+Position me as:
+“I help small property teams reduce admin, improve follow-ups, and gain visibility by automating their workflows.”
+
+This is the primary offer:
+- Workflow automation for small property businesses
+
+This is a secondary add-on only:
+- Simple dashboards and reporting layered on top of workflows
+
+Do not make dashboards the main thing.
+Do not make AI the headline.
+Do not make it sound like a vague consultancy.
+Keep it specific and outcome-driven.
+
+TONE AND COPY STYLE
+- Clear
+- Direct
+- Professional
+- Non-technical
+- No startup waffle
+- No fake corporate language
+- No empty buzzwords like:
+  - cutting-edge
+  - innovative solutions
+  - revolutionise
+  - AI-powered transformation
+  - end-to-end ecosystem
+- Focus on practical outcomes:
+  - less admin
+  - faster follow-ups
+  - clearer task ownership
+  - better visibility
+  - fewer missed actions
+  - more consistent processes
+
+The copy should sound like a capable technical operator who solves real admin problems for real businesses.
+
+SITE GOAL
+A stranger should land on the page and understand the offer in under 10 seconds.
+
+VISUAL DIRECTION
+Design a clean, modern, lightweight service-business landing page.
+It should feel:
+- sharp
+- credible
+- practical
+- polished
+- not flashy
+- not generic SaaS template
+- not corporate blue sludge
+
+Use a restrained palette and strong spacing.
+Prioritise readability and trust.
+
+Suggested visual style:
+- clean white or off-white background
+- dark text
+- one accent colour used consistently
+- subtle cards or bordered panels
+- soft shadows only if tasteful
+- rounded corners but not exaggerated
+- excellent spacing
+- strong hierarchy
+- mobile-first responsive layout
+
+Do not over-design it.
+Do not use loud gradients everywhere.
+Do not make it look like a startup selling venture-backed software.
+This is a service business site.
+
+SITE STRUCTURE
+Create one single-page website with these sections in this order:
+
+1. HERO
+Purpose:
+Immediately explain what I do and who it is for.
+
+Include:
+- a sharp headline
+- a supporting subheadline
+- one primary CTA
+- one secondary CTA
+
+Example direction:
+Headline should clearly say I automate workflows for estate agents and property managers.
+Subheadline should mention reducing admin, improving follow-ups, and creating visibility.
+
+Primary CTA:
+- View demo
+
+Secondary CTA:
+- Get in touch
+
+The hero should not be vague.
+It should not lead with “AI”.
+It should lead with the business outcome and niche.
+
+2. PROBLEM SECTION
+Show that I understand their pain.
+
+Cover pain points like:
+- enquiries being handled inconsistently
+- maintenance requests getting buried
+- follow-ups being missed
+- too much manual copying between inboxes, spreadsheets, and task lists
+- no clear visibility over what needs action
+- reliance on one person remembering everything
+
+This section should make property businesses feel seen.
+Use concise copy.
+A 3-card or 4-card layout is fine.
+
+3. WHAT I AUTOMATE
+Add a section showing specific examples of workflows I can automate.
+
+Include practical property-relevant items such as:
+- new enquiry triage
+- viewing follow-up workflows
+- maintenance request logging and tasking
+- landlord admin requests
+- chasing missing information
+- internal handoffs between team members
+- status tracking dashboards
+- email drafting and response suggestions
+- lead or tenant pipeline updates
+
+Make these sound concrete and useful.
+Do not drift into general business automation language.
+
+4. DEMO SECTION
+Add a section that promotes a clickable demo hosted separately on Replit.
+
+This section should explain that the demo is a simplified example of the kind of workflow I can build.
+
+The demo flow should be described clearly:
+- new enquiry comes in
+- system categorises it
+- suggested response is generated
+- follow-up task is created
+- dashboard/status updates
+
+Mention the example scenarios:
+- tenant enquiry
+- maintenance request
+- viewing follow-up
+- landlord admin request
+
+Include a prominent button:
+- Open demo
+
+Use a placeholder link for now like:
+href="#"
+and label it clearly so I can replace it later.
+
+5. PROTOTYPE WORKFLOW EXAMPLE
+This is not a fake case study.
+It must be framed honestly as a prototype/example based on a real workflow system I built.
+
+Use this structure:
+- The problem
+- The approach
+- What the system did
+- Why this matters for property businesses
+
+Context to incorporate:
+I previously built a workflow-style system to replace messy manual tracking and improve visibility over actions.
+Do not invent fake statistics.
+Do not invent enterprise outcomes.
+Do not fabricate client names or ROI.
+Do not make legal claims.
+
+This section should translate the relevance to property businesses:
+- centralised visibility
+- clearer next actions
+- less manual tracking
+- more consistent follow-up
+- easier coordination
+
+Frame this as proof of practical capability, not a polished software product.
+
+6. HOW IT WORKS
+Create a simple step-by-step process section.
+
+Suggested steps:
+1. Identify the admin bottleneck
+2. Map the workflow
+3. Build a lightweight automation
+4. Test it with real examples
+5. Refine and hand over
+
+Keep it simple and credible.
+No bloated delivery model.
+
+7. CONTACT SECTION
+Since this is GitHub Pages and we are keeping the site static, do not build a backend contact form.
+
+Instead include:
+- email contact link
+- LinkedIn link
+- optional CTA button for booking a call if I later add one
+
+Use placeholder links for now and make them easy to swap:
+- email: mailto:your@email.com
+- LinkedIn: https://www.linkedin.com/in/yourprofile
+
+Make the CTA clear and low-friction.
+
+8. FOOTER
+Simple footer with:
+- name or brand
+- short descriptor
+- copyright line
+- links back to LinkedIn/email
+
+UX REQUIREMENTS
+- Fully responsive
+- Strong mobile layout
+- Sticky header is allowed if lightweight
+- Smooth scroll for section links
+- Accessible contrast
+- Clear hover/focus states
+- Semantic HTML
+- Keyboard navigable
+- Buttons should feel modern and clean
+- Avoid clutter
+
+SEO / META
+Include:
+- page title
+- meta description
+- Open Graph title
+- Open Graph description
+- viewport meta tag
+- favicon placeholder if helpful
+
+Use property workflow automation keywords naturally, but do not stuff keywords.
+
+FILES TO CREATE
+Please create the following files:
+- index.html
+- styles.css
+- script.js
+- .nojekyll
+- 404.html
+
+404.html should be simple and lightweight.
+Since this is a single-page site, it can just help users get back to the homepage rather than trying to do complicated routing.
+
+IMPORTANT IMPLEMENTATION NOTES
+- All internal navigation should be anchor-based, not client-side routed pages.
+- Use section IDs and nav links like #problem, #demo, #contact.
+- Do not create a multi-route SPA.
+- Do not use absolute / paths for local assets.
+  Example:
+  use ./styles.css not /styles.css
+- Keep JavaScript minimal. It should only handle small front-end enhancements such as:
+  - mobile menu toggle
+  - smooth scroll if needed
+  - active nav state if clean
+- The site must work even if JavaScript fails.
+- The layout and content should remain strong without animation.
+
+COPY DIRECTION
+Write all on-page copy for me.
+The copy should be strong enough that I can publish it with only light edits.
+
+Make sure the messaging reflects:
+- workflow automation for small property businesses
+- practical admin pain
+- visibility and consistency
+- service offer, not software subscription
+- honest prototype example
+- simple CTA to view demo or contact me
+
+Do not write generic filler text like lorem ipsum.
+Do not leave content sections blank.
+
+FINAL OUTPUT REQUIREMENTS
+When you generate the project:
+1. Provide the complete contents of each file.
+2. Make the code production-ready for a lightweight GitHub Pages deployment.
+3. Keep the total project very lean.
+4. Do not add anything that requires a package manager.
+5. Do not add analytics, cookies, or third-party scripts unless explicitly necessary.
+6. Make it easy for me to replace the demo URL, email, LinkedIn URL, and brand name.
+
+Before finishing, check:
+- Is this fully static?
+- Would this deploy cleanly on GitHub Pages?
+- Are all asset paths relative?
+- Is the messaging specific to estate agents and property managers?
+- Is it lightweight and credible?
+- Does it avoid buzzword-heavy AI nonsense?
+- Does it look polished enough to impress a real prospect?
+
+If anything conflicts with GitHub Pages simplicity, choose the simpler static option.

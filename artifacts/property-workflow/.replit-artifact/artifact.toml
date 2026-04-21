@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Property Workflow Automation"
+version = "1.0.0"
+id = "artifacts/property-workflow"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24073
+
+[services.development]
+run = "pnpm --filter @workspace/property-workflow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/property-workflow", "run", "build" ]
+publicDir = "artifacts/property-workflow/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24073"
+BASE_PATH = "/"
