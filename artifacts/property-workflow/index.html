@@ -18,6 +18,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c2a25'/%3E%3Crect x='10' y='10' width='12' height='12' fill='%232f6b53' transform='rotate(45 16 16)'/%3E%3C/svg%3E" />
 
   <link rel="stylesheet" href="./styles.css" />
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -57,32 +58,77 @@
             For UK estate agents, letting agents &amp; property managers
           </p>
 
-          <h1>Quietly automating the <em>admin</em> behind small property teams.</h1>
+          <h1>Workflow automation for small UK property teams.</h1>
 
-          <p class="lede">Less manual chasing. Faster follow-ups. A clear view of what needs action &mdash; without changing the tools your team already uses.</p>
+          <p class="lede">I build lightweight systems that turn scattered emails and spreadsheets into one shared view of what&rsquo;s open, who owns it, and what&rsquo;s overdue.</p>
 
           <div class="cta-row">
             <a class="btn btn-primary" href="#demo">
               View the demo
               <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a class="btn btn-ghost" href="#contact">Get in touch</a>
+            <a class="btn btn-outline" href="#contact">Get in touch</a>
           </div>
 
-          <ul class="hero-meta">
-            <li>Independent operator, UK-based</li>
-            <li>Built for property teams of 1&ndash;50 people</li>
-            <li>Works alongside your inbox, spreadsheets &amp; CRM</li>
-          </ul>
+          <p class="trust-strip">
+            <span class="trust-label">Built for</span>
+            estate agents &middot; letting agents &middot; block &amp; residential property managers &middot; small ops teams
+          </p>
         </div>
 
-        <div class="hero-visual reveal">
-          <img class="hero-image" src="./assets/hero-desk.png" alt="A desk with property notes, a leather notebook, brass keys and a fountain pen" loading="eager" />
-          <div class="hero-quote" aria-hidden="false">
-            Built for the way small property businesses actually work &mdash; not how software companies think they should.
-            <span class="hero-quote-attr">The brief</span>
-          </div>
-        </div>
+        <aside class="workflow-card reveal" aria-label="Example workflow">
+          <header class="wf-header">
+            <span class="wf-dot" aria-hidden="true"></span>
+            <span class="wf-title">Live workflow</span>
+            <span class="wf-time">10:42</span>
+          </header>
+
+          <ol class="wf-steps">
+            <li class="wf-step is-done">
+              <span class="wf-num" aria-hidden="true">1</span>
+              <div class="wf-body">
+                <span class="wf-label">Enquiry received</span>
+                <span class="wf-detail">Sarah J. &mdash; 14 Park Road</span>
+              </div>
+              <span class="wf-tag tag-tenant">Tenant</span>
+            </li>
+            <li class="wf-step is-done">
+              <span class="wf-num" aria-hidden="true">2</span>
+              <div class="wf-body">
+                <span class="wf-label">Categorised automatically</span>
+                <span class="wf-detail">Intent: viewing request</span>
+              </div>
+              <span class="wf-tag wf-tag-muted">Auto</span>
+            </li>
+            <li class="wf-step is-active">
+              <span class="wf-num" aria-hidden="true">3</span>
+              <div class="wf-body">
+                <span class="wf-label">Draft response prepared</span>
+                <span class="wf-detail">Awaiting team review</span>
+              </div>
+              <span class="wf-tag wf-tag-active">Now</span>
+            </li>
+            <li class="wf-step is-pending">
+              <span class="wf-num" aria-hidden="true">4</span>
+              <div class="wf-body">
+                <span class="wf-label">Follow-up task created</span>
+                <span class="wf-detail">Owner: Alex &middot; due in 4h</span>
+              </div>
+            </li>
+            <li class="wf-step is-pending">
+              <span class="wf-num" aria-hidden="true">5</span>
+              <div class="wf-body">
+                <span class="wf-label">Status visible across the team</span>
+                <span class="wf-detail">Open &rarr; In progress</span>
+              </div>
+            </li>
+          </ol>
+
+          <footer class="wf-foot">
+            <span class="wf-foot-dot" aria-hidden="true"></span>
+            From inbox to assigned task in under a minute
+          </footer>
+        </aside>
       </div>
     </section>
 
@@ -211,8 +257,8 @@
 
             <p class="demo-scenarios">Scenarios you can try: <strong>tenant enquiry</strong>, <strong>maintenance request</strong>, <strong>viewing follow-up</strong>, <strong>landlord admin request</strong>.</p>
 
-            <!-- TODO: replace href below with your hosted demo URL -->
-            <a class="btn btn-primary" href="#" target="_blank" rel="noopener">
+            <!-- TODO: replace href with your hosted demo URL; defaults to Get in touch so it never dead-ends -->
+            <a class="btn btn-primary" href="#contact">
               Open the demo
               <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
@@ -380,9 +426,6 @@
 
             <!-- TODO: replace LinkedIn URL below -->
             <a class="btn btn-ghost" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">Connect on LinkedIn</a>
-
-            <!-- TODO: optional &mdash; replace with your booking link, or remove this button -->
-            <a class="btn btn-link" href="#">Book a 20-minute call &rarr;</a>
           </div>
         </div>
       </div>

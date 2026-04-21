@@ -81,8 +81,10 @@
     }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
 
     reveals.forEach(function (el) { revealObs.observe(el); });
-  } else {
-    // Fallback: just show everything
+  }
+  // No IntersectionObserver fallback needed: CSS gates .reveal on .js,
+  // and we still want content visible — so mark all visible immediately.
+  if (!("IntersectionObserver" in window)) {
     document.querySelectorAll(".reveal").forEach(function (el) {
       el.classList.add("is-visible");
     });
