@@ -40,7 +40,7 @@
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {% for key, s in scenarios.items() %}
         <button data-scenario="{{ key }}" class="scenario-btn rounded-md px-4 py-3 text-left text-sm font-medium transition">
-          <span class="block text-[0.65rem] uppercase tracking-widest opacity-60 mb-1">{{ s.type.replace('_',' ') }}</span>
+          <span class="block text-[0.65rem] uppercase tracking-widest opacity-60 mb-1">{{ key.replace('_',' ') }}</span>
           {{ s.label }}
         </button>
         {% endfor %}

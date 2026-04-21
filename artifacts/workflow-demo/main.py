@@ -24,15 +24,14 @@ from workflow import ingest, update_status
 ROOT = Path(__file__).parent
 app = FastAPI(title="Property Workflow Demo")
 
-app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
-templates = Jinja2Templates(directory=ROOT / "templates")
+app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
+templates = Jinja2Templates(directory=str(ROOT / "templates"))
 
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "scenarios": SCENARIOS},
+        request, "index.html", {"scenarios": SCENARIOS}
     )
 
 
