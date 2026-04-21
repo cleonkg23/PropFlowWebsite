@@ -68,11 +68,6 @@
             </a>
             <a class="btn btn-outline" href="#contact">Get in touch</a>
           </div>
-
-          <p class="trust-strip">
-            <span class="trust-label">Built for</span>
-            estate agents &middot; letting agents &middot; block &amp; residential property managers &middot; small ops teams
-          </p>
         </div>
 
         <aside class="workflow-card reveal" aria-label="Live workflow snapshot">
@@ -119,7 +114,6 @@
 
           <footer class="wf-foot">
             <span class="wf-stat"><strong>38s</strong><span>inbox &rarr; assigned</span></span>
-            <span class="wf-stat"><strong>5</strong><span>open today</span></span>
             <span class="wf-stat"><strong>0</strong><span>overdue</span></span>
           </footer>
         </aside>
@@ -152,39 +146,57 @@
 
         <div class="grid grid-3 grid-tight">
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Enquiry triage</h3>
-            <p>Capture enquiries from every channel into one queue, categorised and routed.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-1">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Enquiry triage</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-1" hidden><div class="ac-body-inner"><p>Capture enquiries from every channel into one queue, categorised and routed.</p></div></div>
           </article>
 
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Viewing follow-ups</h3>
-            <p>Automatic follow-up tasks after every viewing, with reminders when nothing happens.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-2">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Viewing follow-ups</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-2" hidden><div class="ac-body-inner"><p>Automatic follow-up tasks after every viewing, with reminders when nothing happens.</p></div></div>
           </article>
 
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
-            <h3>Maintenance tracking</h3>
-            <p>Turn a tenant message into a tracked job with owner, status and SLA.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-3">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
+              <span class="ac-name">Maintenance tracking</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-3" hidden><div class="ac-body-inner"><p>Turn a tenant message into a tracked job with owner, status and SLA.</p></div></div>
           </article>
 
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Document chasing</h3>
-            <p>References, ID, deposits and signed agreements &mdash; chased on a schedule until returned.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-4">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Document chasing</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-4" hidden><div class="ac-body-inner"><p>References, ID, deposits and signed agreements &mdash; chased on a schedule until returned.</p></div></div>
           </article>
 
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
-            <h3>Internal handoffs</h3>
-            <p>The next person gets a clean task &mdash; not a forwarded email thread.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-5">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
+              <span class="ac-name">Internal handoffs</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-5" hidden><div class="ac-body-inner"><p>The next person gets a clean task &mdash; not a forwarded email thread.</p></div></div>
           </article>
 
           <article class="automate-card reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
-            <h3>Status &amp; pipeline</h3>
-            <p>One shared view of every job, updated automatically as the work moves.</p>
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-6">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+              <span class="ac-name">Status &amp; pipeline</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-6" hidden><div class="ac-body-inner"><p>One shared view of every job, updated automatically as the work moves.</p></div></div>
           </article>
         </div>
       </div>
@@ -217,9 +229,7 @@
 
         <div class="demo-card reveal">
           <div class="demo-copy">
-            <p class="demo-lead">A simplified working example of what your team would see day-to-day. Open enquiries, ageing jobs, response times &mdash; all in one place.</p>
-
-            <p class="demo-scenarios">Try: <strong>tenant enquiry</strong> &middot; <strong>maintenance</strong> &middot; <strong>viewing follow-up</strong> &middot; <strong>landlord admin</strong>.</p>
+            <p class="demo-lead">What your team sees, every morning.</p>
 
             <!-- TODO: replace href with your hosted demo URL; defaults to Get in touch so it never dead-ends -->
             <a class="btn btn-primary" href="#contact">
@@ -297,33 +307,45 @@
           <h2 class="h-supporting">One bottleneck, fixed well. Then we decide what&rsquo;s next.</h2>
         </div>
 
-        <ol class="process-strip reveal">
-          <li>
-            <span class="ps-num">01</span>
-            <h3>Identify</h3>
-            <p>A short call to find where admin hurts most.</p>
-          </li>
-          <li>
-            <span class="ps-num">02</span>
-            <h3>Map</h3>
-            <p>Document how the work actually moves today.</p>
-          </li>
-          <li>
-            <span class="ps-num">03</span>
-            <h3>Build</h3>
-            <p>The smallest workflow that solves the problem.</p>
-          </li>
-          <li>
-            <span class="ps-num">04</span>
-            <h3>Test</h3>
-            <p>Run it on real enquiries and real jobs.</p>
-          </li>
-          <li>
-            <span class="ps-num">05</span>
-            <h3>Hand over</h3>
-            <p>Tweaks, short docs, and your team takes it on.</p>
-          </li>
-        </ol>
+        <div class="process-wrap reveal is-open">
+          <ol class="process-strip">
+            <li><button class="ps-step" type="button" aria-expanded="true" aria-controls="ps-detail" data-step="1">
+              <span class="ps-num">01</span>
+              <span class="ps-name">Identify</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="2">
+              <span class="ps-num">02</span>
+              <span class="ps-name">Map</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="3">
+              <span class="ps-num">03</span>
+              <span class="ps-name">Build</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="4">
+              <span class="ps-num">04</span>
+              <span class="ps-name">Test</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="5">
+              <span class="ps-num">05</span>
+              <span class="ps-name">Hand over</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+          </ol>
+
+          <div class="ps-detail-panel" id="ps-detail" role="region" aria-live="polite">
+            <div class="ps-detail-inner">
+              <p data-detail="1">A short call to find where admin hurts most.</p>
+              <p data-detail="2" hidden>Document how the work actually moves today.</p>
+              <p data-detail="3" hidden>The smallest workflow that solves the problem.</p>
+              <p data-detail="4" hidden>Run it on real enquiries and real jobs.</p>
+              <p data-detail="5" hidden>Tweaks, short docs, and your team takes it on.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

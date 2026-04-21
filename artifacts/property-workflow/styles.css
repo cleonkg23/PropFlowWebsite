@@ -589,6 +589,28 @@ ul, ol { margin: 0; padding: 0; }
   font-size: 0.78rem;
   color: var(--muted);
   line-height: 1.35;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Always show detail on the active step */
+.wf-step.is-active .wf-detail {
+  opacity: 1;
+  transform: none;
+  height: auto;
+}
+
+/* On devices that support hover, reveal detail on hover/focus */
+@media (hover: hover) {
+  .wf-step:hover .wf-detail,
+  .wf-step:focus-within .wf-detail {
+    opacity: 1;
+    transform: none;
+    height: auto;
+  }
 }
 
 /* ---------- Unified chip system ---------- */
@@ -638,7 +660,7 @@ ul, ol { margin: 0; padding: 0; }
 /* ---------- Workflow card footer: product metrics ---------- */
 .wf-foot {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   align-items: center;
   padding: 0;
   background: var(--bg-deep);
@@ -1383,25 +1405,100 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 /* ---------- Tighter card grid ---------- */
-.grid-tight { gap: 1rem; }
+.grid-tight { gap: 0.85rem; }
+
+/* override default automate-card flex/padding now that the card is a button + body */
 .grid-tight .automate-card {
-  padding: 1.15rem 1.2rem 1.25rem;
-  gap: 0.35rem;
+  padding: 0;
+  display: block;
+  gap: 0;
+  overflow: hidden;
 }
-.grid-tight .automate-card h3 {
-  font-size: 0.98rem;
-  margin-bottom: 0.15rem;
+.grid-tight .automate-card:hover {
+  transform: none;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
 }
-.grid-tight .automate-card p {
-  font-size: 0.9rem;
-  line-height: 1.5;
+
+/* the toggle button takes the full card */
+.ac-title { margin: 0; }
+.ac-toggle {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 1rem 1.1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  transition: background 0.18s ease;
 }
-.grid-tight .automate-icon {
+.ac-toggle:hover { background: rgba(28,42,37,0.025); }
+.ac-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.grid-tight .automate-card .automate-icon {
   width: 30px;
   height: 30px;
-  margin-bottom: 0.3rem;
+  margin: 0;
 }
-.grid-tight .automate-icon svg { width: 16px; height: 16px; }
+.grid-tight .automate-card .automate-icon svg { width: 16px; height: 16px; }
+
+.ac-name {
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.ac-plus {
+  display: inline-grid;
+  place-items: center;
+  width: 16px; height: 16px;
+  color: var(--muted);
+  transition: transform 0.16s ease, color 0.16s ease;
+}
+.ac-plus svg { width: 12px; height: 12px; }
+.ac-toggle[aria-expanded="true"] .ac-plus {
+  transform: rotate(45deg);
+  color: var(--accent-strong);
+}
+
+/* body is hidden via [hidden] when collapsed (semantic + visual).
+   When opened, JS removes [hidden] and adds .is-open to the card. */
+.ac-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: opacity 0.18s ease;
+}
+.ac-body[hidden] { display: none; }
+.ac-body-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.ac-body-inner p {
+  margin: 0;
+  padding: 0 1.1rem 1.05rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+/* visually mark active card with accent border */
+.automate-card.is-open {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-1);
+}
 
 /* ---------- Proof strip ---------- */
 .proof-strip-wrap {
@@ -1479,11 +1576,13 @@ ul, ol { margin: 0; padding: 0; }
   .demo-card { grid-template-columns: 1fr; }
 }
 
-/* ---------- Process strip (replaces step cards) ---------- */
+/* ---------- Process strip (button accordion with shared panel) ---------- */
+.process-wrap { margin-top: 0.5rem; }
+
 .process-strip {
   list-style: none;
   margin: 0;
-  padding: 1.5rem 0 0;
+  padding: 1.25rem 0 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
@@ -1491,69 +1590,133 @@ ul, ol { margin: 0; padding: 0; }
   counter-reset: ps;
 }
 
-.process-strip li {
+.process-strip > li {
   position: relative;
-  padding: 1.4rem 1.1rem 0.4rem;
   border-right: 1px solid var(--rule);
+  display: flex;
 }
-.process-strip li:last-child { border-right: none; }
+.process-strip > li:last-child { border-right: none; }
 
 /* small dot at the top of each step on the rule */
-.process-strip li::before {
+.process-strip > li::before {
   content: "";
   position: absolute;
-  top: -4px;
+  top: -1.25rem;
   left: 1.1rem;
+  margin-top: -3px;
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--bg-deep);
   border: 1px solid var(--rule-strong);
+  pointer-events: none;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
-.process-strip li:first-child::before { background: var(--accent); border-color: var(--accent); }
+.process-strip > li:has(.ps-step[aria-expanded="true"])::before,
+.process-strip > li:first-child::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
 
-.process-strip .ps-num {
-  display: block;
+.ps-step {
+  appearance: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 1.1rem 1.1rem 1.1rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ink);
+  border-radius: 0;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.ps-step:hover { background: rgba(28,42,37,0.025); }
+.ps-step:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.ps-num {
   font-family: var(--sans);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   color: var(--muted);
-  margin-bottom: 0.85rem;
   font-feature-settings: "tnum" 1;
 }
 
-.process-strip h3 {
+.ps-name {
   font-family: var(--serif);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: -0.01em;
-  margin-bottom: 0.4rem;
   color: var(--ink);
+  line-height: 1.2;
 }
 
-.process-strip p {
-  font-size: 0.88rem;
+.ps-chev {
+  display: inline-grid;
+  place-items: center;
+  width: 14px; height: 14px;
+  color: var(--muted);
+  transition: transform 0.16s ease, color 0.16s ease;
+}
+.ps-chev svg { width: 12px; height: 12px; }
+.ps-step[aria-expanded="true"] .ps-chev {
+  transform: rotate(180deg);
+  color: var(--accent-strong);
+}
+.ps-step[aria-expanded="true"] .ps-num,
+.ps-step[aria-expanded="true"] .ps-name { color: var(--ink); }
+
+/* Shared detail panel */
+.ps-detail-panel {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: rgba(28,42,37,0.025);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.22s ease, opacity 0.18s ease,
+              padding 0.22s ease, border-color 0.22s ease;
+  padding: 0 1.1rem;
+  border-color: transparent;
+}
+.process-wrap.is-open .ps-detail-panel {
+  max-height: 200px;
+  opacity: 1;
+  padding: 1rem 1.1rem;
+  border-color: var(--rule);
+}
+.ps-detail-inner p {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
   color: var(--ink-soft);
   line-height: 1.5;
-  margin: 0;
+  max-width: 60ch;
 }
 
 @media (max-width: 880px) {
-  .process-strip {
-    grid-template-columns: 1fr 1fr;
-  }
-  .process-strip li {
+  .process-strip { grid-template-columns: 1fr 1fr; }
+  .process-strip > li {
     border-right: 1px solid var(--rule);
     border-bottom: 1px solid var(--rule);
-    padding-bottom: 1.2rem;
   }
-  .process-strip li:nth-child(2n) { border-right: none; }
+  .process-strip > li:nth-child(2n) { border-right: none; }
+  .process-strip > li:nth-last-child(-n+2) { border-bottom: none; }
 }
 
 @media (max-width: 520px) {
   .process-strip { grid-template-columns: 1fr; }
-  .process-strip li { border-right: none; }
+  .process-strip > li { border-right: none; border-bottom: 1px solid var(--rule); }
+  .process-strip > li:last-child { border-bottom: none; }
 }
 
 /* ---------- Reveal animation ---------- */
