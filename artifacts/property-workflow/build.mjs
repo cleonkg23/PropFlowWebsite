@@ -24,5 +24,11 @@ for (const file of FILES) {
   }
 }
 
+const ASSETS_SRC = path.join(__dirname, "assets");
+if (fs.existsSync(ASSETS_SRC)) {
+  fs.cpSync(ASSETS_SRC, path.join(OUT, "assets"), { recursive: true });
+  console.log("copied assets/");
+}
+
 console.log(`\nStatic site built to ${OUT}`);
 console.log("Upload these files to your GitHub repo for GitHub Pages.");

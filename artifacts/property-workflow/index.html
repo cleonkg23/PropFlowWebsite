@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Workflow automation for small UK estate agents, letting agents and property managers. Reduce admin, improve follow-ups, and gain visibility over your team's work." />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#1c2a25" />
 
   <title>Property Workflow Automation | Less admin, faster follow-ups for UK property teams</title>
 
@@ -12,7 +12,10 @@
   <meta property="og:title" content="Workflow automation for small UK property teams" />
   <meta property="og:description" content="I help small estate agents and property managers reduce admin, improve follow-ups, and gain visibility by automating their workflows." />
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230f172a'/%3E%3Cpath d='M9 22V10l7 5 7-5v12' stroke='%2329c3a2' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c2a25'/%3E%3Crect x='10' y='10' width='12' height='12' fill='%232f6b53' transform='rotate(45 16 16)'/%3E%3C/svg%3E" />
 
   <link rel="stylesheet" href="./styles.css" />
 </head>
@@ -22,12 +25,10 @@
   <header class="site-header" id="site-header">
     <div class="container header-inner">
       <a class="brand" href="#top" aria-label="Home">
-        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
-          <rect width="32" height="32" rx="6" fill="currentColor" />
-          <path d="M9 22V10l7 5 7-5v12" stroke="#29c3a2" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span class="brand-name">Property Workflow Co.</span>
-        <!-- TODO: replace brand name above -->
+        <span class="brand-mark" aria-hidden="true"></span>
+        <!-- TODO: replace brand name -->
+        <span>Property Workflow Co.</span>
+        <span class="brand-suffix">UK</span>
       </a>
 
       <nav class="primary-nav" id="primary-nav" aria-label="Primary">
@@ -49,45 +50,70 @@
 
     <!-- HERO -->
     <section class="hero" id="top">
-      <div class="container">
-        <p class="eyebrow">For UK estate agents, letting agents &amp; property managers</p>
-        <h1>I automate the admin that slows down small property teams.</h1>
-        <p class="lede">Less manual chasing. Faster follow-ups. Clearer visibility over what needs action — without changing the tools your team already uses.</p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#demo">View demo</a>
-          <a class="btn btn-ghost" href="#contact">Get in touch</a>
+      <div class="container hero-grid">
+        <div class="reveal">
+          <p class="hero-eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            For UK estate agents, letting agents &amp; property managers
+          </p>
+
+          <h1>Quietly automating the <em>admin</em> behind small property teams.</h1>
+
+          <p class="lede">Less manual chasing. Faster follow-ups. A clear view of what needs action &mdash; without changing the tools your team already uses.</p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#demo">
+              View the demo
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="#contact">Get in touch</a>
+          </div>
+
+          <ul class="hero-meta">
+            <li>Independent operator, UK-based</li>
+            <li>Built for property teams of 1&ndash;50 people</li>
+            <li>Works alongside your inbox, spreadsheets &amp; CRM</li>
+          </ul>
         </div>
-        <ul class="hero-meta">
-          <li>Independent operator, UK-based</li>
-          <li>Built for teams of 1&ndash;50</li>
-          <li>Works alongside your inbox, sheets &amp; CRM</li>
-        </ul>
+
+        <div class="hero-visual reveal">
+          <img class="hero-image" src="./assets/hero-desk.png" alt="A desk with property notes, a leather notebook, brass keys and a fountain pen" loading="eager" />
+          <div class="hero-quote" aria-hidden="false">
+            Built for the way small property businesses actually work &mdash; not how software companies think they should.
+            <span class="hero-quote-attr">The brief</span>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- PROBLEM -->
-    <section class="section" id="problem">
+    <section class="section section-alt" id="problem">
       <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">The problem</p>
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 01 &mdash; The problem</span>
           <h2>You&rsquo;re running the business out of inboxes, spreadsheets and memory.</h2>
-          <p class="section-lead">Most small property teams aren&rsquo;t short on effort. They&rsquo;re short on visibility. The same patterns show up again and again.</p>
-        </header>
+        </div>
+
+        <p class="section-lead reveal" style="margin: -1.5rem 0 2.5rem; max-width: 64ch;">Most small property teams aren&rsquo;t short on effort. They&rsquo;re short on visibility. The same patterns turn up again and again.</p>
 
         <div class="grid grid-4">
-          <article class="card">
+          <article class="problem-card reveal">
+            <span class="num">i.</span>
             <h3>Enquiries handled inconsistently</h3>
-            <p>New leads land in shared inboxes, WhatsApp threads and a personal phone. Some get a reply in an hour. Some get one in three days.</p>
+            <p>New leads land in shared inboxes, on WhatsApp, and on a personal phone. Some get answered in an hour. Some take three days.</p>
           </article>
-          <article class="card">
+          <article class="problem-card reveal">
+            <span class="num">ii.</span>
             <h3>Maintenance buried in email</h3>
-            <p>A tenant reports a leak. It&rsquo;s acknowledged, then drifts down the inbox. Nobody&rsquo;s sure who owns it until the tenant chases again.</p>
+            <p>A tenant reports a leak. It&rsquo;s acknowledged, then drifts down the inbox. Nobody&rsquo;s sure who owns it until they chase again.</p>
           </article>
-          <article class="card">
+          <article class="problem-card reveal">
+            <span class="num">iii.</span>
             <h3>Follow-ups quietly missed</h3>
             <p>Viewings happen, then nothing. Landlord requests get a half answer and no diary entry. Pipeline value leaks out the side of the business.</p>
           </article>
-          <article class="card">
+          <article class="problem-card reveal">
+            <span class="num">iv.</span>
             <h3>One person remembers everything</h3>
             <p>If they&rsquo;re off, things stop. There&rsquo;s no shared view of what&rsquo;s open, what&rsquo;s waiting, and what&rsquo;s overdue across the team.</p>
           </article>
@@ -96,48 +122,66 @@
     </section>
 
     <!-- WHAT I AUTOMATE -->
-    <section class="section section-alt" id="automate">
+    <section class="section" id="automate">
       <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">What I automate</p>
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 02 &mdash; What I automate</span>
           <h2>Practical workflows, built around how property teams actually work.</h2>
-          <p class="section-lead">I don&rsquo;t replace your tools. I connect them, and remove the manual steps in between.</p>
-        </header>
+        </div>
+
+        <p class="section-lead reveal" style="margin: -1.5rem 0 2.5rem; max-width: 64ch;">I don&rsquo;t replace your tools. I connect them &mdash; and remove the manual steps in between.</p>
 
         <div class="grid grid-3">
-          <article class="card-line">
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <h3>New enquiry triage</h3>
             <p>Capture enquiries from email, web forms and portals into one place. Categorise by intent &mdash; tenant, landlord, viewing, maintenance &mdash; and route to the right person.</p>
           </article>
-          <article class="card-line">
-            <h3>Viewing follow-up workflows</h3>
-            <p>Automatically create follow-up tasks after every viewing, with reminders if no response within your chosen window.</p>
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <h3>Viewing follow-ups</h3>
+            <p>Automatically create follow-up tasks after every viewing, with reminders if there&rsquo;s no response within your chosen window.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
             <h3>Maintenance request logging</h3>
             <p>Turn a tenant email or message into a tracked job with owner, status and SLA. Keep tenants updated without anyone retyping the same reply.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 21V9l8-6 8 6v12" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <h3>Landlord admin requests</h3>
             <p>Capture statement requests, certificate questions and instructions in one queue, with clear ownership and a paper trail.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <h3>Chasing missing information</h3>
-            <p>Reference forms, ID, deposit details, signed agreements &mdash; chased automatically on a schedule until they&rsquo;re returned.</p>
+            <p>References, ID, deposit details, signed agreements &mdash; chased automatically on a schedule until they&rsquo;re returned.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
             <h3>Internal handoffs</h3>
             <p>When a deal moves stage, the next person gets a clean task with everything they need &mdash; instead of a forwarded email thread.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
             <h3>Status &amp; pipeline tracking</h3>
-            <p>A simple shared view of where every enquiry, viewing, application and maintenance job is &mdash; updated automatically as work happens.</p>
+            <p>One shared view of every enquiry, viewing, application and maintenance job &mdash; updated automatically as work happens.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h7M7 17h5" stroke-linecap="round"/></svg></span>
             <h3>Drafted email responses</h3>
             <p>Suggested replies for common situations &mdash; viewing confirmations, maintenance acknowledgements, document chasers &mdash; ready to review and send.</p>
           </article>
-          <article class="card-line">
+
+          <article class="automate-card reveal">
+            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 7h7v7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <h3>Lightweight reporting</h3>
             <p>Optional dashboards on top of the workflows: response times, open jobs by branch, pipeline value, what&rsquo;s overdue.</p>
           </article>
@@ -146,12 +190,15 @@
     </section>
 
     <!-- DEMO -->
-    <section class="section" id="demo">
+    <section class="section section-alt" id="demo">
       <div class="container">
-        <div class="demo-card">
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 03 &mdash; The demo</span>
+          <h2>See a property workflow run end-to-end.</h2>
+        </div>
+
+        <div class="demo-card reveal">
           <div class="demo-copy">
-            <p class="eyebrow">Demo</p>
-            <h2>See a property workflow run end-to-end.</h2>
             <p>The clickable demo walks through a simplified version of the kind of system I build. It&rsquo;s a working example, not a polished product &mdash; the point is to show how the moving parts fit together.</p>
 
             <ol class="demo-steps">
@@ -162,35 +209,68 @@
               <li><strong>Dashboard updates.</strong> The shared view reflects the new state automatically.</li>
             </ol>
 
-            <p class="demo-scenarios">Scenarios you can try: tenant enquiry &middot; maintenance request &middot; viewing follow-up &middot; landlord admin request.</p>
+            <p class="demo-scenarios">Scenarios you can try: <strong>tenant enquiry</strong>, <strong>maintenance request</strong>, <strong>viewing follow-up</strong>, <strong>landlord admin request</strong>.</p>
 
             <!-- TODO: replace href below with your hosted demo URL -->
-            <a class="btn btn-primary" href="#" target="_blank" rel="noopener">Open demo</a>
+            <a class="btn btn-primary" href="#" target="_blank" rel="noopener">
+              Open the demo
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
           </div>
 
           <div class="demo-visual" aria-hidden="true">
             <div class="mock-window">
               <div class="mock-bar">
-                <span></span><span></span><span></span>
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="label">Workflow &mdash; Today</span>
               </div>
+
+              <div class="mock-summary">
+                <div class="mock-stat">
+                  <span class="stat-label">Open</span>
+                  <span class="stat-value">17</span>
+                  <span class="stat-trend">&minus;4 vs. yesterday</span>
+                </div>
+                <div class="mock-stat">
+                  <span class="stat-label">Overdue</span>
+                  <span class="stat-value">2</span>
+                  <span class="stat-trend">Action needed</span>
+                </div>
+                <div class="mock-stat">
+                  <span class="stat-label">Avg. response</span>
+                  <span class="stat-value">38m</span>
+                  <span class="stat-trend">&minus;1h 12m</span>
+                </div>
+              </div>
+
               <div class="mock-body">
                 <div class="mock-row mock-row-head">
-                  <span>Enquiry</span><span>Type</span><span>Status</span>
+                  <span>Item</span><span>Type</span><span>Status</span>
                 </div>
                 <div class="mock-row">
-                  <span>Sarah &mdash; 14 Park Rd</span><span class="tag tag-tenant">Tenant</span><span class="status status-new">New</span>
+                  <div class="mock-cell-name">Sarah J. &mdash; 14 Park Road<small>Enquiry &middot; received 09:42</small></div>
+                  <span class="tag tag-tenant">Tenant</span>
+                  <span class="status status-new">New</span>
                 </div>
                 <div class="mock-row">
-                  <span>Boiler issue &mdash; Flat 3B</span><span class="tag tag-maint">Maintenance</span><span class="status status-progress">In progress</span>
+                  <div class="mock-cell-name">Boiler issue &mdash; Flat 3B<small>Maintenance &middot; SLA 4h</small></div>
+                  <span class="tag tag-maint">Maintenance</span>
+                  <span class="status status-progress">In progress</span>
                 </div>
                 <div class="mock-row">
-                  <span>Viewing &mdash; James W.</span><span class="tag tag-viewing">Viewing</span><span class="status status-followup">Follow-up due</span>
+                  <div class="mock-cell-name">Viewing &mdash; James W.<small>Follow-up due today</small></div>
+                  <span class="tag tag-viewing">Viewing</span>
+                  <span class="status status-followup">Follow-up due</span>
                 </div>
                 <div class="mock-row">
-                  <span>Landlord statement Q4</span><span class="tag tag-landlord">Landlord</span><span class="status status-done">Completed</span>
+                  <div class="mock-cell-name">Landlord statement Q4<small>Sent &middot; 15:18</small></div>
+                  <span class="tag tag-landlord">Landlord</span>
+                  <span class="status status-done">Completed</span>
                 </div>
                 <div class="mock-row">
-                  <span>Reference chase &mdash; M. Patel</span><span class="tag tag-tenant">Tenant</span><span class="status status-progress">In progress</span>
+                  <div class="mock-cell-name">Reference chase &mdash; M. Patel<small>Auto-chase &middot; reminder 2 of 3</small></div>
+                  <span class="tag tag-tenant">Tenant</span>
+                  <span class="status status-progress">In progress</span>
                 </div>
               </div>
             </div>
@@ -200,69 +280,82 @@
     </section>
 
     <!-- EXAMPLE / PROTOTYPE -->
-    <section class="section section-alt" id="example">
+    <section class="section" id="example">
       <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">Worked example</p>
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 04 &mdash; Worked example</span>
           <h2>A real workflow system I built &mdash; and what it means for property businesses.</h2>
-          <p class="section-lead">This isn&rsquo;t a polished case study with invented numbers. It&rsquo;s an honest description of a prototype I built to replace messy manual tracking, and how the same approach translates to property.</p>
-        </header>
-
-        <div class="grid grid-2 example-grid">
-          <article class="card example-card">
-            <h3>The problem</h3>
-            <p>Work was being tracked across email, chat and a couple of spreadsheets. Items got picked up twice, dropped, or quietly forgotten. Nobody could answer &ldquo;what&rsquo;s actually open right now?&rdquo; without asking three people.</p>
-          </article>
-          <article class="card example-card">
-            <h3>The approach</h3>
-            <p>Map the real workflow as it&rsquo;s used &mdash; not as it&rsquo;s described. Identify where information is being copied by hand. Replace those handoffs with a single source of truth and lightweight automation around it.</p>
-          </article>
-          <article class="card example-card">
-            <h3>What the system did</h3>
-            <p>Captured incoming work into one queue. Assigned ownership automatically. Generated reminders for ageing items. Surfaced status on a single shared view, so anyone could see what was open, blocked, or overdue.</p>
-          </article>
-          <article class="card example-card">
-            <h3>Why this matters for property</h3>
-            <p>The same pattern fits estate agencies and property management almost directly: enquiries, viewings, maintenance jobs, landlord requests, document chasing. Centralised visibility, clearer next actions, fewer dropped balls, more consistent follow-up.</p>
-          </article>
         </div>
 
-        <p class="example-note">Treat this as proof of practical capability, not a packaged product. Each engagement is built around your actual workflow.</p>
+        <p class="section-lead reveal" style="margin: -1.5rem 0 3rem; max-width: 64ch;">This isn&rsquo;t a polished case study with invented numbers. It&rsquo;s an honest description of a prototype I built to replace messy manual tracking, and how the same approach translates to property.</p>
+
+        <div class="example-grid-outer">
+          <div class="example-image-wrap reveal">
+            <img class="example-image" src="./assets/example-house.png" alt="A muted Georgian terraced house facade in soft sage tones" loading="lazy" />
+            <span class="example-image-cap">Same operating principles. Different front door.</span>
+          </div>
+
+          <div class="example-blocks">
+            <article class="example-block reveal">
+              <span class="label">The problem</span>
+              <h3>Work scattered across email, chat and spreadsheets.</h3>
+              <p>Items got picked up twice, dropped, or quietly forgotten. Nobody could answer &ldquo;what&rsquo;s actually open right now?&rdquo; without asking three people.</p>
+            </article>
+            <article class="example-block reveal">
+              <span class="label">The approach</span>
+              <h3>Map the workflow as it&rsquo;s used &mdash; not as it&rsquo;s described.</h3>
+              <p>Find where information is being copied by hand. Replace those handoffs with a single source of truth and lightweight automation around it.</p>
+            </article>
+            <article class="example-block reveal">
+              <span class="label">What the system did</span>
+              <h3>One queue, automatic ownership, ageing reminders, shared visibility.</h3>
+              <p>Captured incoming work into one queue. Assigned ownership automatically. Generated reminders for ageing items. Surfaced status on a shared view, so anyone could see what was open, blocked, or overdue.</p>
+            </article>
+            <article class="example-block reveal">
+              <span class="label">Why this matters for property</span>
+              <h3>The same pattern fits estate agencies and property management almost directly.</h3>
+              <p>Enquiries, viewings, maintenance jobs, landlord requests, document chasing &mdash; centralised visibility, clearer next actions, fewer dropped balls, more consistent follow-up.</p>
+            </article>
+          </div>
+        </div>
+
+        <p class="example-note reveal">Treat this as proof of practical capability, not a packaged product. Each engagement is built around your actual workflow.</p>
       </div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section class="section" id="how">
+    <section class="section section-alt" id="how">
       <div class="container">
-        <header class="section-head">
-          <p class="eyebrow">How it works</p>
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 05 &mdash; How it works</span>
           <h2>A simple, low-risk way to start.</h2>
-          <p class="section-lead">No long discovery phase. No bloated delivery model. We pick one bottleneck, fix it well, then decide what&rsquo;s next.</p>
-        </header>
+        </div>
+
+        <p class="section-lead reveal" style="margin: -1.5rem 0 2.5rem; max-width: 64ch;">No long discovery phase. No bloated delivery model. We pick one bottleneck, fix it well, then decide what&rsquo;s next.</p>
 
         <ol class="steps">
-          <li>
-            <span class="step-num">01</span>
+          <li class="reveal">
+            <span class="step-num">i.</span>
             <h3>Identify the bottleneck</h3>
             <p>A short conversation about where admin is hurting the most &mdash; missed follow-ups, maintenance backlog, enquiry response time.</p>
           </li>
-          <li>
-            <span class="step-num">02</span>
+          <li class="reveal">
+            <span class="step-num">ii.</span>
             <h3>Map the workflow</h3>
             <p>I document how the work actually moves today: who touches what, where it gets copied, where it stalls.</p>
           </li>
-          <li>
-            <span class="step-num">03</span>
+          <li class="reveal">
+            <span class="step-num">iii.</span>
             <h3>Build a lightweight automation</h3>
-            <p>I build the smallest version of the workflow that solves the problem. No oversized platform. No long build cycle.</p>
+            <p>The smallest version of the workflow that solves the problem. No oversized platform. No long build cycle.</p>
           </li>
-          <li>
-            <span class="step-num">04</span>
+          <li class="reveal">
+            <span class="step-num">iv.</span>
             <h3>Test with real examples</h3>
             <p>We run it on real enquiries, real maintenance jobs, real follow-ups &mdash; and adjust based on what you see.</p>
           </li>
-          <li>
-            <span class="step-num">05</span>
+          <li class="reveal">
+            <span class="step-num">v.</span>
             <h3>Refine and hand over</h3>
             <p>Final tweaks, simple documentation, and a clear handover so your team can run it without me.</p>
           </li>
@@ -273,19 +366,22 @@
     <!-- CONTACT -->
     <section class="section section-contact" id="contact">
       <div class="container">
-        <div class="contact-card">
+        <div class="contact-card reveal">
           <p class="eyebrow">Get in touch</p>
           <h2>Tell me where the admin hurts most. I&rsquo;ll tell you honestly if I can help.</h2>
-          <p>No pitch deck. No long sales process. A short, specific conversation about your workflow.</p>
+          <p>No pitch deck. No long sales process. A short, specific conversation about your workflow &mdash; and whether automation is the right answer.</p>
 
           <div class="contact-actions">
             <!-- TODO: replace email below -->
-            <a class="btn btn-primary" href="mailto:your@email.com">Email me</a>
+            <a class="btn btn-primary" href="mailto:your@email.com">
+              Email me
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
 
             <!-- TODO: replace LinkedIn URL below -->
             <a class="btn btn-ghost" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">Connect on LinkedIn</a>
 
-            <!-- TODO: optional &mdash; replace href with your booking link, or remove this button -->
+            <!-- TODO: optional &mdash; replace with your booking link, or remove this button -->
             <a class="btn btn-link" href="#">Book a 20-minute call &rarr;</a>
           </div>
         </div>
@@ -297,7 +393,7 @@
     <div class="container footer-inner">
       <div>
         <p class="footer-brand">Property Workflow Co.</p>
-        <p class="footer-tag">Workflow automation for small UK property businesses.</p>
+        <p class="footer-tag">Workflow automation for small UK property businesses. Less admin. Faster follow-ups. Clearer visibility.</p>
       </div>
       <div class="footer-links">
         <!-- TODO: replace email -->
@@ -305,7 +401,7 @@
         <!-- TODO: replace LinkedIn URL -->
         <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">LinkedIn</a>
       </div>
-      <p class="footer-copy">&copy; <span id="year"></span> Property Workflow Co. All rights reserved.</p>
+      <p class="footer-copy">&copy; <span id="year"></span> Property Workflow Co. &middot; Made in the UK.</p>
     </div>
   </footer>
 

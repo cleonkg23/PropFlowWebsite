@@ -1,22 +1,19 @@
 /* =========================================================
-   Property Workflow Co. — Marketing site script
-   Lightweight, vanilla JS. Works without it too.
+   Property Workflow Co. — site script
+   Lightweight vanilla JS. Site works without it.
    ========================================================= */
 (function () {
   "use strict";
 
-  // --- Mobile nav toggle ---
+  // --- Mobile nav ---
   var toggle = document.getElementById("menu-toggle");
   var nav = document.getElementById("primary-nav");
-
   if (toggle && nav) {
     toggle.addEventListener("click", function () {
       var isOpen = nav.classList.toggle("open");
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
       toggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
     });
-
-    // Close mobile nav when a link is clicked
     nav.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () {
         if (nav.classList.contains("open")) {
@@ -28,21 +25,17 @@
     });
   }
 
-  // --- Sticky header background on scroll ---
+  // --- Sticky header background ---
   var header = document.getElementById("site-header");
   if (header) {
     var onScroll = function () {
-      if (window.scrollY > 8) {
-        header.classList.add("scrolled");
-      } else {
-        header.classList.remove("scrolled");
-      }
+      header.classList.toggle("scrolled", window.scrollY > 8);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  // --- Active nav state via IntersectionObserver ---
+  // --- Active nav state ---
   if ("IntersectionObserver" in window) {
     var navLinks = document.querySelectorAll(".primary-nav a[href^='#']");
     var sectionMap = {};
@@ -52,7 +45,7 @@
       if (section) sectionMap[id] = link;
     });
 
-    var observer = new IntersectionObserver(
+    var navObs = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
           var link = sectionMap[entry.target.id];
@@ -67,14 +60,35 @@
     );
 
     Object.keys(sectionMap).forEach(function (id) {
-      var section = document.getElementById(id);
-      if (section) observer.observe(section);
+      var s = document.getElementById(id);
+      if (s) navObs.observe(s);
+    });
+
+    // --- Scroll reveal with light stagger ---
+    var reveals = document.querySelectorAll(".reveal");
+    var revealObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry, idx) {
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          // light stagger using parent index
+          var parent = el.parentElement;
+          var siblings = parent ? Array.prototype.indexOf.call(parent.children, el) : 0;
+          var delay = Math.min(siblings, 6) * 70;
+          setTimeout(function () { el.classList.add("is-visible"); }, delay);
+          revealObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    reveals.forEach(function (el) { revealObs.observe(el); });
+  } else {
+    // Fallback: just show everything
+    document.querySelectorAll(".reveal").forEach(function (el) {
+      el.classList.add("is-visible");
     });
   }
 
   // --- Footer year ---
   var year = document.getElementById("year");
-  if (year) {
-    year.textContent = new Date().getFullYear();
-  }
+  if (year) year.textContent = new Date().getFullYear();
 })();
