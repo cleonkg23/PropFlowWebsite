@@ -1,0 +1,246 @@
+You are an expert senior full-stack engineer building a lightweight, production-minded MVP for a workflow automation service.
+
+You must prioritise:
+
+* simplicity
+* clarity
+* low cost (near £0)
+* fast build time
+* real-world usability
+
+You must NOT:
+
+* overengineer
+* build unnecessary abstractions
+* build full SaaS features (no auth, no billing, no multi-tenancy)
+* introduce paid tools or dependencies
+
+Persist key decisions, architecture, and reusable logic in a file called `replit.md`. Continuously update it so future prompts can build on this system without rethinking structure.
+
+---
+
+## PROJECT GOAL
+
+Build a browser-based workflow automation demo + engine for small property businesses (estate agents / property managers).
+
+This is NOT a full product.
+
+It is:
+
+* a clickable demo
+* a lightweight workflow engine
+* a base system that can later connect to real client tools
+
+---
+
+## CORE FUNCTIONALITY
+
+The system must demonstrate this flow:
+
+1. New input arrives (enquiry, maintenance request, etc.)
+2. System classifies it
+3. System determines:
+
+   * category
+   * urgency
+   * owner
+   * next action
+4. System:
+
+   * creates a task
+   * generates a draft response
+   * updates a workflow status board
+
+---
+
+## REQUIRED SCENARIOS
+
+Implement 4 demo scenarios:
+
+1. Tenant enquiry
+2. Maintenance request
+3. Viewing follow-up
+4. Landlord admin request
+
+Each should be triggerable via UI buttons.
+
+---
+
+## TECH STACK (STRICT)
+
+Backend:
+
+* Python (FastAPI preferred)
+
+Frontend:
+
+* Minimal HTML + Tailwind OR lightweight JS (no heavy frameworks required)
+
+Storage:
+
+* SQLite OR JSON file (keep extremely simple)
+
+No external paid services.
+
+---
+
+## ARCHITECTURE REQUIREMENTS
+
+You must structure the system into clear layers:
+
+### 1. Input Layer
+
+* Endpoint: `/ingest`
+* Accepts new message data
+* Also support mock/demo triggers
+
+### 2. Processing Layer
+
+* Function: classify_input()
+* Function: determine_workflow()
+* Can use rules or mocked AI responses
+
+### 3. Workflow Engine
+
+* Central logic that:
+
+  * creates tasks
+  * assigns owners
+  * sets deadlines
+  * determines status transitions
+
+### 4. Action Layer
+
+* generate_draft_response()
+* create_task()
+* update_status()
+
+### 5. Storage Layer
+
+* store:
+
+  * items
+  * tasks
+  * statuses
+
+### 6. UI Layer
+
+Must include:
+
+* Inbox panel (incoming items)
+* Detail panel (classification + decisions)
+* Action panel (task + draft)
+* Workflow board (status columns)
+
+---
+
+## UI BEHAVIOUR
+
+User must be able to:
+
+* Click a scenario
+* See an item appear in inbox
+* See classification occur
+* See task created
+* See draft response generated
+* See item move into workflow board
+
+All within ~30–60 seconds.
+
+---
+
+## DATA MODEL (KEEP SIMPLE)
+
+Item:
+
+* id
+* type
+* message
+* category
+* urgency
+* owner
+* status
+* created_at
+
+Task:
+
+* id
+* item_id
+* description
+* assigned_to
+* due_date
+* status
+
+---
+
+## IMPORTANT DESIGN RULES
+
+* Everything must be understandable in under 60 seconds
+* No authentication
+* No complex state management
+* No unnecessary abstraction layers
+* Code must be clean but minimal
+
+---
+
+## FUTURE-PROOFING (IMPORTANT)
+
+Even though this is a demo, design with simple extensibility:
+
+* Input connectors can later support:
+
+  * Gmail
+  * Forms
+  * Webhooks
+
+* Output connectors can later support:
+
+  * Email sending
+  * Google Sheets
+  * CRM updates
+
+Structure code so connectors can be swapped without rewriting logic.
+
+---
+
+## DELIVERABLES
+
+* Working FastAPI app
+* Simple UI served from backend
+* Demo scenarios fully functional
+* Clear folder structure
+* `replit.md` containing:
+
+  * architecture decisions
+  * workflow logic explanation
+  * how to extend system
+
+---
+
+## EXECUTION STYLE
+
+Build incrementally:
+
+1. Backend structure
+2. Data model
+3. Basic endpoints
+4. Demo scenario logic
+5. UI
+6. Interaction flows
+
+After each major step:
+
+* update `replit.md`
+* explain what was built and why
+
+---
+
+## FINAL GOAL
+
+A user should open the app and immediately understand:
+
+"What this system would do for my business"
+
+---
+
+Start building now.
