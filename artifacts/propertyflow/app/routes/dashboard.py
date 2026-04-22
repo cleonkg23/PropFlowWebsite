@@ -73,30 +73,47 @@ def dashboard(request: Request, user: User = Depends(require_user), db: Session 
     def _ts(dt):
         return dt.replace(tzinfo=timezone.utc) if (dt and dt.tzinfo is None) else dt
 
-    received_today = sum(1 for it in items if _ts(it.created_at) and _ts(it.created_at) >= midnight)
-    classified = sum(1 for it in items if it.ai_mode)
-    assigned = sum(1 for it in items if it.assigned_user_id)
     reply_ready = sum(1 for it in items if it.draft_reply and it.status != ItemStatus.done)
-    tracked = len(columns[ItemStatus.in_progress]) + len(columns[ItemStatus.awaiting_reply])
     active = sum(len(columns[s]) for s in ItemStatus if s != ItemStatus.done)
-    action_needed = sum(1 for it in items if it.status == ItemStatus.new or not it.assigned_user_id)
     done_today = sum(
         1 for it in items
         if it.status == ItemStatus.done and _ts(it.updated_at) and _ts(it.updated_at) >= midnight
     )
     processed_today = sum(1 for it in items if _ts(it.created_at) and _ts(it.created_at) >= midnight)
 
+    # Overdue: open tasks past due
+    overdue_q = db.query(Task).filter(Task.status == TaskStatus.open, Task.due_at < now.replace(tzinfo=None))
+    if user.role is not Role.owner:
+        overdue_q = overdue_q.filter(Task.tenant_id == user.tenant_id)
+    overdue = overdue_q.count()
+
+    # Average response: minutes from create -> update for items that have moved past 'new'
+    response_samples = [
+        (_ts(it.updated_at) - _ts(it.created_at)).total_seconds() / 60.0
+        for it in items
+        if it.status != ItemStatus.new
+        and _ts(it.updated_at) and _ts(it.created_at)
+        and _ts(it.updated_at) > _ts(it.created_at)
+    ]
+    if response_samples:
+        avg_min = sum(response_samples) / len(response_samples)
+        if avg_min < 60:
+            avg_response = f"{int(round(avg_min))}m"
+        else:
+            avg_response = f"{avg_min/60:.1f}h"
+    else:
+        avg_response = "—"
+
     latest = max((_ts(it.updated_at) or _ts(it.created_at) for it in items), default=None)
 
     metrics = {
-        "received_today": received_today,
-        "classified": classified,
-        "assigned": assigned,
+        "open": active,
+        "overdue": overdue,
+        "avg_response": avg_response,
         "reply_ready": reply_ready,
-        "tracked": tracked,
-        "active": active,
-        "action_needed": action_needed,
         "done_today": done_today,
+        "active": active,
+        "action_needed": sum(1 for it in items if it.status == ItemStatus.new or not it.assigned_user_id),
     }
 
     return templates.TemplateResponse(

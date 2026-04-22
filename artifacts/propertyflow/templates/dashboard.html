@@ -1,47 +1,87 @@
 {% extends "base.html" %}
+{% set page = 'dashboard' %}
 {% block title %}Today's operations · PropertyFlow{% endblock %}
 {% block content %}
 
-{# ---- Header ---- #}
-<div class="flex items-start justify-between gap-4 mb-8">
+{% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
+{% set chip_label = {'tenant_enquiry':'Tenant','maintenance':'Maintenance','viewing':'Viewing','landlord':'Landlord'} %}
+{% set status_label = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+
+<div class="page-head between">
   <div>
-    <h1 class="text-2xl font-semibold">Today's operations</h1>
-    <p class="text-sm mt-1.5" style="color: var(--pf-ink-soft);">Everything your team needs to action — automatically organised.</p>
-    <p class="text-xs mt-2" style="color: var(--pf-ink-muted);">
-      Updated {{ updated_label }} · {{ processed_today }} item{{ '' if processed_today == 1 else 's' }} processed today
-    </p>
+    <span class="eyebrow">§ Today &mdash; {{ user.name.split()[0] if user else 'Team' }}</span>
+    <h1>Everything open, in one view.</h1>
+    <p class="deck">Updated {{ updated_label }} &mdash; {{ processed_today }} item{{ '' if processed_today == 1 else 's' }} processed today.</p>
   </div>
-  <div>
+  <div class="row-actions">
     <a href="#add-item" class="btn-primary">+ Add item</a>
   </div>
 </div>
 
-{# ---- Metrics panel ---- #}
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-  <div class="card px-6 py-5">
-    <div class="text-3xl font-semibold tracking-tight">{{ metrics.active }}</div>
-    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Active items</div>
-    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">in the pipeline</div>
+{# ---- Main editorial panel: bar + metrics + items table ---- #}
+<div class="panel" style="margin-bottom: 2.5rem;">
+  <div class="panel-bar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="label">Workflow &mdash; Today</span>
   </div>
-  <div class="card px-6 py-5">
-    <div class="text-3xl font-semibold tracking-tight">{{ metrics.action_needed }}</div>
-    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Action needed</div>
-    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">unassigned or new</div>
+
+  <div class="summary">
+    <div class="metric">
+      <span class="stat-label">Open</span>
+      <span class="stat-value">{{ metrics.open }}</span>
+      <span class="stat-trend">{% if metrics.action_needed %}{{ metrics.action_needed }} need attention{% else %}All assigned{% endif %}</span>
+    </div>
+    <div class="metric">
+      <span class="stat-label">Overdue</span>
+      <span class="stat-value">{{ metrics.overdue }}</span>
+      <span class="stat-trend {{ 'is-warn' if metrics.overdue else '' }}">{% if metrics.overdue %}Action needed{% else %}On track{% endif %}</span>
+    </div>
+    <div class="metric">
+      <span class="stat-label">Avg. response</span>
+      <span class="stat-value">{{ metrics.avg_response }}</span>
+      <span class="stat-trend {{ 'is-good' if metrics.done_today else '' }}">{{ metrics.done_today }} resolved today</span>
+    </div>
   </div>
-  <div class="card px-6 py-5">
-    <div class="text-3xl font-semibold tracking-tight">{{ metrics.reply_ready }}</div>
-    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Replies drafted</div>
-    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">awaiting send</div>
-  </div>
-  <div class="card px-6 py-5">
-    <div class="text-3xl font-semibold tracking-tight">{{ metrics.done_today }}</div>
-    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Resolved today</div>
-    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">closed since midnight</div>
+
+  <div class="items-table">
+    <div class="items-row is-head">
+      <span>Item</span><span>Type</span><span>Status</span><span></span>
+    </div>
+    {% set all_items = (columns['new'] if 'new' in columns else []) + (columns['in_progress'] if 'in_progress' in columns else []) + (columns['awaiting_reply'] if 'awaiting_reply' in columns else []) + (columns['done'] if 'done' in columns else []) %}
+    {# Above won't work because columns is keyed by enum. Use the pre-flattened list passed by route, falling back to iterating statuses. #}
+    {% set rows = [] %}
+    {% for s in statuses %}{% for it in columns[s] %}{% set _ = rows.append(it) %}{% endfor %}{% endfor %}
+    {% if rows %}
+      {% for item in rows[:14] %}
+        <a href="/items/{{ item.id }}" class="items-row">
+          <div class="name">
+            <strong>{{ item.subject }}</strong>
+            <small>
+              {% if item.sender_name %}{{ item.sender_name }} &middot; {% endif %}received {{ item.created_at.strftime('%H:%M') }}
+              {% if item.assigned_user %} &middot; {{ item.assigned_user.name.split()[0] }}{% endif %}
+            </small>
+          </div>
+          <span class="chip-cell">
+            <span class="chip {{ chip_for.get(item.category, 'chip-general') }}">{{ chip_label.get(item.category, item.category.replace('_',' ')|capitalize) }}</span>
+          </span>
+          <span class="status-cell">
+            <span class="status status-{{ item.status.value }}">{{ status_label[item.status.value] }}</span>
+          </span>
+          <span class="arrow">&rarr;</span>
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-row">Nothing in the pipeline yet.</div>
+    {% endif %}
   </div>
 </div>
 
-{# ---- Inbox board (no outer column boxes) ---- #}
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+{# ---- Bottom strip: status across the team ---- #}
+<div class="between" style="margin-bottom: 1.25rem;">
+  <h2 class="h-section">This is what your team sees every morning.</h2>
+  <span class="eyebrow">Status across the team</span>
+</div>
+<div class="board-strip" style="margin-bottom: 2.5rem;">
   {% for status in statuses %}
     {% with items=columns[status] %}
       {% include "_components/board.html" %}
@@ -49,34 +89,55 @@
   {% endfor %}
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div class="card p-6 md:col-span-2">
-    <h2 class="text-sm font-semibold mb-3">My open tasks</h2>
+{# ---- My tasks + Add item ---- #}
+<div class="grid-2" id="add-item">
+  <div class="card">
+    <span class="eyebrow">My open tasks</span>
+    <h3 class="h-card" style="margin-top:0.4rem; margin-bottom:1rem;">Assigned to {{ user.name.split()[0] }}</h3>
     {% if my_tasks %}
-      <ul class="row-divide">
+      <div>
         {% for t in my_tasks %}
-          <li class="py-3 flex items-center justify-between gap-3">
-            <div>
-              <a class="text-sm font-medium hover:underline" href="/items/{{ t.item_id }}" style="color: var(--pf-ink);">{{ t.description }}</a>
-              <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">item #{{ t.item_id }}{% if t.due_at %} · due {{ t.due_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}</div>
+          <div class="rule-top" style="padding: 0.85rem 0;">
+            <div class="between">
+              <div style="min-width:0;">
+                <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ t.description }}</a>
+                <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
+              </div>
+              <span class="chip chip-general">open</span>
             </div>
-            <span class="badge pill-soft-neutral">open</span>
-          </li>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
-      <p class="text-sm" style="color: var(--pf-ink-muted);">No open tasks assigned to you.</p>
+      <p class="deck" style="margin-top:0;">No open tasks assigned to you.</p>
     {% endif %}
   </div>
-  <div class="card p-6" id="add-item">
-    <h2 class="text-sm font-semibold mb-3">Add item</h2>
-    <form method="post" action="/api/items" id="manual-item" class="space-y-2.5 text-sm">
-      <input name="subject" placeholder="Subject" required class="field w-full px-3.5 py-2.5" />
-      <textarea name="body" placeholder="Message body" required rows="4" class="field w-full px-3.5 py-2.5"></textarea>
-      <input name="sender_name" placeholder="From (name)" class="field w-full px-3.5 py-2.5" />
-      <input name="sender_email" type="email" placeholder="From (email)" class="field w-full px-3.5 py-2.5" />
-      <button class="btn-primary w-full justify-center">Run through workflow</button>
+
+  <div class="card">
+    <span class="eyebrow">Add item</span>
+    <h3 class="h-card" style="margin-top:0.4rem; margin-bottom:1rem;">Run a message through the workflow</h3>
+    <form method="post" action="/api/items" id="manual-item" class="stack-md">
+      <div>
+        <label class="label" for="f-subj">Subject</label>
+        <input id="f-subj" name="subject" required class="field" placeholder="Boiler issue — Flat 3B" />
+      </div>
+      <div>
+        <label class="label" for="f-body">Message</label>
+        <textarea id="f-body" name="body" required rows="4" class="field" placeholder="What did the tenant or landlord say?"></textarea>
+      </div>
+      <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="label" for="f-from">From</label>
+          <input id="f-from" name="sender_name" class="field" placeholder="Name" />
+        </div>
+        <div>
+          <label class="label" for="f-email">Email</label>
+          <input id="f-email" name="sender_email" type="email" class="field" placeholder="name@example.com" />
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;">Run through workflow &rarr;</button>
     </form>
   </div>
 </div>
+
 {% endblock %}

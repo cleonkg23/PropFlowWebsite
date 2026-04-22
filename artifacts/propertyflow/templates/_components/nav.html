@@ -1,30 +1,29 @@
-<header style="background: var(--pf-bg); border-bottom: 1px solid var(--pf-border);">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <a href="/" class="font-semibold flex items-center gap-2" style="color: var(--pf-ink);">
-        <span class="inline-block w-2 h-2 rounded-full" style="background: #2f6b53;"></span>
-        PropertyFlow
-      </a>
-      {% if tenant %}
-        <span class="text-xs ml-2" style="color: var(--pf-ink-muted);">/ {{ tenant.name }}</span>
-      {% endif %}
-    </div>
+{% set page = page|default('') %}
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Property Workflow Co.</span>
+      {% if tenant %}<span class="brand-suffix">{{ tenant.name }}</span>{% endif %}
+    </a>
+
     {% if user %}
-      <nav class="flex items-center gap-1 text-sm">
-        <a class="btn-ghost" href="/dashboard">Dashboard</a>
+      <nav class="header-nav" aria-label="Primary">
+        <a href="/dashboard" class="{{ 'is-active' if page == 'dashboard' else '' }}">Today</a>
         {% if user.role.value in ['admin', 'owner'] %}
-          <a class="btn-ghost" href="/admin">Admin</a>
+          <a href="/admin" class="{{ 'is-active' if page == 'admin' else '' }}">Admin</a>
         {% endif %}
         {% if user.role.value == 'owner' %}
-          <a class="btn-ghost" href="/owner">Owner</a>
+          <a href="/owner" class="{{ 'is-active' if page == 'owner' else '' }}">Owner</a>
         {% endif %}
-        <span class="ml-3" style="color: var(--pf-ink-soft);">{{ user.name }}
-          <span class="badge pill-soft-neutral ml-1">{{ user.role.value }}</span>
-        </span>
-        <form method="post" action="/logout" class="inline ml-2">
-          <button class="btn-ghost">Sign out</button>
-        </form>
       </nav>
+      <div class="header-meta">
+        <span><b>{{ user.name }}</b></span>
+        <span class="role-tag">{{ user.role.value }}</span>
+        <form method="post" action="/logout" style="display:inline;">
+          <button class="btn-ghost btn-sm" type="submit">Sign out</button>
+        </form>
+      </div>
     {% endif %}
   </div>
 </header>

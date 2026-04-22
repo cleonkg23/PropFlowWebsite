@@ -1,74 +1,76 @@
 {% extends "base.html" %}
+{% set page = 'owner' %}
 {% block title %}Owner · PropertyFlow{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-semibold mb-1">System owner</h1>
-<p class="text-sm mb-6" style="color: var(--pf-ink-soft);">Cross-tenant overview and AI status.</p>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-  {# ---- AI status ---- #}
-  <div class="card p-6">
-    <h3 class="text-sm font-semibold mb-3">AI</h3>
-    {% if ai_status.ollama == 'up' %}
-      <div class="flex items-center gap-2 mb-2">
-        <span class="dot dot-done"></span>
-        <span class="text-sm font-medium">AI running (remote)</span>
+<div class="page-head">
+  <span class="eyebrow">§ Owner &mdash; cross-tenant view</span>
+  <h1>The whole system, at a glance.</h1>
+  <p class="deck">Tenants, the AI engine, and the full audit trail across every workspace.</p>
+</div>
+
+<div class="grid-2" style="margin-bottom: 1.6rem;">
+  <div class="card">
+    <span class="eyebrow">Tenants</span>
+    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 1rem;">{{ rows|length }} workspaces</h3>
+    <div class="items-row is-head" style="grid-template-columns: 1.4fr 0.6fr 0.6fr 0.6fr; padding: 0.6rem 0; border-bottom: 1px solid var(--rule);">
+      <span>Tenant</span><span>Users</span><span>Items</span><span>Open</span>
+    </div>
+    {% for r in rows %}
+      <div class="items-row" style="grid-template-columns: 1.4fr 0.6fr 0.6fr 0.6fr; padding: 0.85rem 0;">
+        <span style="font-weight:500;">{{ r.tenant.name }}</span>
+        <span class="tnum muted">{{ r.users }}</span>
+        <span class="tnum muted">{{ r.items }}</span>
+        <span class="tnum" style="font-family: var(--serif); font-style: italic; color: var(--ink);">{{ r.open }}</span>
       </div>
-      <p class="text-sm" style="color: var(--pf-ink-soft);">Model: {{ ai_status.model }}</p>
     {% else %}
-      <div class="flex items-center gap-2 mb-2">
-        <span class="dot dot-progress"></span>
-        <span class="text-sm font-medium">Using fallback (rule-based)</span>
-      </div>
-      <p class="text-sm" style="color: var(--pf-ink-soft);">Model: {{ ai_status.model }}</p>
-      <p class="text-xs mt-1" style="color: var(--pf-ink-muted);">Local model not yet present.</p>
-    {% endif %}
+      <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No tenants.</p>
+    {% endfor %}
   </div>
 
-  {# ---- Tenants ---- #}
-  <div class="card p-6 md:col-span-2">
-    <h3 class="text-sm font-semibold mb-3">Tenants ({{ rows|length }})</h3>
-    <table class="w-full text-sm">
-      <thead class="text-xs text-left" style="color: var(--pf-ink-muted);">
-        <tr>
-          <th class="py-2 font-normal">Tenant</th>
-          <th class="font-normal">Users</th>
-          <th class="font-normal">Items</th>
-          <th class="font-normal">Open</th>
-        </tr>
-      </thead>
-      <tbody class="row-divide">
-        {% for r in rows %}
-          <tr>
-            <td class="py-3">{{ r.tenant.name }}</td>
-            <td>{{ r.users }}</td>
-            <td>{{ r.items }}</td>
-            <td>{{ r.open }}</td>
-          </tr>
-        {% else %}
-          <tr><td class="py-3" style="color: var(--pf-ink-muted);" colspan="4">No tenants.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card">
+    <span class="eyebrow">AI engine</span>
+    {% if ai_status.ollama == 'up' %}
+      <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.4rem;">AI running <span class="muted" style="font-style:italic; font-weight:400;">— remote</span></h3>
+      <p class="deck" style="margin-bottom: 1.1rem;">Live model is responding to classification and draft requests.</p>
+    {% else %}
+      <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.4rem;">Using fallback <span class="muted" style="font-style:italic; font-weight:400;">— rule-based</span></h3>
+      <p class="deck" style="margin-bottom: 1.1rem;">Local model not yet present. Deterministic rules are running every classification and draft.</p>
+    {% endif %}
+    <div class="card-inset">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; gap: 0.85rem;">
+        <span class="eyebrow">Model</span>
+        <span class="tnum" style="font-family: var(--serif); font-style: italic; font-size: 1.05rem;">{{ ai_status.model }}</span>
+      </div>
+      <div style="display:flex; align-items:baseline; justify-content:space-between; gap: 0.85rem; margin-top: 0.5rem;">
+        <span class="eyebrow">Engine</span>
+        <span class="muted" style="font-size: 0.85rem;">{% if ai_status.ollama == 'up' %}ollama (remote){% else %}fallback (rules){% endif %}</span>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="card p-6">
-  <h3 class="text-sm font-semibold mb-3">System activity</h3>
-  <div class="max-h-96 overflow-y-auto scroll-soft pr-2">
-    <ul class="text-sm row-divide">
-      {% for a in audit %}
-        <li class="py-3 flex items-start gap-4">
-          <span class="text-xs shrink-0 w-32" style="color: var(--pf-ink-muted);">{{ a.created_at.strftime('%b %d · %H:%M:%S') }}</span>
-          <span class="badge pill-soft-neutral shrink-0">{{ a.action.replace('_',' ') }}</span>
-          <span class="text-sm" style="color: var(--pf-ink);">
-            tenant #{{ a.tenant_id or '—' }}{% if a.item_id %} · item #{{ a.item_id }}{% endif %}
-            {% if a.detail %}<span style="color: var(--pf-ink-soft);"> — {{ a.detail }}</span>{% endif %}
-          </span>
-        </li>
-      {% else %}
-        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No activity yet.</li>
-      {% endfor %}
-    </ul>
+<div class="card">
+  <div class="between" style="margin-bottom: 1rem;">
+    <div>
+      <span class="eyebrow">System activity</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">All workspaces, every action</h3>
+    </div>
+    <span class="muted tnum" style="font-size:0.78rem;">{{ audit|length }} entries</span>
+  </div>
+  <div class="activity-list">
+    {% for a in audit %}
+      <div class="activity-row">
+        <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
+        <span class="action">{{ a.action.replace('_',' ') }}</span>
+        <span class="what">
+          <b>tenant #{{ a.tenant_id or '—' }}</b>{% if a.item_id %} &middot; item #{{ a.item_id }}{% endif %}
+          {% if a.detail %} &mdash; {{ a.detail }}{% endif %}
+        </span>
+      </div>
+    {% else %}
+      <p class="muted" style="font-size:0.85rem;">No activity yet.</p>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}

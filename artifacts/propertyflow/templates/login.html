@@ -1,31 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Sign in · PropertyFlow{% endblock %}
 {% block content %}
-<div class="max-w-md mx-auto mt-12">
-  <div class="card p-6">
-    <h1 class="text-xl font-semibold mb-1">Sign in</h1>
-    <p class="text-sm mb-4" style="color: var(--pf-ink-soft);">Enter the email address of a seeded demo user.</p>
+<div style="max-width: 460px; margin: 4rem auto 0;">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <span class="eyebrow">§ Property Workflow Co.</span>
+    <h1 style="font-size: 2.1rem; margin-top: 0.6rem;">Sign in to your workspace.</h1>
+    <p class="deck" style="margin-top: 0.5rem;">Use a seeded demo email below.</p>
+  </div>
+
+  <div class="card">
     {% if error %}
-      <div class="mb-3 p-3 rounded-lg text-sm" style="background: #f3dad3; color: #8a3522; border: 1px solid #e5c4ba;">{{ error }}</div>
+      <div class="flash" style="background:#f5e1d2; border-color:#e6c8af; color:#7a3a13;">{{ error }}</div>
     {% endif %}
-    <form method="post" action="/login" class="space-y-3">
-      <input name="email" type="email" required autocomplete="email"
-             class="field w-full px-3 py-2 rounded-lg"
-             placeholder="you@example.com" />
-      <button class="btn-primary w-full justify-center">Continue</button>
+    <form method="post" action="/login" class="stack-md">
+      <div>
+        <label class="label" for="email">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="email" class="field" placeholder="you@example.com" />
+      </div>
+      <button class="btn-primary" style="width:100%;">Continue &rarr;</button>
     </form>
   </div>
 
-  <div class="card p-5 mt-4">
-    <h2 class="text-sm font-semibold mb-3" style="color: var(--pf-ink);">Demo logins</h2>
-    <ul class="text-sm space-y-1.5" style="color: var(--pf-ink-soft);">
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="owner@propertyflow.dev">owner@propertyflow.dev</button> — system owner</li>
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="admin@acme.dev">admin@acme.dev</button> — Acme admin</li>
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="maria@acme.dev">maria@acme.dev</button> — Acme operator</li>
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="priya@acme.dev">priya@acme.dev</button> — Acme operator</li>
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="viewer@acme.dev">viewer@acme.dev</button> — Acme viewer</li>
-      <li><button class="quick-login underline-offset-2 hover:underline" data-email="admin@beech.dev">admin@beech.dev</button> — Beech admin</li>
-    </ul>
+  <div class="card" style="margin-top: 1.2rem;">
+    <span class="eyebrow">Demo logins</span>
+    <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">Click to fill</h3>
+    <div>
+      {% for email, label in [
+        ('owner@propertyflow.dev', 'system owner'),
+        ('admin@acme.dev', 'Acme admin'),
+        ('maria@acme.dev', 'Acme operator'),
+        ('priya@acme.dev', 'Acme operator'),
+        ('viewer@acme.dev', 'Acme viewer'),
+        ('admin@beech.dev', 'Beech admin'),
+      ] %}
+        <div class="rule-top between" style="padding: 0.7rem 0;">
+          <button type="button" class="quick-login" data-email="{{ email }}"
+                  style="background:none; border:none; padding:0; cursor:pointer; font-family: var(--sans); font-size:0.92rem; color: var(--accent-strong); text-decoration: underline; text-underline-offset: 3px;">{{ email }}</button>
+          <span class="muted" style="font-size:0.82rem; font-style: italic; font-family: var(--serif);">{{ label }}</span>
+        </div>
+      {% endfor %}
+    </div>
   </div>
 </div>
+<script src="/static/app.js" defer></script>
 {% endblock %}

@@ -1,63 +1,77 @@
 {% extends "base.html" %}
+{% set page = 'admin' %}
 {% block title %}Admin · PropertyFlow{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-semibold mb-1">Admin</h1>
-<p class="text-sm mb-6" style="color: var(--pf-ink-soft);">{{ tenant.name if tenant else 'No tenant selected' }}</p>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div class="card p-6">
-    <h2 class="text-sm font-semibold mb-3">Users ({{ users|length }})</h2>
-    <ul class="text-sm row-divide">
-      {% for u in users %}
-        <li class="py-3 flex items-center justify-between">
-          <div>
-            <div>{{ u.name }}</div>
-            <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">{{ u.email }}</div>
-          </div>
-          <span class="badge pill-soft-neutral">{{ u.role.value }}</span>
-        </li>
-      {% else %}
-        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No users.</li>
-      {% endfor %}
-    </ul>
-  </div>
+{% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
+{% set status_label = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
 
-  <div class="card p-6 md:col-span-2">
-    <h2 class="text-sm font-semibold mb-3">Recent items ({{ items|length }})</h2>
-    <ul class="text-sm row-divide">
+<div class="page-head">
+  <span class="eyebrow">§ Admin &mdash; {{ tenant.name if tenant else 'No tenant' }}</span>
+  <h1>People, items, and the system trail.</h1>
+  <p class="deck">Everything that happens in your workspace, in chronological order.</p>
+</div>
+
+<div class="grid-2" style="margin-bottom: 1.6rem;">
+  <div class="card">
+    <span class="eyebrow">Recent items</span>
+    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.85rem;">{{ items|length }} in this tenant</h3>
+    <div>
       {% for it in items %}
-        <li class="py-3 flex items-center justify-between gap-3">
-          <a href="/items/{{ it.id }}" class="hover:underline truncate">{{ it.subject }}</a>
-          <div class="flex items-center gap-2 text-xs shrink-0" style="color: var(--pf-ink-muted);">
-            <span class="badge pill-soft-neutral">{{ it.category.replace('_',' ') }}</span>
-            <span>{{ it.status.value.replace('_',' ') }}</span>
-            <span>{{ it.created_at.strftime('%m-%d %H:%M') }}</span>
+        <a href="/items/{{ it.id }}" class="rule-top" style="display:flex; align-items:center; justify-content:space-between; gap:0.85rem; padding:0.8rem 0; text-decoration:none; color: var(--ink);">
+          <div style="min-width:0; flex:1;">
+            <div style="font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ it.subject }}</div>
+            <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ it.created_at.strftime('%a %d %b, %H:%M') }}</div>
           </div>
-        </li>
+          <span class="chip {{ chip_for.get(it.category, 'chip-general') }}">{{ it.category.replace('_',' ')|capitalize }}</span>
+          <span class="status status-{{ it.status.value }}">{{ status_label[it.status.value] }}</span>
+        </a>
       {% else %}
-        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No items yet.</li>
+        <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No items yet.</p>
       {% endfor %}
-    </ul>
+    </div>
   </div>
 
-  <div class="card p-6 md:col-span-3">
-    <h2 class="text-sm font-semibold mb-3">System activity</h2>
-    <div class="max-h-96 overflow-y-auto scroll-soft pr-2">
-      <ul class="text-sm row-divide">
-        {% for a in audit %}
-          <li class="py-3 flex items-start gap-4">
-            <span class="text-xs shrink-0 w-32" style="color: var(--pf-ink-muted);">{{ a.created_at.strftime('%b %d · %H:%M:%S') }}</span>
-            <span class="badge pill-soft-neutral shrink-0">{{ a.action.replace('_',' ') }}</span>
-            <span class="text-sm" style="color: var(--pf-ink);">
-              {% if a.item_id %}item #{{ a.item_id }}{% endif %}
-              {% if a.detail %}<span style="color: var(--pf-ink-soft);"> — {{ a.detail }}</span>{% endif %}
-            </span>
-          </li>
-        {% else %}
-          <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No activity yet.</li>
-        {% endfor %}
-      </ul>
+  <div class="card">
+    <span class="eyebrow">Users</span>
+    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.85rem;">{{ users|length }} on the team</h3>
+    <div>
+      {% for u in users %}
+        <div class="rule-top" style="display:flex; align-items:center; justify-content:space-between; padding:0.8rem 0;">
+          <div>
+            <div style="font-weight:500;">{{ u.name }}</div>
+            <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ u.email }}</div>
+          </div>
+          <span class="chip chip-general">{{ u.role.value }}</span>
+        </div>
+      {% else %}
+        <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No users.</p>
+      {% endfor %}
     </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="between" style="margin-bottom: 1rem;">
+    <div>
+      <span class="eyebrow">System activity</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">Everything the workflow has done</h3>
+    </div>
+    <span class="muted tnum" style="font-size:0.78rem;">{{ audit|length }} entries</span>
+  </div>
+  <div class="activity-list">
+    {% for a in audit %}
+      <div class="activity-row">
+        <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
+        <span class="action">{{ a.action.replace('_',' ') }}</span>
+        <span class="what">
+          {% if a.item_id %}<b>item #{{ a.item_id }}</b>{% endif %}
+          {% if a.detail %}{% if a.item_id %} &mdash; {% endif %}{{ a.detail }}{% endif %}
+        </span>
+      </div>
+    {% else %}
+      <p class="muted" style="font-size:0.85rem;">No activity yet.</p>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
