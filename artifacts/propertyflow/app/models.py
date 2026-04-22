@@ -30,6 +30,7 @@ class Role(str, enum.Enum):
     owner = "owner"      # system-level (no tenant or any tenant)
     admin = "admin"      # tenant manager
     operator = "operator"  # day-to-day staff
+    contractor_admin = "contractor_admin"  # dispatcher: receives handoffs, assigns to contractors
     contractor = "contractor"  # external party — read-only EXCEPT on items/tasks assigned to them
     viewer = "viewer"    # read-only
 
@@ -38,7 +39,7 @@ class Role(str, enum.Enum):
         # Contractors sit between viewer and operator: more capability than a
         # pure viewer (they can act on their own assignments) but less than an
         # operator (they can't create, assign, or touch other people's work).
-        return {"viewer": 1, "contractor": 2, "operator": 3, "admin": 4, "owner": 5}[self.value]
+        return {"viewer": 1, "contractor": 2, "contractor_admin": 3, "operator": 4, "admin": 5, "owner": 6}[self.value]
 
 
 class ItemStatus(str, enum.Enum):

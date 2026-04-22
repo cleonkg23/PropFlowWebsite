@@ -16,8 +16,28 @@ _AUDIT_PAGE_SIZE = 25
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-# Roles an admin is allowed to assign to other users in their own client.
-_ADMIN_ASSIGNABLE = {Role.viewer, Role.contractor, Role.operator, Role.admin}
+# Roles a client admin is allowed to assign to other users in their own client.
+_ADMIN_ASSIGNABLE = {Role.viewer, Role.contractor, Role.contractor_admin, Role.operator, Role.admin}
+# A contractor admin can only add/manage other contractors (no operators,
+# admins, or other contractor admins).
+_CONTRACTOR_ADMIN_ASSIGNABLE = {Role.contractor}
+
+
+def _assignable_for(actor: User) -> set[Role]:
+    if actor.role is Role.contractor_admin:
+        return _CONTRACTOR_ADMIN_ASSIGNABLE
+    return _ADMIN_ASSIGNABLE
+
+
+def _visible_users_for(actor: User, db: Session, tenant_id):
+    """Contractor admins only see contractors in the user list — they don't
+    need (or get) visibility into the full team roster."""
+    if not tenant_id:
+        return []
+    q = db.query(User).filter(User.tenant_id == tenant_id)
+    if actor.role is Role.contractor_admin:
+        q = q.filter(User.role == Role.contractor)
+    return q.order_by(User.role, User.name).all()
 
 
 def _audit(db: Session, *, tenant_id, user_id, action: str, detail: str = "") -> None:
@@ -42,7 +62,7 @@ def _resolve_tenant_id(user: User, db: Session) -> int | None:
 @router.get("/admin")
 def admin_home(
     request: Request,
-    user: User = Depends(require_role(Role.admin)),
+    user: User = Depends(require_role(Role.admin, Role.contractor_admin)),
     db: Session = Depends(get_db),
     event: str = "",
     actor: str = "",
@@ -51,10 +71,7 @@ def admin_home(
 ):
     tenant_id = _resolve_tenant_id(user, db)
 
-    users = (
-        db.query(User).filter(User.tenant_id == tenant_id).order_by(User.role, User.name).all()
-        if tenant_id else []
-    )
+    users = _visible_users_for(user, db, tenant_id)
     items = (
         db.query(Item).filter(Item.tenant_id == tenant_id).order_by(Item.created_at.desc()).limit(100).all()
         if tenant_id else []
@@ -99,7 +116,7 @@ def admin_home(
             "audit_filters": audit_filters,
             "event_choices": event_choices,
             "actor_choices": actor_choices,
-            "assignable_roles": [Role.viewer, Role.contractor, Role.operator, Role.admin],
+            "assignable_roles": [r for r in (Role.viewer, Role.contractor, Role.contractor_admin, Role.operator, Role.admin) if r in _assignable_for(user)],
             "flash": flash,
             "flash_kind": flash_kind,
         },
@@ -142,7 +159,7 @@ def create_user(
     name: str = Form(...),
     email: str = Form(...),
     role: str = Form(...),
-    user: User = Depends(require_role(Role.admin)),
+    user: User = Depends(require_role(Role.admin, Role.contractor_admin)),
     db: Session = Depends(get_db),
 ):
     tenant_id = _resolve_tenant_id(user, db)
@@ -158,8 +175,9 @@ def create_user(
         _flash(request, "Invalid role.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
 
-    if role_enum not in _ADMIN_ASSIGNABLE:
-        _flash(request, "You can only add viewers, operators, or admins.", "err")
+    allowed = _assignable_for(user)
+    if role_enum not in allowed:
+        _flash(request, "You don't have permission to add that role.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
 
     if not name or not email:
@@ -189,7 +207,7 @@ def change_user_role(
     request: Request,
     user_id: int,
     role: str = Form(...),
-    user: User = Depends(require_role(Role.admin)),
+    user: User = Depends(require_role(Role.admin, Role.contractor_admin)),
     db: Session = Depends(get_db),
 ):
     target = db.get(User, user_id)
@@ -212,8 +230,13 @@ def change_user_role(
         _flash(request, "Invalid role.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
 
-    if role_enum not in _ADMIN_ASSIGNABLE:
-        _flash(request, "You can only assign viewer, operator, or admin.", "err")
+    allowed = _assignable_for(user)
+    # Contractor admins can only modify contractors and only re-assign them
+    # within the same restricted set.
+    if user.role is Role.contractor_admin and target.role is not Role.contractor:
+        raise HTTPException(403, "Contractor admins can only manage contractors")
+    if role_enum not in allowed:
+        _flash(request, "You don't have permission to assign that role.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
 
     old = target.role.value
@@ -234,7 +257,7 @@ def change_user_role(
 def delete_user(
     request: Request,
     user_id: int,
-    user: User = Depends(require_role(Role.admin)),
+    user: User = Depends(require_role(Role.admin, Role.contractor_admin)),
     db: Session = Depends(get_db),
 ):
     target = db.get(User, user_id)
@@ -246,6 +269,9 @@ def delete_user(
         raise HTTPException(403, "Cannot delete users outside your client")
     if target.role is Role.owner:
         raise HTTPException(403, "Cannot delete the system owner")
+    # Contractor admins can only delete contractors.
+    if user.role is Role.contractor_admin and target.role is not Role.contractor:
+        raise HTTPException(403, "Contractor admins can only manage contractors")
     if target.id == user.id:
         _flash(request, "You can't delete yourself.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)

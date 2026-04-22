@@ -10,7 +10,7 @@
 {% set now_naive = now_utc.replace(tzinfo=None) %}
 {% set is_overdue = due_naive and due_naive < now_naive and item.status.value != 'done' %}
 {% set is_contractor = user.role.value == 'contractor' %}
-{% set is_ops = user.role.value in ['operator', 'admin', 'owner'] %}
+{% set is_ops = user.role.value in ['operator', 'admin', 'owner', 'contractor_admin'] %}
 
 <style>
   .due-banner {
@@ -65,8 +65,10 @@
         <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">{{ my_open_task.description }}</h2>
         <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
           {% if my_open_task.due_at %}Target: {{ my_open_task.due_at.strftime('%a %d %b, %H:%M') }} &middot; {% endif %}
-          When you're done, leave a quick note describing what was done and mark it complete.
+          When you're done on site, choose one of the three actions below.
         </p>
+
+        {# 1. Complete — closes the task (and the ticket if it's the last one) #}
         <form method="post" action="/tasks/{{ my_open_task.id }}/complete" class="compose-note"
               {% if completing_will_close %}
               onsubmit="return confirm('This is the only open task on this ticket. Marking it complete will close the whole ticket. Continue?');"
@@ -81,6 +83,34 @@
             </button>
           </div>
         </form>
+
+        {# 2. Postpone — push the due date out a day (parts on order, no access etc.) #}
+        <details class="rule-top" style="margin-top: 1.1rem; padding-top: 1rem;">
+          <summary class="btn btn-sm" style="display:inline-flex;">Postpone — come back later</summary>
+          <form method="post" action="/tasks/{{ my_open_task.id }}/postpone" class="compose-note" style="margin-top:0.6rem;">
+            <label class="label" for="pp-hours">Push due date by</label>
+            <select id="pp-hours" name="hours" style="margin-bottom:0.5rem;">
+              <option value="24">1 day</option>
+              <option value="48">2 days</option>
+              <option value="72">3 days</option>
+              <option value="168">1 week</option>
+            </select>
+            <label class="label" for="pp-note" style="margin-bottom:0;">Reason (visible on the timeline)</label>
+            <textarea id="pp-note" name="note" required placeholder="e.g. Part on order, will return Thursday."></textarea>
+            <div class="row"><button class="btn-primary" type="submit">Postpone</button></div>
+          </form>
+        </details>
+
+        {# 3. Hand back — bounces the task to ops (access refused, scope dispute) #}
+        <details style="margin-top: 0.7rem;">
+          <summary class="btn btn-sm" style="display:inline-flex;">Hand back to operator</summary>
+          <form method="post" action="/tasks/{{ my_open_task.id }}/handback" class="compose-note" style="margin-top:0.6rem;"
+                onsubmit="return confirm('Hand this task back to the operator? They will need to follow up before you can finish.');">
+            <label class="label" for="hb-note" style="margin-bottom:0;">Why are you handing back?</label>
+            <textarea id="hb-note" name="note" required placeholder="e.g. No-one home, tenant said they cancelled — needs ops follow-up."></textarea>
+            <div class="row"><button class="btn-primary" type="submit">Hand back</button></div>
+          </form>
+        </details>
       </article>
     {% endif %}
 
@@ -335,6 +365,20 @@
                       onsubmit="return confirm({% if open_tasks_count == 1 %}'This is the last open task — completing it will close the ticket. Continue?'{% else %}'Mark this task complete?'{% endif %});">
                   <textarea name="note" placeholder="What was done?" rows="2"></textarea>
                   <div class="row"><button class="btn btn-sm" type="submit">Complete</button></div>
+                </form>
+              </details>
+              {# Per-task reassign — primary use case is contractor admins
+                 dispatching a handoff task to a specific contractor. #}
+              <details style="margin-top: 0.4rem;">
+                <summary class="btn btn-sm" style="display:inline-flex;">Reassign task</summary>
+                <form method="post" action="/tasks/{{ t.id }}/assign" class="compose-note" style="margin-top: 0.45rem;">
+                  <select name="assignee_id" style="margin-bottom:0.5rem;">
+                    <option value="">— Unassigned —</option>
+                    {% for a in assignees %}
+                      <option value="{{ a.id }}" {% if a.id == t.assigned_user_id %}selected{% endif %}>{{ a.name }} ({{ a.role.value }})</option>
+                    {% endfor %}
+                  </select>
+                  <div class="row"><button class="btn btn-sm" type="submit">Reassign</button></div>
                 </form>
               </details>
             {% endif %}

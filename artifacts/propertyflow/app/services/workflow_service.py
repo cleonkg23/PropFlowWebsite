@@ -86,16 +86,45 @@ def _audit(db: Session, *, tenant_id: Optional[int], user_id: Optional[int], act
     db.add(AuditLog(tenant_id=tenant_id, user_id=user_id, action=action, item_id=item_id, detail=detail))
 
 
-def _pick_assignee(db: Session, tenant_id: int, category: str) -> Optional[User]:
-    """First user in the tenant whose role matches the routing rule."""
-    preferred_roles = ROUTING.get(category, [Role.operator, Role.admin])
+def _pick_least_loaded(db: Session, tenant_id: int, roles: list[Role]) -> Optional[User]:
+    """Pick the candidate with the fewest currently-open tasks (round-robin
+    by workload). Falls back to lowest user id on ties so the choice is
+    stable. Returns None if no user in the tenant has one of the roles.
+
+    This is a pragmatic "fair-share" router: in a busy office it stops one
+    operator from being buried while a colleague sits idle, without needing
+    skill matrices or estimated-time data we don't have. If we later capture
+    per-user availability or skills we can layer that on top of this."""
     candidates = (
         db.query(User)
-        .filter(User.tenant_id == tenant_id, User.role.in_(preferred_roles))
+        .filter(User.tenant_id == tenant_id, User.role.in_(roles))
         .order_by(User.id)
         .all()
     )
-    return candidates[0] if candidates else None
+    if not candidates:
+        return None
+    open_counts: dict[int, int] = {u.id: 0 for u in candidates}
+    rows = (
+        db.query(Task.assigned_user_id)
+        .filter(
+            Task.tenant_id == tenant_id,
+            Task.status == TaskStatus.open,
+            Task.assigned_user_id.in_(open_counts.keys()),
+        )
+        .all()
+    )
+    for (uid,) in rows:
+        if uid in open_counts:
+            open_counts[uid] += 1
+    # min by (open task count, user id) — id breaks ties deterministically
+    return min(candidates, key=lambda u: (open_counts[u.id], u.id))
+
+
+def _pick_assignee(db: Session, tenant_id: int, category: str) -> Optional[User]:
+    """Routing entry point used by ingest_item — picks the least-loaded
+    user whose role matches the routing rule for this category."""
+    preferred_roles = ROUTING.get(category, [Role.operator, Role.admin])
+    return _pick_least_loaded(db, tenant_id, preferred_roles)
 
 
 # --- Public API --------------------------------------------------------------
@@ -220,7 +249,16 @@ def edit_draft(db: Session, *, item: Item, text: str, actor: User) -> Item:
 
 
 def send_reply(db: Session, *, item: Item, actor: User) -> Item:
-    """Mark draft as sent — moves item into 'awaiting reply' from the recipient."""
+    """Mark draft as sent — moves item into 'awaiting reply' from the recipient.
+
+    For maintenance tickets this is also the dispatch trigger: sending the
+    reply confirms to the tenant we're sending someone, so we:
+      1. Auto-complete any open ops-side tasks on the item (the "triage and
+         dispatch" task is now done by virtue of the reply having been sent).
+      2. Spawn a handoff task assigned to the least-loaded contractor admin
+         in the tenant — they then assign the right contractor.
+    If the tenant has no contractor admin, the handoff is left unassigned and
+    surfaces on the operator's board for manual routing."""
     if not item.draft_reply:
         raise ValueError("no draft to send")
     target = ItemStatus.awaiting_reply
@@ -237,6 +275,59 @@ def send_reply(db: Session, *, item: Item, actor: User) -> Item:
         item_id=item.id,
         detail=f"{old.value} -> {item.status.value}",
     )
+
+    # Maintenance handoff: kick the dispatch task to a contractor admin.
+    if item.category in HANDOFF_TASK:
+        ops_roles = (Role.operator, Role.admin, Role.owner)
+        # Idempotency check by task IDENTITY (description), not assignee role.
+        # Using description survives reassignment (a contractor admin who
+        # reassigns the handoff to a contractor doesn't lose the marker) and
+        # also catches the no-contractor-admin fallback (handoff exists but
+        # is unassigned). Stops a second send_reply from creating duplicates.
+        handoff_desc = HANDOFF_TASK[item.category]
+        already_handed_off = any(
+            t.description == handoff_desc and t.status is TaskStatus.open
+            for t in item.tasks
+        )
+        if not already_handed_off:
+            # Auto-close the operator's own open tasks — the reply IS the
+            # dispatch, so leaving them as "open" pollutes the dashboard.
+            for t in item.tasks:
+                if (
+                    t.status is TaskStatus.open
+                    and t.assigned_user is not None
+                    and t.assigned_user.role in ops_roles
+                ):
+                    t.status = TaskStatus.done
+                    _audit(
+                        db,
+                        tenant_id=item.tenant_id,
+                        user_id=actor.id,
+                        action="task_complete",
+                        item_id=item.id,
+                        detail=f"{t.description[:60]}{'…' if len(t.description) > 60 else ''} — auto-closed on reply",
+                    )
+
+            dispatcher = _pick_least_loaded(db, item.tenant_id, [Role.contractor_admin])
+            handoff = Task(
+                tenant_id=item.tenant_id,
+                item_id=item.id,
+                description=HANDOFF_TASK[item.category],
+                assigned_user_id=dispatcher.id if dispatcher else None,
+                due_at=item.due_at,
+                status=TaskStatus.open,
+            )
+            db.add(handoff)
+            who = f"{dispatcher.name} (contractor admin)" if dispatcher else "unassigned"
+            _audit(
+                db,
+                tenant_id=item.tenant_id,
+                user_id=actor.id,
+                action="task_created",
+                item_id=item.id,
+                detail=f"handoff -> {who}: {handoff.description[:80]}",
+            )
+
     db.commit()
     db.refresh(item)
     return item
@@ -358,40 +449,16 @@ def complete_task(
     )
 
     item = task.item
+    # Handoff to the contractor admin is now triggered by send_reply (the
+    # operator hitting "Send" IS the dispatch decision), so complete_task
+    # no longer spawns a follow-up itself.
     follow_up: Optional[Task] = None
 
-    # Operator-completed maintenance triage → spawn the on-site visit task,
-    # but only if we don't already have an open contractor follow-up. This
-    # prevents duplicate handoffs if the operator clicks complete twice.
-    is_ops_actor = actor.role in (Role.operator, Role.admin, Role.owner)
-    if (
-        is_ops_actor
-        and item.category in HANDOFF_TASK
-        and not any(t.status is TaskStatus.open and t.id != task.id for t in item.tasks)
-    ):
-        follow_up = Task(
-            tenant_id=item.tenant_id,
-            item_id=item.id,
-            description=HANDOFF_TASK[item.category],
-            assigned_user_id=None,  # ops will assign the contractor next
-            due_at=item.due_at,
-            status=TaskStatus.open,
-        )
-        db.add(follow_up)
-        _audit(
-            db,
-            tenant_id=item.tenant_id,
-            user_id=actor.id,
-            action="task_created",
-            item_id=item.id,
-            detail=f"handoff: {follow_up.description[:80]}",
-        )
-
-    # Auto-close the item if no open tasks remain (and we didn't just create
-    # a follow-up). The completion note is rolled up so anyone reading the
-    # ticket can see how it ended without scrolling the timeline.
+    # Auto-close the item if no open tasks remain. The completion note is
+    # rolled up so anyone reading the ticket can see how it ended without
+    # scrolling the timeline.
     auto_closed = False
-    db.flush()  # make the new follow-up visible to the next query
+    db.flush()
     open_left = (
         db.query(Task)
         .filter(Task.item_id == item.id, Task.status == TaskStatus.open)
@@ -444,6 +511,94 @@ def reopen_item(db: Session, *, item: Item, actor: User, reason: str = "") -> It
     db.commit()
     db.refresh(item)
     return item
+
+
+def assign_task(db: Session, *, task: Task, new_user: Optional[User], actor: User) -> Task:
+    """Reassign a single task to another user (or unassign with None). Used
+    by contractor admins to dispatch a handoff task to a specific contractor
+    without disturbing the item-level ownership."""
+    if task.status is TaskStatus.done:
+        raise ValueError("can't reassign a completed task")
+    old_uid = task.assigned_user_id
+    task.assigned_user_id = new_user.id if new_user else None
+    _audit(
+        db,
+        tenant_id=task.tenant_id,
+        user_id=actor.id,
+        action="task_assign",
+        item_id=task.item_id,
+        detail=f"{task.description[:60]}{'…' if len(task.description) > 60 else ''} — user_id {old_uid} -> {task.assigned_user_id}",
+    )
+    db.commit()
+    db.refresh(task)
+    return task
+
+
+def postpone_task(db: Session, *, task: Task, actor: User, hours: int = 24, note: str = "") -> Task:
+    """Push a task's due date out (default +24h) and log the reason. Used by
+    contractors when a job needs to come back another day (parts on order,
+    tenant not home, etc.) so the work stays visible without false-completing."""
+    if task.status is TaskStatus.done:
+        raise ValueError("can't postpone a completed task")
+    if hours <= 0:
+        raise ValueError("postpone hours must be positive")
+    base = task.due_at or datetime.utcnow()
+    if base < datetime.utcnow():
+        base = datetime.utcnow()
+    task.due_at = base + timedelta(hours=hours)
+    note = (note or "").strip()
+    snippet = (note[:100] + "…") if len(note) > 100 else note
+    detail = f"+{hours}h -> {task.due_at.strftime('%a %d %b, %H:%M')}"
+    if snippet:
+        detail += f" — {snippet}"
+    _audit(
+        db,
+        tenant_id=task.tenant_id,
+        user_id=actor.id,
+        action="task_postpone",
+        item_id=task.item_id,
+        detail=detail,
+    )
+    db.commit()
+    db.refresh(task)
+    return task
+
+
+def handback_task(db: Session, *, task: Task, actor: User, note: str = "") -> Task:
+    """Hand a task back to the operator side. Reassigns the task to the
+    item's owner (an operator/admin); if there's no item owner, falls back
+    to the least-loaded operator in the tenant. Used by contractors who
+    need ops follow-up before they can finish (e.g. tenant disputed the
+    work, access refused, scope changed)."""
+    if task.status is TaskStatus.done:
+        raise ValueError("can't hand back a completed task")
+    item = task.item
+    target: Optional[User] = None
+    if item.assigned_user_id:
+        owner = db.get(User, item.assigned_user_id)
+        if owner and owner.role in (Role.operator, Role.admin):
+            target = owner
+    if target is None:
+        target = _pick_least_loaded(db, task.tenant_id, [Role.operator, Role.admin])
+    if target is None:
+        raise ValueError("no operator available to hand back to")
+    task.assigned_user_id = target.id
+    note = (note or "").strip()
+    snippet = (note[:120] + "…") if len(note) > 120 else note
+    detail = f"-> {target.name}"
+    if snippet:
+        detail += f" — {snippet}"
+    _audit(
+        db,
+        tenant_id=task.tenant_id,
+        user_id=actor.id,
+        action="task_handback",
+        item_id=task.item_id,
+        detail=detail,
+    )
+    db.commit()
+    db.refresh(task)
+    return task
 
 
 def regenerate_draft(db: Session, *, item: Item, actor: User) -> Item:

@@ -81,7 +81,7 @@ def init_db() -> None:
                 conn.execute(text(
                     "INSERT INTO users (tenant_id, email, name, role, auth_nonce) "
                     "VALUES (NULL, '__schemacheck__@local', 'check', :r, 'x')"
-                ), {"r": Role.contractor.value})
+                ), {"r": Role.contractor_admin.value})
                 conn.execute(text("DELETE FROM users WHERE email = '__schemacheck__@local'"))
         except Exception:  # noqa: BLE001
             # Old constraint is in place — rebuild from scratch.

@@ -18,7 +18,8 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Mutating endpoints require at least operator (viewer is read-only).
-WRITE_ROLES = (Role.operator, Role.admin)
+WRITE_ROLES = (Role.operator, Role.admin, Role.contractor_admin)
+_OPS_ROLES = (Role.operator, Role.admin, Role.owner, Role.contractor_admin)
 
 
 def _is_assigned(user: User, item: Item) -> bool:
@@ -36,7 +37,7 @@ def _can_act_on_item(user: User, item: Item) -> bool:
     """Permission gate for posting timeline notes and (in future) other
     contractor-allowed actions. Operators+ can always act; contractors only
     if they're the assignee."""
-    if user.role in (Role.operator, Role.admin, Role.owner):
+    if user.role in _OPS_ROLES:
         return True
     if user.role is Role.contractor:
         return _is_assigned(user, item)
@@ -243,7 +244,7 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
     # Tenant assignees for the assignment dropdown.
     assignees = (
         db.query(User)
-        .filter(User.tenant_id == item.tenant_id, User.role.in_([Role.operator, Role.admin]))
+        .filter(User.tenant_id == item.tenant_id, User.role.in_([Role.operator, Role.admin, Role.contractor_admin, Role.contractor]))
         .order_by(User.name)
         .all()
     )
@@ -401,12 +402,97 @@ def post_task_complete(
     item = _load_item_for(user, db, task.item_id)  # also enforces tenant + visibility
 
     is_assignee = task.assigned_user_id == user.id
-    is_ops = user.role in (Role.operator, Role.admin, Role.owner)
+    is_ops = user.role in _OPS_ROLES
     if not (is_assignee or is_ops):
         raise HTTPException(403, "you can only complete tasks assigned to you")
 
     try:
         workflow_service.complete_task(db, task=task, actor=user, note=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item.id}#timeline", status_code=303)
+
+
+@router.post("/tasks/{task_id}/postpone")
+def post_postpone_task(
+    task_id: int,
+    hours: int = Form(24),
+    note: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES, Role.contractor)),
+    db: Session = Depends(get_db),
+):
+    """Push a task's due date out. Assignee can postpone their own task;
+    ops can postpone any task on a ticket they can see."""
+    task = db.get(Task, task_id)
+    if not task:
+        raise HTTPException(404, "task not found")
+    item = _load_item_for(user, db, task.item_id)
+    is_assignee = task.assigned_user_id == user.id
+    is_ops = user.role in _OPS_ROLES
+    if not (is_assignee or is_ops):
+        raise HTTPException(403, "you can only postpone tasks assigned to you")
+    try:
+        workflow_service.postpone_task(db, task=task, actor=user, hours=hours, note=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item.id}#timeline", status_code=303)
+
+
+@router.post("/tasks/{task_id}/handback")
+def post_handback_task(
+    task_id: int,
+    note: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES, Role.contractor)),
+    db: Session = Depends(get_db),
+):
+    """Contractor hands a task back to the operator side. Restricted to the
+    task's current assignee — you can't hand back someone else's work."""
+    task = db.get(Task, task_id)
+    if not task:
+        raise HTTPException(404, "task not found")
+    item = _load_item_for(user, db, task.item_id)
+    if task.assigned_user_id != user.id and user.role not in _OPS_ROLES:
+        raise HTTPException(403, "you can only hand back your own task")
+    try:
+        workflow_service.handback_task(db, task=task, actor=user, note=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item.id}#timeline", status_code=303)
+
+
+@router.post("/tasks/{task_id}/assign")
+def post_assign_task(
+    task_id: int,
+    assignee_id: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    """Reassign a single task — used by contractor admins to dispatch the
+    handoff task to a specific contractor without changing item ownership."""
+    task = db.get(Task, task_id)
+    if not task:
+        raise HTTPException(404, "task not found")
+    item = _load_item_for(user, db, task.item_id)
+    new_user = None
+    if assignee_id:
+        new_user = db.get(User, int(assignee_id))
+        if not new_user or new_user.tenant_id != item.tenant_id:
+            raise HTTPException(400, "invalid assignee")
+    # Scope contractor_admin tightly: they can only dispatch a maintenance
+    # HANDOFF task and only to a contractor (or unassign). Without this
+    # guard a contractor_admin could reassign any tenant task to anyone,
+    # which is a privilege escalation.
+    if user.role is Role.contractor_admin:
+        is_handoff = (
+            item.category in workflow_service.HANDOFF_TASK
+            and task.description == workflow_service.HANDOFF_TASK[item.category]
+        )
+        if not is_handoff:
+            raise HTTPException(403, "contractor admins can only dispatch handoff tasks")
+        if new_user is not None and new_user.role is not Role.contractor:
+            raise HTTPException(403, "contractor admins can only assign to contractors")
+    try:
+        workflow_service.assign_task(db, task=task, new_user=new_user, actor=user)
     except ValueError as e:
         raise HTTPException(400, str(e))
     return RedirectResponse(f"/items/{item.id}#timeline", status_code=303)

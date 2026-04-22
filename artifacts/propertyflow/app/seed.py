@@ -34,11 +34,14 @@ def seed_if_empty(db: Session) -> None:
     # External contractor — sees only items/tasks assigned to them, can post
     # timeline notes and mark their own tasks complete.
     carl = User(tenant_id=acme.id, email="carl.contractor@test.test", name="Carl Contractor", role=Role.contractor)
+    # Contractor-admin (dispatcher): receives the operator handoff and assigns
+    # the on-site visit to the right contractor.
+    mike = User(tenant_id=acme.id, email="mike.dispatch@test.test", name="Mike Dispatch", role=Role.contractor_admin)
 
     # Beech: just an admin so the owner panel shows two tenants populated
     beech_admin = User(tenant_id=beech.id, email="tom.beech@test.test", name="Tom Admin", role=Role.admin)
 
-    db.add_all([owner, acme_admin, maria, priya, viewer, carl, beech_admin])
+    db.add_all([owner, acme_admin, maria, priya, viewer, carl, mike, beech_admin])
     db.flush()
 
     # Sample items in Acme (already classified, sitting in the board so it
