@@ -128,6 +128,27 @@ def dashboard(
     for it in items:
         columns[it.status].append(it)
 
+    # Per-user task state for each visible item. The dashboard shows the
+    # *item's* status by default, but that can be misleading for someone
+    # who has finished their own task — they see "In progress" and assume
+    # they still need to act, when really they're done and waiting on
+    # someone else. We surface a "your part is done" / "action needed
+    # from you" badge per row to fix that.
+    item_ids = [it.id for it in items] or [-1]
+    my_task_rows = (
+        db.query(Task.item_id, Task.status)
+        .filter(Task.assigned_user_id == user.id, Task.item_id.in_(item_ids))
+        .all()
+    )
+    my_state_by_item: dict[int, str] = {}
+    for item_id, status in my_task_rows:
+        # If they have ANY open task on the item, that wins — they need to
+        # act. Otherwise (only done tasks), they're done with their part.
+        if status is TaskStatus.open:
+            my_state_by_item[item_id] = "open"
+        elif my_state_by_item.get(item_id) != "open":
+            my_state_by_item[item_id] = "done"
+
     my_tasks_q = db.query(Task).filter(Task.assigned_user_id == user.id, Task.status == TaskStatus.open)
     my_tasks = my_tasks_q.order_by(Task.due_at.asc().nullslast()).all()
 
@@ -197,6 +218,7 @@ def dashboard(
             "processed_today": processed_today,
             "filters": filters,
             "now_utc": now,
+            "my_state_by_item": my_state_by_item,
         },
     )
 

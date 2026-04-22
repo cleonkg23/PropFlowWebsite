@@ -112,6 +112,28 @@
       vertical-align: middle;
     }
     .owner-init.unassigned { background: #f1f1ef; color: var(--muted); }
+
+    /* Per-user task state pill — answers "do I personally still owe
+       something on this item?" at a glance, separate from the item's
+       overall status. */
+    .me-pill {
+      display: inline-flex; align-items: center; gap: 0.35em;
+      font-size: 0.72rem; font-weight: 600;
+      padding: 0.18em 0.6em; border-radius: 999px;
+      vertical-align: middle; line-height: 1.2;
+      white-space: nowrap;
+    }
+    .me-pill.done {
+      background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+    }
+    .me-pill.open {
+      background: #fff7e0; color: #92400e; border: 1px solid #fcd34d;
+    }
+    .me-pill .me-dot {
+      width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+    }
+    .me-pill.done .me-dot { background: #10b981; }
+    .me-pill.open .me-dot { background: #f59e0b; }
   </style>
 
   {% set f = filters or {} %}
@@ -179,6 +201,16 @@
           </span>
           <span class="status-cell">
             <span class="status status-{{ item.status.value }}">{{ status_label[item.status.value] }}</span>
+            {# "Your part" indicator — only meaningful when the user actually
+               has tasks on the item. We deliberately don't show a pill for
+               items with no tasks for them, to avoid noise on the operator
+               view of items they aren't directly assigned to. #}
+            {% set my_state = my_state_by_item.get(item.id) %}
+            {% if my_state == 'done' and item.status.value != 'done' %}
+              <span class="me-pill done" title="You've finished your part of this item — waiting on team."><span class="me-dot"></span>Your part: done</span>
+            {% elif my_state == 'open' %}
+              <span class="me-pill open" title="You have an open task on this item."><span class="me-dot"></span>Action needed</span>
+            {% endif %}
           </span>
           <span class="arrow">&rarr;</span>
         </a>
