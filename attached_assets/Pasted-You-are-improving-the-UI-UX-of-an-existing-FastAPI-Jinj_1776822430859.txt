@@ -1,0 +1,186 @@
+You are improving the UI/UX of an existing FastAPI + Jinja2 application.
+
+DO NOT change layout or structure.
+
+You MUST align the app UI to match the existing **PropertyFlow marketing/demo aesthetic**:
+
+* soft beige backgrounds
+* subtle borders
+* minimal, elegant typography
+* calm, structured layout
+
+---
+
+# 🎯 GOAL
+
+Make the app feel like a **premium operational system** that matches the demo site.
+
+---
+
+# ⚠️ CONSTRAINTS
+
+* Keep existing layout and sections
+* Use Tailwind CSS only
+* No React or frontend frameworks
+* Minimal JavaScript
+* Do not redesign — only refine
+
+---
+
+# 🎨 DESIGN SYSTEM
+
+Apply globally:
+
+Background:
+bg-[#f7f3ea]
+
+Cards:
+bg-[#f2ede4]
+border border-[#e5ded2]
+rounded-xl
+
+Text:
+
+* headings: dark muted (not black)
+* body: soft grey
+* metadata: lighter grey
+
+---
+
+# 🔧 REQUIRED IMPROVEMENTS
+
+---
+
+## 1. Header
+
+Replace:
+
+"Workflow board"
+
+With:
+
+"Today’s operations"
+
+Subtext:
+
+"Everything your team needs to action — automatically organised."
+
+Add:
+
+"Updated X mins ago · X items processed today"
+
+---
+
+## 2. Workflow strip
+
+Keep:
+
+Received → Classified → Assigned → Reply ready → Tracked
+
+Improve:
+
+* spacing
+* subtle active state
+
+---
+
+## 3. Metrics panel
+
+Enhance:
+
+* slightly larger numbers
+* softer contrast
+* add sub-labels:
+  "active items", "action needed"
+
+---
+
+## 4. Inbox
+
+Improve:
+
+* increase row spacing
+
+* refine urgency pills:
+
+  * urgent (soft red)
+  * high (amber)
+  * normal (neutral/green)
+
+* update metadata format:
+  "Maintenance · received 01:20"
+
+---
+
+## 5. Table rows
+
+Add:
+hover:bg-[#efe8db]
+
+Improve:
+
+* status dots visibility
+* spacing consistency
+
+---
+
+## 6. Ownership
+
+Add to all items:
+
+"Owner: Sarah (Admin)"
+
+Keep subtle but consistent
+
+---
+
+## 7. AI messaging
+
+Add subtle lines:
+
+"AI classified as maintenance · high priority"
+"Draft generated automatically"
+
+Do NOT make this visually loud
+
+---
+
+## 8. System indicators
+
+Add:
+
+"Updated X mins ago"
+"X items auto-processed today"
+
+---
+
+## 9. Polish
+
+Apply consistently:
+
+* rounded-xl
+* subtle shadows (very light)
+* clean spacing
+* calm colour palette
+
+---
+
+# 🎯 RESULT
+
+The system should feel:
+
+* calm
+* premium
+* structured
+* reliable
+* operational
+
+NOT:
+
+* flashy
+* overdesigned
+* noisy
+
+---
+
+Implement now.

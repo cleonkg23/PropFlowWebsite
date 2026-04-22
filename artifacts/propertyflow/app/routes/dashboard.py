@@ -1,6 +1,8 @@
 """Operator dashboard + item detail."""
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -17,6 +19,26 @@ templates = Jinja2Templates(directory="templates")
 
 # Mutating endpoints require at least operator (viewer is read-only).
 WRITE_ROLES = (Role.operator, Role.admin)
+
+
+def _format_updated(dt: datetime | None) -> str:
+    if not dt:
+        return "just now"
+    now = datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    delta = now - dt
+    secs = int(delta.total_seconds())
+    if secs < 60:
+        return "just now"
+    if secs < 3600:
+        m = secs // 60
+        return f"{m} min{'s' if m != 1 else ''} ago"
+    if secs < 86400:
+        h = secs // 3600
+        return f"{h} hour{'s' if h != 1 else ''} ago"
+    d = secs // 86400
+    return f"{d} day{'s' if d != 1 else ''} ago"
 
 
 def _tenant_scope(user: User):
@@ -44,6 +66,39 @@ def dashboard(request: Request, user: User = Depends(require_user), db: Session 
 
     tenant = db.get(Tenant, user.tenant_id) if user.tenant_id else None
 
+    # Freshness + workflow strip + metric counts.
+    now = datetime.now(timezone.utc)
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    def _ts(dt):
+        return dt.replace(tzinfo=timezone.utc) if (dt and dt.tzinfo is None) else dt
+
+    received_today = sum(1 for it in items if _ts(it.created_at) and _ts(it.created_at) >= midnight)
+    classified = sum(1 for it in items if it.ai_mode)
+    assigned = sum(1 for it in items if it.assigned_user_id)
+    reply_ready = sum(1 for it in items if it.draft_reply and it.status != ItemStatus.done)
+    tracked = len(columns[ItemStatus.in_progress]) + len(columns[ItemStatus.awaiting_reply])
+    active = sum(len(columns[s]) for s in ItemStatus if s != ItemStatus.done)
+    action_needed = sum(1 for it in items if it.status == ItemStatus.new or not it.assigned_user_id)
+    done_today = sum(
+        1 for it in items
+        if it.status == ItemStatus.done and _ts(it.updated_at) and _ts(it.updated_at) >= midnight
+    )
+    processed_today = sum(1 for it in items if _ts(it.created_at) and _ts(it.created_at) >= midnight)
+
+    latest = max((_ts(it.updated_at) or _ts(it.created_at) for it in items), default=None)
+
+    metrics = {
+        "received_today": received_today,
+        "classified": classified,
+        "assigned": assigned,
+        "reply_ready": reply_ready,
+        "tracked": tracked,
+        "active": active,
+        "action_needed": action_needed,
+        "done_today": done_today,
+    }
+
     return templates.TemplateResponse(
         request,
         "dashboard.html",
@@ -53,6 +108,9 @@ def dashboard(request: Request, user: User = Depends(require_user), db: Session 
             "columns": columns,
             "my_tasks": my_tasks,
             "statuses": list(ItemStatus),
+            "metrics": metrics,
+            "updated_label": _format_updated(latest),
+            "processed_today": processed_today,
         },
     )
 

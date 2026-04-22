@@ -1,24 +1,26 @@
-<header class="bg-white border-b border-slate-200">
+<header style="background: #f2ede4; border-bottom: 1px solid var(--pf-border);">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <a href="/" class="font-semibold text-slate-900 flex items-center gap-2">
-        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+      <a href="/" class="font-semibold flex items-center gap-2" style="color: var(--pf-ink);">
+        <span class="inline-block w-2 h-2 rounded-full" style="background: #2f6b53;"></span>
         PropertyFlow
       </a>
       {% if tenant %}
-        <span class="text-xs text-slate-500 ml-2">/ {{ tenant.name }}</span>
+        <span class="text-xs ml-2" style="color: var(--pf-ink-muted);">/ {{ tenant.name }}</span>
       {% endif %}
     </div>
     {% if user %}
       <nav class="flex items-center gap-1 text-sm">
-        <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/dashboard">Dashboard</a>
+        <a class="px-3 py-1.5 rounded-lg card-hover" href="/dashboard" style="color: var(--pf-ink-soft);">Dashboard</a>
         {% if user.role.value in ['admin', 'owner'] %}
-          <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/admin">Admin</a>
+          <a class="px-3 py-1.5 rounded-lg card-hover" href="/admin" style="color: var(--pf-ink-soft);">Admin</a>
         {% endif %}
         {% if user.role.value == 'owner' %}
-          <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/owner">Owner</a>
+          <a class="px-3 py-1.5 rounded-lg card-hover" href="/owner" style="color: var(--pf-ink-soft);">Owner</a>
         {% endif %}
-        <span class="ml-3 text-slate-500">{{ user.name }} <span class="badge bg-slate-100 text-slate-600 ml-1">{{ user.role.value }}</span></span>
+        <span class="ml-3" style="color: var(--pf-ink-soft);">{{ user.name }}
+          <span class="badge pill-soft-neutral ml-1">{{ user.role.value }}</span>
+        </span>
         <form method="post" action="/logout" class="inline ml-2">
           <button class="btn">Sign out</button>
         </form>

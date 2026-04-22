@@ -1,57 +1,57 @@
 {% extends "base.html" %}
 {% block title %}Admin · PropertyFlow{% endblock %}
 {% block content %}
-<h1 class="text-xl font-semibold mb-1">Admin</h1>
-<p class="text-sm text-slate-500 mb-4">{{ tenant.name if tenant else 'No tenant selected' }}</p>
+<h1 class="text-2xl font-semibold mb-1">Admin</h1>
+<p class="text-sm mb-5" style="color: var(--pf-ink-soft);">{{ tenant.name if tenant else 'No tenant selected' }}</p>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div class="card p-4">
+  <div class="card p-5">
     <h2 class="text-sm font-semibold mb-3">Users ({{ users|length }})</h2>
-    <ul class="text-sm divide-y divide-slate-100">
+    <ul class="text-sm row-divide">
       {% for u in users %}
-        <li class="py-2 flex items-center justify-between">
+        <li class="py-2.5 flex items-center justify-between">
           <div>
             <div>{{ u.name }}</div>
-            <div class="text-xs text-slate-500">{{ u.email }}</div>
+            <div class="text-xs" style="color: var(--pf-ink-muted);">{{ u.email }}</div>
           </div>
-          <span class="badge bg-slate-100 text-slate-700">{{ u.role.value }}</span>
+          <span class="badge pill-soft-neutral">{{ u.role.value }}</span>
         </li>
       {% else %}
-        <li class="py-2 text-sm text-slate-500">No users.</li>
+        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No users.</li>
       {% endfor %}
     </ul>
   </div>
 
-  <div class="card p-4 md:col-span-2">
+  <div class="card p-5 md:col-span-2">
     <h2 class="text-sm font-semibold mb-3">Recent items ({{ items|length }})</h2>
-    <ul class="text-sm divide-y divide-slate-100">
+    <ul class="text-sm row-divide">
       {% for it in items %}
-        <li class="py-2 flex items-center justify-between gap-3">
+        <li class="py-2.5 flex items-center justify-between gap-3">
           <a href="/items/{{ it.id }}" class="hover:underline truncate">{{ it.subject }}</a>
-          <div class="flex items-center gap-2 text-xs text-slate-500">
-            <span class="badge bg-slate-100 text-slate-700">{{ it.category.replace('_',' ') }}</span>
+          <div class="flex items-center gap-2 text-xs" style="color: var(--pf-ink-muted);">
+            <span class="badge pill-soft-neutral">{{ it.category.replace('_',' ') }}</span>
             <span>{{ it.status.value.replace('_',' ') }}</span>
             <span>{{ it.created_at.strftime('%m-%d %H:%M') }}</span>
           </div>
         </li>
       {% else %}
-        <li class="py-2 text-sm text-slate-500">No items yet.</li>
+        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No items yet.</li>
       {% endfor %}
     </ul>
   </div>
 
-  <div class="card p-4 md:col-span-3">
+  <div class="card p-5 md:col-span-3">
     <h2 class="text-sm font-semibold mb-3">Audit log (latest 50)</h2>
-    <ul class="text-xs divide-y divide-slate-100 font-mono">
+    <ul class="text-xs row-divide font-mono">
       {% for a in audit %}
-        <li class="py-1.5 flex items-center gap-2">
-          <span class="text-slate-400 w-32">{{ a.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
-          <span class="font-semibold w-24">{{ a.action }}</span>
-          <span class="text-slate-500">item={{ a.item_id }} user={{ a.user_id }}</span>
-          <span class="text-slate-700 ml-2">{{ a.detail }}</span>
+        <li class="py-2 flex items-center gap-2">
+          <span style="color: var(--pf-ink-muted);" class="w-32">{{ a.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+          <span class="font-semibold w-24" style="color: var(--pf-ink);">{{ a.action }}</span>
+          <span style="color: var(--pf-ink-soft);">item={{ a.item_id }} user={{ a.user_id }}</span>
+          <span class="ml-2" style="color: var(--pf-ink);">{{ a.detail }}</span>
         </li>
       {% else %}
-        <li class="py-1.5 text-slate-500">No activity yet.</li>
+        <li class="py-2" style="color: var(--pf-ink-muted);">No activity yet.</li>
       {% endfor %}
     </ul>
   </div>
