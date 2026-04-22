@@ -4,53 +4,253 @@
 {% block title %}Owner · PropertyFlow{% endblock %}
 {% block content %}
 
+<style>
+  /* ---- Owner analytics page ---- */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .summary-tile {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem 1rem;
+  }
+  .summary-tile .tile-val {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1.1;
+    color: var(--ink);
+    display: block;
+    margin-top: 0.35rem;
+  }
+  .summary-tile .tile-label {
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .summary-tile .tile-sub {
+    font-size: 0.76rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ---- Sortable analytics table ---- */
+  .analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .analytics-table th {
+    font-size: 0.63rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.55rem 0.85rem 0.55rem 0;
+    border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  .analytics-table th:not(:first-child) { text-align: right; }
+  .analytics-table th .sort-arrow {
+    display: inline-block; margin-left: 0.3em; opacity: 0.35; font-style: normal;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .analytics-table th.sorted-asc .sort-arrow,
+  .analytics-table th.sorted-desc .sort-arrow { opacity: 1; color: var(--accent-strong); }
+  .analytics-table th.sorted-desc .sort-arrow { transform: rotate(180deg); }
+
+  .analytics-table td {
+    padding: 0.8rem 0.85rem 0.8rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.88rem;
+    vertical-align: middle;
+  }
+  .analytics-table tr:last-child td { border-bottom: none; }
+  .analytics-table td:not(:first-child) { text-align: right; font-feature-settings: "tnum" 1; }
+
+  .analytics-table .client-name { font-weight: 500; color: var(--ink); }
+  .analytics-table .client-sub { font-size: 0.74rem; color: var(--muted); margin-top: 0.15rem; }
+
+  .bar-cell { min-width: 7rem; }
+  .mini-bar {
+    display: inline-block;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--rule-strong);
+    width: 100%;
+    max-width: 4.5rem;
+    position: relative;
+    vertical-align: middle;
+    margin-right: 0.4em;
+  }
+  .mini-bar-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .ai-rate-high .mini-bar-fill { background: var(--accent); }
+  .ai-rate-mid  .mini-bar-fill { background: var(--highlight); }
+  .ai-rate-low  .mini-bar-fill { background: var(--rule-strong); }
+
+  .chip-open { background: #e7efe8; color: #2f5d3a; border: 1px solid #cfdfd0; border-radius: 999px; padding: 0.1em 0.6em; font-size: 0.75rem; }
+  .chip-done { background: var(--accent-soft); color: var(--accent-strong); border: 1px solid rgba(47,107,83,0.18); border-radius: 999px; padding: 0.1em 0.6em; font-size: 0.75rem; }
+
+  .response-fast { color: var(--accent-strong); font-weight: 600; }
+  .response-mid  { color: var(--ink); }
+  .response-slow { color: #b45309; }
+
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 0.35em;
+    font-size: 0.74rem; font-weight: 500;
+  }
+  .ai-badge::before {
+    content: '';
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+  }
+  .ai-badge.up::before { background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,0.18); }
+  .ai-badge.fallback::before { background: var(--highlight); box-shadow: 0 0 0 3px rgba(180,83,9,0.12); }
+
+  @media (max-width: 700px) {
+    .analytics-table .hide-sm { display: none; }
+    .summary-strip { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
 <div class="page-head">
-  <span class="eyebrow">§ Owner &mdash; cross-tenant view</span>
-  <h1>The whole system, at a glance.</h1>
-  <p class="deck">Tenants, the AI engine, and the full audit trail across every workspace.</p>
+  <span class="eyebrow">§ Owner &mdash; system view</span>
+  <h1>Client analytics &amp; performance.</h1>
+  <p class="deck">Response times, AI efficiency, and workflow health across every workspace.</p>
 </div>
 
-<div class="grid-2" style="margin-bottom: 1.6rem;">
-  <div class="card">
-    <span class="eyebrow">Tenants</span>
-    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 1rem;">{{ rows|length }} workspaces</h3>
-    <div class="items-row is-head" style="grid-template-columns: 1.4fr 0.6fr 0.6fr 0.6fr; padding: 0.6rem 0; border-bottom: 1px solid var(--rule);">
-      <span>Tenant</span><span>Users</span><span>Items</span><span>Open</span>
-    </div>
-    {% for r in rows %}
-      <div class="items-row" style="grid-template-columns: 1.4fr 0.6fr 0.6fr 0.6fr; padding: 0.85rem 0;">
-        <span style="font-weight:500;">{{ r.tenant.name }}</span>
-        <span class="tnum muted">{{ r.users }}</span>
-        <span class="tnum muted">{{ r.items }}</span>
-        <span class="tnum" style="font-family: var(--serif); font-style: italic; color: var(--ink);">{{ r.open }}</span>
-      </div>
-    {% else %}
-      <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No tenants.</p>
-    {% endfor %}
+{# ---- System summary strip ---- #}
+<div class="summary-strip">
+  <div class="summary-tile">
+    <span class="tile-label">Clients</span>
+    <span class="tile-val">{{ summary.clients }}</span>
+    <span class="tile-sub">active workspaces</span>
   </div>
-
-  <div class="card">
-    <span class="eyebrow">AI engine</span>
+  <div class="summary-tile">
+    <span class="tile-label">Total items</span>
+    <span class="tile-val">{{ summary.items }}</span>
+    <span class="tile-sub">{{ summary.done }} resolved</span>
+  </div>
+  <div class="summary-tile">
+    <span class="tile-label">Avg response</span>
+    <span class="tile-val">{{ summary.avg_response }}</span>
+    <span class="tile-sub">across resolved items</span>
+  </div>
+  <div class="summary-tile">
+    <span class="tile-label">AI draft rate</span>
+    <span class="tile-val">{{ summary.ai_rate }}%</span>
+    <span class="tile-sub">items AI-assisted</span>
+  </div>
+  <div class="summary-tile">
+    <span class="tile-label">Time saved</span>
+    <span class="tile-val">{{ summary.est_hours }}h</span>
+    <span class="tile-sub">est. vs manual drafting</span>
+  </div>
+  <div class="summary-tile">
+    <span class="tile-label">AI engine</span>
     {% if ai_status.ollama == 'up' %}
-      <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.4rem;">AI running <span class="muted" style="font-style:italic; font-weight:400;">— remote</span></h3>
-      <p class="deck" style="margin-bottom: 1.1rem;">Live model is responding to classification and draft requests.</p>
+      <span class="tile-val" style="font-size:1.1rem; font-style:normal; margin-top: 0.55rem;">
+        <span class="ai-badge up">Live — {{ ai_status.model }}</span>
+      </span>
+      <span class="tile-sub">Ollama model running</span>
     {% else %}
-      <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.4rem;">Using fallback <span class="muted" style="font-style:italic; font-weight:400;">— rule-based</span></h3>
-      <p class="deck" style="margin-bottom: 1.1rem;">Local model not yet present. Deterministic rules are running every classification and draft.</p>
+      <span class="tile-val" style="font-size:1.1rem; font-style:normal; margin-top: 0.55rem;">
+        <span class="ai-badge fallback">Rule-based</span>
+      </span>
+      <span class="tile-sub">Deterministic fallback — fully operational</span>
     {% endif %}
-    <div class="card-inset">
-      <div style="display:flex; align-items:baseline; justify-content:space-between; gap: 0.85rem;">
-        <span class="eyebrow">Model</span>
-        <span class="tnum" style="font-family: var(--serif); font-style: italic; font-size: 1.05rem;">{{ ai_status.model }}</span>
-      </div>
-      <div style="display:flex; align-items:baseline; justify-content:space-between; gap: 0.85rem; margin-top: 0.5rem;">
-        <span class="eyebrow">Engine</span>
-        <span class="muted" style="font-size: 0.85rem;">{% if ai_status.ollama == 'up' %}ollama (remote){% else %}fallback (rules){% endif %}</span>
-      </div>
-    </div>
   </div>
 </div>
 
+{# ---- Analytics table ---- #}
+<div class="card" style="margin-bottom: 2rem;">
+  <div class="between" style="margin-bottom: 1.25rem;">
+    <div>
+      <span class="eyebrow">Client performance</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">Click any column to sort</h3>
+    </div>
+  </div>
+
+  <div style="overflow-x: auto;">
+    <table class="analytics-table" id="analytics-tbl">
+      <thead>
+        <tr>
+          <th data-col="0" data-type="str">Client <span class="sort-arrow">↑</span></th>
+          <th data-col="1" data-type="num" class="hide-sm">Team <span class="sort-arrow">↑</span></th>
+          <th data-col="2" data-type="num">Items <span class="sort-arrow">↑</span></th>
+          <th data-col="3" data-type="num" class="hide-sm">Done <span class="sort-arrow">↑</span></th>
+          <th data-col="4" data-type="num">Open <span class="sort-arrow">↑</span></th>
+          <th data-col="5" data-type="num">Avg response <span class="sort-arrow">↑</span></th>
+          <th data-col="6" data-type="num">AI rate <span class="sort-arrow">↑</span></th>
+          <th data-col="7" data-type="num">Est. saved <span class="sort-arrow">↑</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          {% set resp_class = 'response-fast' if r.avg_response_min and r.avg_response_min < 30 else ('response-slow' if r.avg_response_min and r.avg_response_min > 240 else 'response-mid') %}
+          {% set ai_bar_class = 'ai-rate-high' if r.ai_rate >= 60 else ('ai-rate-mid' if r.ai_rate >= 25 else 'ai-rate-low') %}
+          <tr>
+            <td data-val="{{ r.tenant.name }}">
+              <div class="client-name">{{ r.tenant.name }}</div>
+              <div class="client-sub">since {{ r.tenant.created_at.strftime('%b %Y') }}</div>
+            </td>
+            <td data-val="{{ r.users }}" class="hide-sm">
+              <span class="muted">{{ r.users }} user{{ '' if r.users == 1 else 's' }}</span>
+            </td>
+            <td data-val="{{ r.total }}">{{ r.total }}</td>
+            <td data-val="{{ r.done }}" class="hide-sm">
+              {% if r.total > 0 %}
+                <span class="chip-done">{{ r.done }}</span>
+                <span class="muted" style="font-size:0.74rem; margin-left:0.3em;">{{ (r.done / r.total * 100)|round|int }}%</span>
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+            <td data-val="{{ r.open }}">
+              {% if r.open > 0 %}
+                <span class="chip-open">{{ r.open }}</span>
+              {% else %}
+                <span class="muted">0</span>
+              {% endif %}
+            </td>
+            <td data-val="{{ r.avg_response_min if r.avg_response_min else 9999 }}">
+              <span class="{{ resp_class }}">{{ r.avg_response }}</span>
+            </td>
+            <td data-val="{{ r.ai_rate }}" class="bar-cell">
+              <span class="{{ ai_bar_class }}" style="display:inline-flex; align-items:center; gap:0.4em;">
+                <span class="mini-bar">
+                  <span class="mini-bar-fill" style="width:{{ r.ai_rate }}%;"></span>
+                </span>
+                {{ r.ai_rate }}%
+              </span>
+            </td>
+            <td data-val="{{ r.est_hours }}">
+              <span style="font-family: var(--serif); font-style: italic;">{{ r.est_hours }}h</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="muted" style="padding: 2rem 0; text-align:center; font-size:0.85rem;">No clients yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# ---- Audit log ---- #}
 <div class="card">
   <div class="between" style="margin-bottom: 1rem;">
     <div>
@@ -80,4 +280,43 @@
     {% endfor %}
   </div>
 </div>
+
+<script>
+(function () {
+  const tbl = document.getElementById('analytics-tbl');
+  if (!tbl) return;
+  const headers = tbl.querySelectorAll('thead th');
+  let sortCol = -1, sortAsc = true;
+
+  headers.forEach((th, i) => {
+    th.addEventListener('click', () => {
+      const type = th.dataset.type || 'str';
+      if (sortCol === i) {
+        sortAsc = !sortAsc;
+      } else {
+        sortCol = i; sortAsc = true;
+      }
+
+      headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+      th.classList.add(sortAsc ? 'sorted-asc' : 'sorted-desc');
+
+      const tbody = tbl.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const av = a.children[i]?.dataset.val ?? '';
+        const bv = b.children[i]?.dataset.val ?? '';
+        let cmp;
+        if (type === 'num') {
+          cmp = (parseFloat(av) || 0) - (parseFloat(bv) || 0);
+        } else {
+          cmp = av.localeCompare(bv);
+        }
+        return sortAsc ? cmp : -cmp;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    });
+  });
+})();
+</script>
+
 {% endblock %}
