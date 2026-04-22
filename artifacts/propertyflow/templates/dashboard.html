@@ -26,11 +26,18 @@
   </div>
 
   <div class="summary">
-    <div class="metric">
+    <a href="#my-tasks" class="metric metric-link" title="Jump to my tasks">
       <span class="stat-label">Open</span>
       <span class="stat-value">{{ metrics.open }}</span>
-      <span class="stat-trend">{% if metrics.action_needed %}{{ metrics.action_needed }} need attention{% else %}All assigned{% endif %}</span>
-    </div>
+      {% if metrics.action_needed %}
+        <span class="stat-trend attn-loud">
+          <span class="attn-dot" aria-hidden="true"></span>
+          {{ metrics.action_needed }} need{{ '' if metrics.action_needed == 1 else 's' }} attention &rarr;
+        </span>
+      {% else %}
+        <span class="stat-trend">All assigned</span>
+      {% endif %}
+    </a>
     <div class="metric">
       <span class="stat-label">Overdue</span>
       <span class="stat-value">{{ metrics.overdue }}</span>
@@ -42,6 +49,33 @@
       <span class="stat-trend {{ 'is-good' if metrics.done_today else '' }}">{{ metrics.done_today }} resolved today</span>
     </div>
   </div>
+
+  <style>
+    .metric-link {
+      cursor: pointer; text-decoration: none; color: inherit;
+      transition: background 0.15s, transform 0.15s;
+      border-radius: 6px;
+    }
+    .metric-link:hover { background: var(--accent-soft); transform: translateY(-1px); }
+
+    .attn-loud {
+      display: inline-flex; align-items: center; gap: 0.45em;
+      background: #fef3c7; color: #92400e;
+      border: 1px solid #fcd34d;
+      padding: 0.2em 0.65em; border-radius: 999px;
+      font-weight: 600; font-size: 0.78rem;
+      animation: pulse-attn 2.4s ease-in-out infinite;
+    }
+    .attn-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.25);
+    }
+    @keyframes pulse-attn {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+      50%      { box-shadow: 0 0 0 5px rgba(245,158,11,0.18); }
+    }
+    html { scroll-behavior: smooth; }
+  </style>
 
   <div class="items-table">
     <div class="items-row is-head">
@@ -76,6 +110,36 @@
   </div>
 </div>
 
+{# ---- My open tasks (front and centre) ---- #}
+<div class="card" id="my-tasks" style="margin-bottom: 2.5rem; {% if my_tasks %}border-left: 3px solid var(--accent-strong);{% endif %}">
+  <div class="between" style="margin-bottom: 0.85rem;">
+    <div>
+      <span class="eyebrow">My open tasks</span>
+      <h3 class="h-card" style="margin-top:0.35rem;">Assigned to {{ user.name.split()[0] }}</h3>
+    </div>
+    {% if my_tasks %}
+      <span class="attn-loud">{{ my_tasks|length }} open</span>
+    {% endif %}
+  </div>
+  {% if my_tasks %}
+    <div>
+      {% for t in my_tasks %}
+        <div class="rule-top" style="padding: 0.85rem 0;">
+          <div class="between">
+            <div style="min-width:0;">
+              <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ t.description }}</a>
+              <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
+            </div>
+            <span class="chip chip-general">open</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="deck" style="margin-top:0;">No open tasks assigned to you. 🎉</p>
+  {% endif %}
+</div>
+
 {# ---- Bottom strip: status across the team ---- #}
 <div class="between" style="margin-bottom: 1.25rem;">
   <h2 class="h-section">This is what your team sees every morning.</h2>
@@ -89,34 +153,11 @@
   {% endfor %}
 </div>
 
-{# ---- My tasks + Add item ---- #}
-<div class="grid-2" id="add-item">
-  <div class="card">
-    <span class="eyebrow">My open tasks</span>
-    <h3 class="h-card" style="margin-top:0.4rem; margin-bottom:1rem;">Assigned to {{ user.name.split()[0] }}</h3>
-    {% if my_tasks %}
-      <div>
-        {% for t in my_tasks %}
-          <div class="rule-top" style="padding: 0.85rem 0;">
-            <div class="between">
-              <div style="min-width:0;">
-                <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ t.description }}</a>
-                <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
-              </div>
-              <span class="chip chip-general">open</span>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p class="deck" style="margin-top:0;">No open tasks assigned to you.</p>
-    {% endif %}
-  </div>
-
-  <div class="card">
-    <span class="eyebrow">Add item</span>
-    <h3 class="h-card" style="margin-top:0.4rem; margin-bottom:1rem;">Run a message through the workflow</h3>
-    <form method="post" action="/api/items" id="manual-item" class="stack-md">
+{# ---- Add item ---- #}
+<div class="card" id="add-item">
+  <span class="eyebrow">Add item</span>
+  <h3 class="h-card" style="margin-top:0.4rem; margin-bottom:1rem;">Run a message through the workflow</h3>
+  <form method="post" action="/api/items" id="manual-item" class="stack-md">
       <div>
         <label class="label" for="f-subj">Subject</label>
         <input id="f-subj" name="subject" required class="field" placeholder="Boiler issue — Flat 3B" />

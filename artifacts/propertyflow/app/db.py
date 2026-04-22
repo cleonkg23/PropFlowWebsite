@@ -9,7 +9,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,6 +28,18 @@ engine = create_engine(
 )
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+
+
+# SQLite ships with foreign-key enforcement OFF by default. Without this hook,
+# `ondelete=CASCADE` declarations are silently ignored — and SQLite recycles
+# deleted row IDs, so orphaned rows would re-attach to whichever new row took
+# the freed ID. Turn FKs on for every connection.
+if DB_URL.startswith("sqlite"):
+    @event.listens_for(Engine, "connect")
+    def _enable_sqlite_fk(dbapi_connection, _connection_record):  # noqa: ANN001
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 class Base(DeclarativeBase):
