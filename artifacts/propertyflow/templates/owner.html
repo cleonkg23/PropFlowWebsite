@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% set page = 'owner' %}
+{% set sl = {'new':'New','in_progress':'In Progress','awaiting_reply':'Awaiting Reply','done':'Done'} %}
 {% block title %}Owner · PropertyFlow{% endblock %}
 {% block content %}
 
@@ -58,14 +59,20 @@
     </div>
     <span class="muted tnum" style="font-size:0.78rem;">{{ audit|length }} entries</span>
   </div>
+  <div class="activity-row" style="border-top: none; border-bottom: 1px solid var(--rule-strong); padding-bottom: 0.5rem; margin-bottom: 0.1rem;">
+    <span class="eyebrow" style="font-size:0.66rem;">Time</span>
+    <span class="eyebrow" style="font-size:0.66rem;">Event</span>
+    <span class="eyebrow" style="font-size:0.66rem;">Detail</span>
+  </div>
   <div class="activity-list">
     {% for a in audit %}
+      {% set det = a.detail|default('')|replace('awaiting_reply','Awaiting Reply')|replace('in_progress','In Progress')|replace('done','Done')|replace('new','New')|replace('->','→') %}
       <div class="activity-row">
         <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
         <span class="action">{{ a.action.replace('_',' ') }}</span>
         <span class="what">
-          <b>tenant #{{ a.tenant_id or '—' }}</b>{% if a.item_id %} &middot; item #{{ a.item_id }}{% endif %}
-          {% if a.detail %} &mdash; {{ a.detail }}{% endif %}
+          <b>Tenant {{ a.tenant_id or '—' }}</b>{% if a.item_id %} &middot; Item {{ a.item_id }}{% endif %}
+          {% if det %} &mdash; {{ det }}{% endif %}
         </span>
       </div>
     {% else %}

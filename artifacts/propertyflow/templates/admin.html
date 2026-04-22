@@ -4,7 +4,8 @@
 {% block content %}
 
 {% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
-{% set status_label = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set status_label = {'new':'New','in_progress':'In Progress','awaiting_reply':'Awaiting Reply','done':'Done'} %}
+{% set sl = status_label %}
 
 <div class="page-head">
   <span class="eyebrow">§ Admin &mdash; {{ tenant.name if tenant else 'No tenant' }}</span>
@@ -42,7 +43,7 @@
             <div style="font-weight:500;">{{ u.name }}</div>
             <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ u.email }}</div>
           </div>
-          <span class="chip chip-general">{{ u.role.value }}</span>
+          <span class="chip chip-general">{{ u.role.value|capitalize }}</span>
         </div>
       {% else %}
         <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No users.</p>
@@ -59,14 +60,20 @@
     </div>
     <span class="muted tnum" style="font-size:0.78rem;">{{ audit|length }} entries</span>
   </div>
+  <div class="activity-row" style="border-top: none; border-bottom: 1px solid var(--rule-strong); padding-bottom: 0.5rem; margin-bottom: 0.1rem;">
+    <span class="eyebrow" style="font-size:0.66rem;">Time</span>
+    <span class="eyebrow" style="font-size:0.66rem;">Event</span>
+    <span class="eyebrow" style="font-size:0.66rem;">Detail</span>
+  </div>
   <div class="activity-list">
     {% for a in audit %}
+      {% set det = a.detail|default('')|replace('awaiting_reply','Awaiting Reply')|replace('in_progress','In Progress')|replace('done','Done')|replace('new','New')|replace('->','→') %}
       <div class="activity-row">
         <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
         <span class="action">{{ a.action.replace('_',' ') }}</span>
         <span class="what">
-          {% if a.item_id %}<b>item #{{ a.item_id }}</b>{% endif %}
-          {% if a.detail %}{% if a.item_id %} &mdash; {% endif %}{{ a.detail }}{% endif %}
+          {% if a.item_id %}<b>Item {{ a.item_id }}</b>{% endif %}
+          {% if det %}{% if a.item_id %} &mdash; {% endif %}{{ det }}{% endif %}
         </span>
       </div>
     {% else %}
