@@ -22,17 +22,18 @@ def seed_if_empty(db: Session) -> None:
     db.add_all([acme, beech])
     db.flush()
 
-    # System owner — no tenant
-    owner = User(email="owner@propertyflow.dev", name="System Owner", role=Role.owner)
+    # All seed accounts use @test.test so they sign in instantly without
+    # requiring a magic-link email — see app/auth.py:is_test_email.
+    owner = User(email="owner@test.test", name="System Owner", role=Role.owner)
 
     # Acme users
-    acme_admin = User(tenant_id=acme.id, email="admin@acme.dev", name="Sarah Admin", role=Role.admin)
-    maria = User(tenant_id=acme.id, email="maria@acme.dev", name="Maria Operator", role=Role.operator)
-    priya = User(tenant_id=acme.id, email="priya@acme.dev", name="Priya Operator", role=Role.operator)
-    viewer = User(tenant_id=acme.id, email="viewer@acme.dev", name="Vince Viewer", role=Role.viewer)
+    acme_admin = User(tenant_id=acme.id, email="sarah.acme@test.test", name="Sarah Admin", role=Role.admin)
+    maria = User(tenant_id=acme.id, email="maria.acme@test.test", name="Maria Operator", role=Role.operator)
+    priya = User(tenant_id=acme.id, email="priya.acme@test.test", name="Priya Operator", role=Role.operator)
+    viewer = User(tenant_id=acme.id, email="vince.acme@test.test", name="Vince Viewer", role=Role.viewer)
 
     # Beech: just an admin so the owner panel shows two tenants populated
-    beech_admin = User(tenant_id=beech.id, email="admin@beech.dev", name="Tom Admin", role=Role.admin)
+    beech_admin = User(tenant_id=beech.id, email="tom.beech@test.test", name="Tom Admin", role=Role.admin)
 
     db.add_all([owner, acme_admin, maria, priya, viewer, beech_admin])
     db.flush()

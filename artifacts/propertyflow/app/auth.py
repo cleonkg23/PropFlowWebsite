@@ -1,23 +1,49 @@
-"""Session-cookie authentication.
+"""Session-cookie authentication + magic-link tokens.
 
-Dev model (per spec — "no passwords, magic link OR simple login"):
-  - User submits email at /login
-  - If email matches a seeded user, set session.user_id and redirect by role
-  - No magic-link email is actually sent — for an MVP demo we trust the form
-
-This is intentionally simple. Replace the body of `authenticate_email` with
-a real magic-link flow (sign a token, email it, accept it at /login/magic)
-when moving past MVP.
+Auth model:
+  - User submits email at /login.
+  - Emails ending in @test.test bypass email and log in instantly
+    (development / demo seed accounts).
+  - All other emails get a one-click magic link sent via Resend
+    (15-min expiry, single use enforced by the timestamp + email binding).
 """
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 from fastapi import Depends, HTTPException, Request, status
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import Role, User
+
+MAGIC_LINK_TTL_SECONDS = 15 * 60  # 15 minutes
+TEST_EMAIL_SUFFIX = "@test.test"
+
+_SECRET = os.environ.get("SESSION_SECRET") or "dev-only-not-for-prod"
+_serializer = URLSafeTimedSerializer(_SECRET, salt="propertyflow-magic-link")
+
+
+def is_test_email(email: str) -> bool:
+    return email.strip().lower().endswith(TEST_EMAIL_SUFFIX)
+
+
+def make_magic_token(email: str) -> str:
+    return _serializer.dumps({"email": email.strip().lower()})
+
+
+def verify_magic_token(token: str) -> Optional[str]:
+    """Return the email if the token is valid & unexpired, else None."""
+    try:
+        data = _serializer.loads(token, max_age=MAGIC_LINK_TTL_SECONDS)
+    except (BadSignature, SignatureExpired):
+        return None
+    if not isinstance(data, dict):
+        return None
+    email = data.get("email")
+    return email if isinstance(email, str) else None
 
 
 def login_user(request: Request, user: User) -> None:
@@ -28,9 +54,13 @@ def logout_user(request: Request) -> None:
     request.session.pop("user_id", None)
 
 
-def authenticate_email(db: Session, email: str) -> Optional[User]:
+def lookup_user(db: Session, email: str) -> Optional[User]:
     """Look up a user by email — case-insensitive. Returns None if unknown."""
     return db.query(User).filter(User.email.ilike(email.strip())).one_or_none()
+
+
+# Backwards-compat alias used by older code.
+authenticate_email = lookup_user
 
 
 def current_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:

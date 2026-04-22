@@ -5,7 +5,7 @@
   <div style="text-align: center; margin-bottom: 2rem;">
     <span class="eyebrow">§ Property Workflow Co.</span>
     <h1 style="font-size: 2.1rem; margin-top: 0.6rem;">Sign in to your workspace.</h1>
-    <p class="deck" style="margin-top: 0.5rem;">Use a seeded demo email below.</p>
+    <p class="deck" style="margin-top: 0.5rem;">We'll email you a one-click sign-in link.</p>
   </div>
 
   <div class="card">
@@ -17,21 +17,24 @@
         <label class="label" for="email">Email</label>
         <input id="email" name="email" type="email" required autocomplete="email" spellcheck="false" class="field" placeholder="you@example.com" />
       </div>
-      <button class="btn-primary" style="width:100%;">Sign In &rarr;</button>
+      <button class="btn-primary" style="width:100%;">Send Sign-In Link &rarr;</button>
     </form>
+    <p class="muted" style="font-size: 0.78rem; margin: 0.9rem 0 0; font-style: italic; font-family: var(--serif);">
+      Demo accounts ending in <code>@test.test</code> sign in instantly without email.
+    </p>
   </div>
 
   <div class="card" style="margin-top: 1.2rem;">
-    <span class="eyebrow">Demo logins</span>
+    <span class="eyebrow">Demo logins · instant</span>
     <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">Click to fill</h3>
     <div>
       {% for email, label in [
-        ('owner@propertyflow.dev', 'system owner'),
-        ('admin@acme.dev', 'Acme admin'),
-        ('maria@acme.dev', 'Acme operator'),
-        ('priya@acme.dev', 'Acme operator'),
-        ('viewer@acme.dev', 'Acme viewer'),
-        ('admin@beech.dev', 'Beech admin'),
+        ('owner@test.test', 'system owner'),
+        ('sarah.acme@test.test', 'Acme admin'),
+        ('maria.acme@test.test', 'Acme operator'),
+        ('priya.acme@test.test', 'Acme operator'),
+        ('vince.acme@test.test', 'Acme viewer'),
+        ('tom.beech@test.test', 'Beech admin'),
       ] %}
         <div class="rule-top between" style="padding: 0.7rem 0;">
           <button type="button" class="quick-login" data-email="{{ email }}"
