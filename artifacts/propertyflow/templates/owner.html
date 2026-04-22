@@ -133,6 +133,44 @@
   <p class="deck">Response times, AI efficiency, and workflow health across every workspace.</p>
 </div>
 
+{% if flash %}
+  <div class="flash flash-{{ flash_kind }}" role="status">{{ flash }}</div>
+{% endif %}
+
+<style>
+  .flash { padding: 0.7rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.88rem; }
+  .flash-ok  { background: var(--accent-soft); color: var(--accent-strong); border: 1px solid rgba(47,107,83,0.2); }
+  .flash-err { background: #fbe9e7; color: #9b2c2c; border: 1px solid #f3c9c4; }
+  .row-actions form { display: inline; }
+  .icon-btn {
+    background: none; border: 1px solid var(--rule); border-radius: 6px;
+    padding: 0.25em 0.55em; font-size: 0.72rem; color: var(--muted); cursor: pointer;
+  }
+  .icon-btn:hover { color: #9b2c2c; border-color: #f3c9c4; background: #fef5f4; }
+
+  details.create-client { margin-bottom: 2rem; }
+  details.create-client > summary {
+    cursor: pointer; padding: 0.85rem 1.1rem;
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+    font-weight: 500; list-style: none;
+  }
+  details.create-client > summary::before { content: '+ '; font-weight: 700; color: var(--accent-strong); }
+  details.create-client[open] > summary::before { content: '× '; }
+  details.create-client[open] > summary { border-radius: 10px 10px 0 0; border-bottom: none; }
+  .client-form {
+    background: var(--surface); border: 1px solid var(--rule); border-top: none;
+    border-radius: 0 0 10px 10px; padding: 1.25rem 1.1rem 1.1rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  .client-form .full { grid-column: 1 / -1; }
+  .client-form label { display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; font-weight: 600; }
+  .client-form input { width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--rule); border-radius: 6px; font: inherit; background: white; }
+  .client-form .actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.4rem; }
+  .btn-primary { background: var(--accent-strong); color: white; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font: inherit; font-weight: 500; cursor: pointer; }
+  .btn-primary:hover { filter: brightness(0.92); }
+  .form-help { grid-column: 1 / -1; font-size: 0.78rem; color: var(--muted); margin-top: -0.2rem; }
+</style>
+
 {# ---- System summary strip ---- #}
 <div class="summary-strip">
   <div class="summary-tile">
@@ -181,6 +219,29 @@
   </div>
 </div>
 
+{# ---- Create client ---- #}
+<details class="create-client">
+  <summary>Add a new client</summary>
+  <form method="post" action="/owner/clients" class="client-form">
+    <div class="full">
+      <label for="cl-name">Client (business) name</label>
+      <input id="cl-name" name="name" type="text" required placeholder="e.g. Beech Property Co." autocomplete="off">
+    </div>
+    <p class="form-help">Optional: invite the first admin user for this client now. They'll be able to add operators and viewers themselves.</p>
+    <div>
+      <label for="cl-admin-name">Admin name</label>
+      <input id="cl-admin-name" name="admin_name" type="text" placeholder="e.g. Sarah Lee" autocomplete="off">
+    </div>
+    <div>
+      <label for="cl-admin-email">Admin email</label>
+      <input id="cl-admin-email" name="admin_email" type="email" placeholder="sarah@beechproperty.co.uk" autocomplete="off">
+    </div>
+    <div class="actions">
+      <button type="submit" class="btn-primary">Create client</button>
+    </div>
+  </form>
+</details>
+
 {# ---- Analytics table ---- #}
 <div class="card" style="margin-bottom: 2rem;">
   <div class="between" style="margin-bottom: 1.25rem;">
@@ -202,6 +263,7 @@
           <th data-col="5" data-type="num">Avg response <span class="sort-arrow">↑</span></th>
           <th data-col="6" data-type="num">AI rate <span class="sort-arrow">↑</span></th>
           <th data-col="7" data-type="num">Est. saved <span class="sort-arrow">↑</span></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -246,9 +308,15 @@
             <td data-val="{{ r.est_hours }}">
               <span style="font-family: var(--serif); font-style: italic;">{{ r.est_hours }}h</span>
             </td>
+            <td class="row-actions" style="text-align:right;">
+              <form method="post" action="/owner/clients/{{ r.tenant.id }}/delete"
+                    onsubmit="return confirm('Delete client &quot;{{ r.tenant.name }}&quot; and all its users, items, and history? This cannot be undone.');">
+                <button type="submit" class="icon-btn" title="Delete client">Delete</button>
+              </form>
+            </td>
           </tr>
         {% else %}
-          <tr><td colspan="8" class="muted" style="padding: 2rem 0; text-align:center; font-size:0.85rem;">No clients yet.</td></tr>
+          <tr><td colspan="9" class="muted" style="padding: 2rem 0; text-align:center; font-size:0.85rem;">No clients yet — use “Add a new client” above to get started.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -272,11 +340,12 @@
   <div class="activity-list">
     {% for a in audit %}
       {% set det = a.detail|default('')|replace('awaiting_reply','Awaiting Reply')|replace('in_progress','In Progress')|replace('done','Done')|replace('new','New')|replace('->','→') %}
+      {% set client_label = tenant_names.get(a.tenant_id, 'System') if a.tenant_id else 'System' %}
       <div class="activity-row">
         <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
         <span class="action">{{ a.action.replace('_',' ') }}</span>
         <span class="what">
-          <b>Tenant {{ a.tenant_id or '—' }}</b>{% if a.item_id %} &middot; Item {{ a.item_id }}{% endif %}
+          <b>{{ client_label }}</b>{% if a.item_id %} &middot; Item {{ a.item_id }}{% endif %}
           {% if det %} &mdash; {{ det }}{% endif %}
         </span>
       </div>

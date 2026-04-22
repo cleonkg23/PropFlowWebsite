@@ -1,9 +1,10 @@
-"""System-owner panel — cross-tenant view + AI health + analytics."""
+"""System-owner panel — cross-client view, AI health, analytics, client CRUD."""
 from __future__ import annotations
 
 from datetime import timezone
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -34,6 +35,10 @@ def _fmt_response(minutes: float | None) -> str:
     return f"{minutes / 60:.1f}h"
 
 
+def _audit(db: Session, *, tenant_id, user_id, action: str, detail: str = "") -> None:
+    db.add(AuditLog(tenant_id=tenant_id, user_id=user_id, action=action, detail=detail))
+
+
 @router.get("/owner")
 def owner_home(request: Request, user: User = Depends(require_role(Role.owner)), db: Session = Depends(get_db)):
     tenants = db.query(Tenant).order_by(Tenant.name).all()
@@ -49,7 +54,6 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
         open_count = total - len(done_items)
         ai_drafted = sum(1 for it in all_items if it.draft_reply)
 
-        # Avg response time: creation → last-update for resolved items
         response_mins: list[float] = []
         for it in done_items:
             a, b = _ts(it.created_at), _ts(it.updated_at)
@@ -78,7 +82,6 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
         system_totals["ai_drafted"] += ai_drafted
         system_totals["response_mins"].extend(response_mins)
 
-    # System-wide summary metrics
     all_mins = system_totals["response_mins"]
     system_avg = _fmt_response((sum(all_mins) / len(all_mins)) if all_mins else None)
     total_est_hours = round(system_totals["ai_drafted"] * _MINUTES_SAVED_PER_AI_ITEM / 60, 1)
@@ -98,8 +101,97 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
 
     audit = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(50).all()
 
+    # Tenant lookup for human-readable audit detail
+    tenant_names = {t.id: t.name for t in tenants}
+
+    flash = request.session.pop("flash", None)
+    flash_kind = request.session.pop("flash_kind", "ok")
+
     return templates.TemplateResponse(
         request,
         "owner.html",
-        {"user": user, "rows": rows, "audit": audit, "ai_status": ai.status(), "summary": summary},
+        {
+            "user": user,
+            "rows": rows,
+            "audit": audit,
+            "ai_status": ai.status(),
+            "summary": summary,
+            "tenant_names": tenant_names,
+            "flash": flash,
+            "flash_kind": flash_kind,
+        },
     )
+
+
+# ---------------------------------------------------------------------------
+# Client (tenant) create / delete + initial admin
+# ---------------------------------------------------------------------------
+
+
+def _flash(request: Request, msg: str, kind: str = "ok") -> None:
+    request.session["flash"] = msg
+    request.session["flash_kind"] = kind
+
+
+@router.post("/owner/clients")
+def create_client(
+    request: Request,
+    name: str = Form(...),
+    admin_name: str = Form(""),
+    admin_email: str = Form(""),
+    user: User = Depends(require_role(Role.owner)),
+    db: Session = Depends(get_db),
+):
+    name = name.strip()
+    if not name:
+        _flash(request, "Client name is required.", "err")
+        return RedirectResponse("/owner", status_code=status.HTTP_303_SEE_OTHER)
+
+    if db.query(Tenant).filter(Tenant.name.ilike(name)).first():
+        _flash(request, f"A client named “{name}” already exists.", "err")
+        return RedirectResponse("/owner", status_code=status.HTTP_303_SEE_OTHER)
+
+    tenant = Tenant(name=name)
+    db.add(tenant)
+    db.flush()  # get tenant.id
+
+    detail = f"Created client {name!r}"
+
+    admin_email = admin_email.strip().lower()
+    admin_name = admin_name.strip()
+    if admin_email:
+        if db.query(User).filter(User.email.ilike(admin_email)).first():
+            db.rollback()
+            _flash(request, f"Email {admin_email} already in use.", "err")
+            return RedirectResponse("/owner", status_code=status.HTTP_303_SEE_OTHER)
+        admin = User(
+            tenant_id=tenant.id,
+            email=admin_email,
+            name=admin_name or admin_email.split("@")[0].title(),
+            role=Role.admin,
+        )
+        db.add(admin)
+        detail += f"; added admin {admin_email}"
+
+    _audit(db, tenant_id=tenant.id, user_id=user.id, action="client_created", detail=detail)
+    db.commit()
+    _flash(request, f"Client “{name}” created." + (f" Admin {admin_email} added." if admin_email else ""))
+    return RedirectResponse("/owner", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/owner/clients/{tenant_id}/delete")
+def delete_client(
+    request: Request,
+    tenant_id: int,
+    user: User = Depends(require_role(Role.owner)),
+    db: Session = Depends(get_db),
+):
+    tenant = db.get(Tenant, tenant_id)
+    if not tenant:
+        raise HTTPException(404, "Client not found")
+    name = tenant.name
+    db.delete(tenant)  # cascades to users + items + tasks
+    _audit(db, tenant_id=None, user_id=user.id, action="client_deleted", detail=f"Deleted client {name!r}")
+    db.commit()
+    _flash(request, f"Client “{name}” deleted.")
+    return RedirectResponse("/owner", status_code=status.HTTP_303_SEE_OTHER)

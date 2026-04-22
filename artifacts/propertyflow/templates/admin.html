@@ -7,51 +7,186 @@
 {% set status_label = {'new':'New','in_progress':'In Progress','awaiting_reply':'Awaiting Reply','done':'Done'} %}
 {% set sl = status_label %}
 
+<style>
+  .flash { padding: 0.7rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.88rem; }
+  .flash-ok  { background: var(--accent-soft); color: var(--accent-strong); border: 1px solid rgba(47,107,83,0.2); }
+  .flash-err { background: #fbe9e7; color: #9b2c2c; border: 1px solid #f3c9c4; }
+
+  .users-table { width: 100%; border-collapse: collapse; }
+  .users-table th {
+    font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600; color: var(--muted); text-align: left;
+    padding: 0.55rem 0.6rem 0.55rem 0; border-bottom: 1px solid var(--rule-strong);
+  }
+  .users-table td {
+    padding: 0.7rem 0.6rem 0.7rem 0; border-bottom: 1px solid var(--rule);
+    font-size: 0.88rem; vertical-align: middle;
+  }
+  .users-table tr:last-child td { border-bottom: none; }
+  .users-table .u-name { font-weight: 500; }
+  .users-table .u-email { font-size: 0.76rem; color: var(--muted); margin-top: 0.15rem; }
+  .users-table form { display: inline; margin: 0; }
+  .users-table .role-form select {
+    font: inherit; font-size: 0.78rem; padding: 0.25em 0.4em;
+    border: 1px solid var(--rule); border-radius: 5px; background: white;
+  }
+  .users-table .actions { text-align: right; white-space: nowrap; }
+  .icon-btn {
+    background: none; border: 1px solid var(--rule); border-radius: 6px;
+    padding: 0.25em 0.6em; font-size: 0.74rem; color: var(--muted); cursor: pointer;
+    font: inherit;
+  }
+  .icon-btn:hover { color: #9b2c2c; border-color: #f3c9c4; background: #fef5f4; }
+  .role-pill {
+    display: inline-block; font-size: 0.72rem;
+    padding: 0.1em 0.55em; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent-strong); border: 1px solid rgba(47,107,83,0.2);
+  }
+  .role-pill.viewer  { background: #f1f1ef; color: var(--muted); border-color: var(--rule); }
+  .role-pill.operator { background: #ecf2ee; color: #2f5d3a; border-color: #cfdfd0; }
+  .role-pill.admin   { background: #f3ecdb; color: #876612; border-color: #ead8a4; }
+
+  .add-user-form {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 1rem; margin-top: 1rem;
+    display: grid; grid-template-columns: 1fr 1fr 9rem auto; gap: 0.7rem; align-items: end;
+  }
+  .add-user-form label {
+    display: block; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.25rem; font-weight: 600;
+  }
+  .add-user-form input, .add-user-form select {
+    width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--rule);
+    border-radius: 6px; font: inherit; background: white;
+  }
+  .btn-primary {
+    background: var(--accent-strong); color: white; border: none;
+    padding: 0.55rem 1.05rem; border-radius: 6px; font: inherit; font-weight: 500; cursor: pointer;
+    height: 2.4rem;
+  }
+  .btn-primary:hover { filter: brightness(0.92); }
+
+  @media (max-width: 700px) {
+    .add-user-form { grid-template-columns: 1fr; }
+  }
+</style>
+
 <div class="page-head">
-  <span class="eyebrow">§ Admin &mdash; {{ tenant.name if tenant else 'No tenant' }}</span>
+  <span class="eyebrow">§ Admin &mdash; {{ tenant.name if tenant else 'No client selected' }}</span>
   <h1>People, items, and the system trail.</h1>
-  <p class="deck">Everything that happens in your workspace, in chronological order.</p>
+  <p class="deck">Manage your team, review what's coming in, and watch every action in chronological order.</p>
 </div>
 
-<div class="grid-2" style="margin-bottom: 1.6rem;">
-  <div class="card">
-    <span class="eyebrow">Recent items</span>
-    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.85rem;">{{ items|length }} in this tenant</h3>
+{% if flash %}
+  <div class="flash flash-{{ flash_kind }}" role="status">{{ flash }}</div>
+{% endif %}
+
+{# ---- Users / team management ---- #}
+<div class="card" style="margin-bottom: 1.6rem;">
+  <div class="between" style="margin-bottom: 1rem;">
     <div>
-      {% for it in items %}
-        <a href="/items/{{ it.id }}" class="rule-top" style="display:flex; align-items:center; justify-content:space-between; gap:0.85rem; padding:0.8rem 0; text-decoration:none; color: var(--ink);">
-          <div style="min-width:0; flex:1;">
-            <div style="font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ it.subject }}</div>
-            <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ it.created_at.strftime('%a %d %b, %H:%M') }}</div>
-          </div>
-          <span class="chip {{ chip_for.get(it.category, 'chip-general') }}">{{ it.category.replace('_',' ')|capitalize }}</span>
-          <span class="status status-{{ it.status.value }}">{{ status_label[it.status.value] }}</span>
-        </a>
-      {% else %}
-        <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No items yet.</p>
-      {% endfor %}
+      <span class="eyebrow">Team</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">{{ users|length }} {{ 'person' if users|length == 1 else 'people' }} on this client</h3>
     </div>
   </div>
 
-  <div class="card">
-    <span class="eyebrow">Users</span>
-    <h3 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.85rem;">{{ users|length }} on the team</h3>
+  <div style="overflow-x: auto;">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>Name &amp; email</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td>
+              <div class="u-name">{{ u.name }}{% if u.id == user.id %} <span class="muted" style="font-size:0.72rem;">(you)</span>{% endif %}</div>
+              <div class="u-email">{{ u.email }}</div>
+            </td>
+            <td>
+              {% if u.id == user.id or u.role.value == 'owner' %}
+                <span class="role-pill {{ u.role.value }}">{{ u.role.value|capitalize }}</span>
+              {% else %}
+                <form method="post" action="/admin/users/{{ u.id }}/role" class="role-form">
+                  <select name="role" onchange="this.form.submit()">
+                    {% for r in assignable_roles %}
+                      <option value="{{ r.value }}" {% if r == u.role %}selected{% endif %}>{{ r.value|capitalize }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              {% endif %}
+            </td>
+            <td class="muted" style="font-size:0.78rem;">{{ u.created_at.strftime('%b %Y') }}</td>
+            <td class="actions">
+              {% if u.id != user.id and u.role.value != 'owner' %}
+                <form method="post" action="/admin/users/{{ u.id }}/delete"
+                      onsubmit="return confirm('Remove {{ u.name }} from this client? Their items will stay but will be unassigned.');">
+                  <button type="submit" class="icon-btn" title="Remove">Remove</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4" class="muted" style="padding: 1.25rem 0; text-align:center; font-size:0.85rem;">No team members yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if tenant %}
+  <form method="post" action="/admin/users" class="add-user-form">
     <div>
-      {% for u in users %}
-        <div class="rule-top" style="display:flex; align-items:center; justify-content:space-between; padding:0.8rem 0;">
-          <div>
-            <div style="font-weight:500;">{{ u.name }}</div>
-            <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ u.email }}</div>
-          </div>
-          <span class="chip chip-general">{{ u.role.value|capitalize }}</span>
+      <label for="u-name">Name</label>
+      <input id="u-name" name="name" type="text" required placeholder="e.g. Sarah Lee" autocomplete="off">
+    </div>
+    <div>
+      <label for="u-email">Email</label>
+      <input id="u-email" name="email" type="email" required placeholder="sarah@{{ tenant.name|lower|replace(' ','') }}.com" autocomplete="off">
+    </div>
+    <div>
+      <label for="u-role">Role</label>
+      <select id="u-role" name="role">
+        {% for r in assignable_roles %}
+          <option value="{{ r.value }}" {% if r.value == 'operator' %}selected{% endif %}>{{ r.value|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="btn-primary">Add member</button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+
+{# ---- Recent items ---- #}
+<div class="card" style="margin-bottom: 1.6rem;">
+  <div class="between" style="margin-bottom: 1rem;">
+    <div>
+      <span class="eyebrow">Recent items</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">{{ items|length }} ingested for this client</h3>
+    </div>
+  </div>
+  <div>
+    {% for it in items %}
+      <a href="/items/{{ it.id }}" class="rule-top" style="display:flex; align-items:center; justify-content:space-between; gap:0.85rem; padding:0.8rem 0; text-decoration:none; color: var(--ink);">
+        <div style="min-width:0; flex:1;">
+          <div style="font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ it.subject }}</div>
+          <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{{ it.created_at.strftime('%a %d %b, %H:%M') }}</div>
         </div>
-      {% else %}
-        <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No users.</p>
-      {% endfor %}
-    </div>
+        <span class="chip {{ chip_for.get(it.category, 'chip-general') }}">{{ it.category.replace('_',' ')|capitalize }}</span>
+        <span class="status status-{{ it.status.value }}">{{ status_label[it.status.value] }}</span>
+      </a>
+    {% else %}
+      <p class="muted" style="font-size:0.85rem; padding:1rem 0;">No items yet.</p>
+    {% endfor %}
   </div>
 </div>
 
+{# ---- Audit log ---- #}
 <div class="card">
   <div class="between" style="margin-bottom: 1rem;">
     <div>
