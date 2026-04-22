@@ -38,7 +38,7 @@ def _fmt_response(minutes: float | None) -> str:
 def owner_home(request: Request, user: User = Depends(require_role(Role.owner)), db: Session = Depends(get_db)):
     tenants = db.query(Tenant).order_by(Tenant.name).all()
     rows = []
-    system_totals = {"items": 0, "done": 0, "ai_drafted": 0, "response_mins": []}
+    system_totals = {"total": 0, "done": 0, "ai_drafted": 0, "response_mins": []}
 
     for t in tenants:
         all_items: list[Item] = db.query(Item).filter(Item.tenant_id == t.id).all()
@@ -73,7 +73,7 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
             "est_hours": est_hours,
         })
 
-        system_totals["items"] += total
+        system_totals["total"] += total
         system_totals["done"] += len(done_items)
         system_totals["ai_drafted"] += ai_drafted
         system_totals["response_mins"].extend(response_mins)
@@ -83,13 +83,13 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
     system_avg = _fmt_response((sum(all_mins) / len(all_mins)) if all_mins else None)
     total_est_hours = round(system_totals["ai_drafted"] * _MINUTES_SAVED_PER_AI_ITEM / 60, 1)
     system_ai_rate = (
-        round(system_totals["ai_drafted"] / system_totals["items"] * 100)
-        if system_totals["items"] else 0
+        round(system_totals["ai_drafted"] / system_totals["total"] * 100)
+        if system_totals["total"] else 0
     )
 
     summary = {
         "clients": len(tenants),
-        "items": system_totals["items"],
+        "total": system_totals["total"],
         "done": system_totals["done"],
         "avg_response": system_avg,
         "est_hours": total_est_hours,
