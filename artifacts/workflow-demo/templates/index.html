@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root { --cream:#f3eee4; --ink:#1f2a24; --green:#2f6b53; --rule:#dcd3c0; }
+    :root { --cream:#f3eee4; --ink:#1f2a24; --green:#2f6b53; --rule:#dcd3c0; --muted:#6b7268; }
     body { background: var(--cream); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
     .serif { font-family: 'Fraunces', Georgia, serif; letter-spacing: -0.01em; }
     .panel { background: #fdfbf6; border: 1px solid var(--rule); }
@@ -16,9 +16,48 @@
     .pill-urgent { background:#fdecea; color:#b3402b; }
     .pill-high   { background:#fdf2dc; color:#9a6300; }
     .pill-normal { background:#e8efe9; color:#2f6b53; }
-    .col-head { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color:#6b7268; }
+    .col-head { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
     .scenario-btn { background:#1f2a24; color:#fdfbf6; }
     .scenario-btn:hover { background:#2f6b53; }
+    .scenario-btn.is-active { background:#2f6b53; box-shadow: 0 0 0 3px rgba(47,107,83,0.18); }
+
+    /* Before/after framing */
+    .ba { font-size: 0.78rem; color: var(--muted); }
+    .ba b { color: var(--ink); font-weight: 600; }
+
+    /* Step indicator — five dots, subtle */
+    .steps { display:flex; gap:1.25rem; align-items:center; flex-wrap:wrap; }
+    .step { display:flex; align-items:center; gap:0.45rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); transition: color 280ms; }
+    .step .dot { width:8px; height:8px; border-radius:999px; background:#d6cdb8; transition: background 280ms, box-shadow 280ms, transform 280ms; }
+    .step.done { color: var(--ink); }
+    .step.done .dot { background: var(--green); }
+    .step.active { color: var(--ink); }
+    .step.active .dot { background: var(--green); box-shadow: 0 0 0 5px rgba(47,107,83,0.18); transform: scale(1.1); }
+
+    /* Section emphasis used by the guided flow */
+    .section { transition: opacity 320ms ease, box-shadow 320ms ease, border-color 320ms ease; border-radius: 0.375rem; }
+    .section.dim { opacity: 0.42; }
+    .section.active { box-shadow: 0 0 0 2px rgba(47,107,83,0.32), 0 14px 40px -22px rgba(47,107,83,0.35); border-color: rgba(47,107,83,0.4); }
+
+    /* Staged reveal — used inside detail/action panels */
+    .stage { opacity: 0; transform: translateY(4px); transition: opacity 320ms ease, transform 320ms ease; }
+    .stage.show { opacity: 1; transform: none; }
+
+    /* Inbox row dim/flash */
+    .inbox-row { transition: opacity 280ms, background 600ms; }
+    .inbox-row.dim { opacity: 0.4; }
+    .inbox-row.flash { background: #fff7df; }
+
+    /* Board card arrival */
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .board-card.new-arrival { animation: rise 520ms ease both; box-shadow: 0 0 0 2px rgba(47,107,83,0.35); }
+
+    /* Final caption under the board */
+    .board-summary { opacity: 0; transition: opacity 480ms ease; font-style: italic; color: var(--ink); }
+    .board-summary.show { opacity: 1; }
+
+    /* Microcopy under panel headings */
+    .caption { font-size: 0.78rem; color: var(--muted); margin-top: -0.15rem; margin-bottom: 0.6rem; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -26,17 +65,25 @@
     <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <span class="serif text-xl font-medium">Property Workflow</span>
-        <span class="text-xs uppercase tracking-widest" style="color:#6b7268">Live demo</span>
+        <span class="text-xs uppercase tracking-widest" style="color:var(--muted)">Live demo</span>
       </div>
-      <button id="reset-btn" class="text-xs uppercase tracking-widest hover:underline" style="color:#6b7268">Reset demo</button>
+      <button id="reset-btn" class="text-xs uppercase tracking-widest hover:underline" style="color:var(--muted)">Reset demo</button>
     </div>
   </header>
 
   <main class="max-w-[1400px] mx-auto px-6 py-8 space-y-8">
-    <!-- Scenario triggers -->
+
+    <!-- Hero + scenario triggers -->
     <section>
-      <h1 class="serif text-3xl md:text-4xl font-medium mb-1">Trigger a scenario</h1>
-      <p class="text-sm mb-4" style="color:#5a6259">Click any button — watch it move from inbox → classified → on the board, with a draft reply ready.</p>
+      <h1 class="serif text-3xl md:text-4xl font-medium mb-2">From inbox chaos to a tracked workflow</h1>
+      <p class="text-base mb-3 max-w-2xl" style="color:#3a443e">
+        Watch one incoming message move from inbox chaos to a tracked workflow with a reply ready — in under a minute.
+      </p>
+      <p class="ba mb-5 max-w-3xl">
+        <b>Before:</b> scattered emails, missed follow-ups, unclear ownership.
+        &nbsp;&nbsp;<b>After:</b> each item is classified, assigned, and visible in one workflow.
+      </p>
+
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {% for key, s in scenarios.items() %}
         <button data-scenario="{{ key }}" class="scenario-btn rounded-md px-4 py-3 text-left text-sm font-medium transition">
@@ -47,30 +94,45 @@
       </div>
     </section>
 
+    <!-- Step indicator -->
+    <section class="panel rounded-md px-5 py-3">
+      <div class="steps" id="step-indicator">
+        <div class="step" data-step="received"><span class="dot"></span>Received</div>
+        <div class="step" data-step="classified"><span class="dot"></span>Classified</div>
+        <div class="step" data-step="assigned"><span class="dot"></span>Assigned</div>
+        <div class="step" data-step="reply"><span class="dot"></span>Reply ready</div>
+        <div class="step" data-step="tracked"><span class="dot"></span>Tracked</div>
+        <span id="step-hint" class="text-xs italic ml-auto" style="color:var(--muted)">Trigger a scenario to start.</span>
+      </div>
+    </section>
+
     <!-- Three-panel working area -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Inbox -->
-      <div class="panel rounded-md lg:col-span-4 p-4">
-        <div class="flex items-baseline justify-between mb-3">
+      <div id="section-inbox" class="section panel lg:col-span-4 p-4">
+        <div class="flex items-baseline justify-between">
           <h2 class="serif text-lg font-medium">Inbox</h2>
           <span class="col-head" id="inbox-count">0 items</span>
         </div>
+        <p class="caption">Mixed messages from tenants, viewers and landlords.</p>
         <ul id="inbox-list" class="divide-y" style="border-color:var(--rule)">
-          <li class="py-6 text-sm text-center" style="color:#6b7268">No items yet — trigger a scenario above.</li>
+          <li class="py-6 text-sm text-center" style="color:var(--muted)">Loading…</li>
         </ul>
       </div>
 
       <!-- Detail -->
-      <div class="panel rounded-md lg:col-span-4 p-4">
-        <h2 class="serif text-lg font-medium mb-3">Classification &amp; routing</h2>
+      <div id="section-detail" class="section panel lg:col-span-4 p-4">
+        <h2 class="serif text-lg font-medium">Classification &amp; routing</h2>
+        <p class="caption">Auto-applied from message content — category, urgency, owner, next step.</p>
         <div id="detail-panel" class="text-sm" style="color:#5a6259">
           Select an item from the inbox to see how it was classified.
         </div>
       </div>
 
       <!-- Action -->
-      <div class="panel rounded-md lg:col-span-4 p-4">
-        <h2 class="serif text-lg font-medium mb-3">Task &amp; draft reply</h2>
+      <div id="section-action" class="section panel lg:col-span-4 p-4">
+        <h2 class="serif text-lg font-medium">Task &amp; draft reply</h2>
+        <p class="caption">Reply prepared automatically — ready for review.</p>
         <div id="action-panel" class="text-sm" style="color:#5a6259">
           The created task and a draft response will appear here.
         </div>
@@ -78,11 +140,12 @@
     </section>
 
     <!-- Workflow board -->
-    <section>
-      <div class="flex items-baseline justify-between mb-3">
-        <h2 class="serif text-2xl font-medium">Workflow board</h2>
+    <section id="section-board" class="section">
+      <div class="flex items-baseline justify-between mb-1">
+        <h2 class="serif text-2xl font-medium">This is what your team sees every morning</h2>
         <span class="col-head">Status across the team</span>
       </div>
+      <p class="caption mb-3">Everything open, assigned, and visible — no more chasing who owns what.</p>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="panel rounded-md p-3">
           <div class="col-head mb-2">New</div>
@@ -101,10 +164,11 @@
           <ul data-status="done" class="space-y-2 min-h-[80px]"></ul>
         </div>
       </div>
+      <p id="board-summary" class="board-summary text-sm mt-4 text-center"></p>
     </section>
   </main>
 
-  <footer class="max-w-[1400px] mx-auto px-6 py-8 text-xs" style="color:#6b7268">
+  <footer class="max-w-[1400px] mx-auto px-6 py-8 text-xs" style="color:var(--muted)">
     Demo system · classification rules in <code>workflow.py</code> · storage in <code>data/store.json</code>
   </footer>
 

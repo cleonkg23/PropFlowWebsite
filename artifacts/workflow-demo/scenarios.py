@@ -1,7 +1,13 @@
-"""Pre-baked demo payloads — one per required scenario."""
+"""Pre-baked demo payloads — one per required scenario.
 
-# Scenarios deliberately omit `type` so the keyword classifier in
-# workflow.classify_input does the work — that's the point of the demo.
+Scenarios deliberately omit `type` so the keyword classifier in
+workflow.classify_input does the work — that's the point of the demo.
+
+PRESSURE_ITEMS are seed messages that pre-populate the inbox so the demo
+feels operationally real (chasers, urgent, etc.) rather than starting empty.
+They go through the full pipeline like any other ingest.
+"""
+
 SCENARIOS = {
     "tenant_enquiry": {
         "label": "Tenant enquiry",
@@ -40,3 +46,18 @@ SCENARIOS = {
         ),
     },
 }
+
+# Inbox-pressure messages: realistic chasers that sit in the inbox so the
+# demo doesn't start from an empty slate. Loaded once on first page view.
+PRESSURE_ITEMS = [
+    {
+        "from_name": "Lauren (8 Beech Cl.)",
+        "property": "8 Beech Close",
+        "message": "Still waiting — any update on the kitchen tap repair? It's been four days.",
+    },
+    {
+        "from_name": "Daniel Brooks",
+        "property": "12 Sycamore Way",
+        "message": "Chasing on the deposit return — second time asking, can someone pick this up please?",
+    },
+]

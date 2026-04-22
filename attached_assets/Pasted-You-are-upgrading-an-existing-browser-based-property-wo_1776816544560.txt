@@ -1,0 +1,467 @@
+You are upgrading an existing browser-based property workflow demo. The current demo already has:
+
+* a scenario trigger section
+* an inbox
+* a classification and routing section
+* a task and draft reply section
+* a workflow board with columns like New, In Progress, Awaiting Reply, Done
+
+The visual style is already strong and should be preserved:
+
+* calm, premium, editorial
+* muted cream / green palette
+* clear typography
+* no flashy SaaS aesthetic
+* no generic “AI” gimmicks
+
+Your job is not to redesign the app from scratch. Your job is to turn the current one-page demo into a much stronger guided sales demo that clearly tells a story:
+
+“Incoming work is messy and scattered. The system classifies it, routes it, drafts the reply, and makes the work visible to the team.”
+
+Important: keep this as a one-page demo. Do not add authentication, billing, multi-tenancy, or product complexity. Do not turn this into a full SaaS app. This is still a sales demo and lightweight workflow engine.
+
+Persist all key architecture, flow logic, animation sequencing, and UI decisions in `replit.md` so future prompts can continue from the same understanding.
+
+## Core objective
+
+Make the demo feel like a real workflow transformation happening live.
+
+The user should not just see a static interface. They should feel guided through a clear operational flow:
+
+1. new item arrives
+2. inbox is highlighted
+3. item is selected
+4. classification appears
+5. task gets created
+6. draft reply appears
+7. workflow board updates
+8. user sees the operational result
+
+The experience should be understandable in under 60 seconds and feel persuasive enough for a small property business owner or manager.
+
+## Current problem to fix
+
+The demo is structurally good, but too static and too open. Everything is visible at once, which makes the user scan and interpret instead of being guided. It needs:
+
+* guided flow
+* highlight animations
+* progressive reveal
+* stronger before/after framing
+* stronger value framing
+* better narrative microcopy
+
+Do not solve this with tabs. Do not hide the system behind lots of collapses. Use animation, emphasis, sequencing, and progressive reveal instead.
+
+## High-level UX changes required
+
+### 1. Keep it one page
+
+Do not create multiple pages.
+
+### 2. Add guided flow animation
+
+When a scenario is triggered, the system should visually guide the eye through each section in order.
+
+### 3. Add progressive reveal
+
+The classification, task, and board update should feel like they happen in sequence, not all at once.
+
+### 4. Add before/after framing
+
+Make the transformation explicit. Show that this solves scattered inbox work and missing ownership.
+
+### 5. Add value framing
+
+The UI should explain why each step matters:
+
+* reply ready quickly
+* task assigned
+* nothing gets missed
+* everything has an owner
+* visibility across the team
+
+## Exact UX structure to build
+
+Keep the page layout broadly the same, but improve the content hierarchy and sequencing.
+
+### Section A: Scenario trigger area
+
+This stays near the top.
+
+Requirements:
+
+* Keep the scenario buttons
+* Keep the four scenarios:
+
+  * Tenant enquiry
+  * Maintenance request
+  * Viewing follow-up
+  * Landlord admin request
+* Add a short before/after style line directly under the main heading
+
+Suggested copy:
+
+* “Before: scattered emails, missed follow-ups, unclear ownership.”
+* “After: each item is classified, assigned, and visible in one workflow.”
+
+Or a stronger alternative:
+
+* “Watch one incoming message move from inbox chaos to a tracked workflow with a reply ready.”
+
+### Section B: Inbox
+
+Keep this visible and prominent.
+
+Requirements:
+
+* The inbox should be the first active area in the flow
+* When a scenario is triggered, the corresponding inbox item should animate in or become highlighted
+* Add one or two more realistic “pressure” style messages to make the inbox feel operationally real, such as:
+
+  * “Still waiting — any update?”
+  * “Client chasing — urgent”
+  * “Can someone pick this up?”
+* The selected inbox item should be clearly distinguished
+
+### Section C: Classification and routing
+
+Keep this below the inbox or adjacent depending on existing layout.
+
+Requirements:
+
+* This section should not appear to update instantly with everything at once
+* Add staged reveal of its fields
+* Add explanatory microcopy that makes it feel like the system is making a decision
+
+Examples:
+
+* “Detected as maintenance request”
+* “Marked urgent from message content”
+* “Assigned using workflow rules”
+* “Next action suggested automatically”
+
+### Section D: Task and draft reply
+
+Keep as a single section.
+
+Requirements:
+
+* Add a stronger header or sublabel that frames the value
+* Example:
+
+  * “Task created and reply ready”
+  * “Reply prepared automatically — ready for review”
+* The task card should animate in after classification
+* The draft reply should fade or slide in after the task appears
+* Buttons like “Mark replied” and “Mark done” can remain, but should feel secondary to the main story
+
+### Section E: Workflow board
+
+Keep the board as the final destination of the flow.
+
+Requirements:
+
+* Add a stronger label above the board, such as:
+
+  * “This is what your team sees every morning”
+  * “No more asking who owns this”
+  * “Everything open, assigned, and visible”
+* The chosen item should visibly move or appear in the correct board column when the animation sequence reaches that step
+* The board should feel like the final operational benefit, not just another UI block
+
+## Critical UX rule
+
+Do not use tabs for the main workflow flow.
+
+Do not heavily collapse content.
+
+Use:
+
+* highlight rings
+* subtle glow
+* pulse
+* fade-in
+* slide-in
+* smooth scroll
+* step indicators
+* sequencing delays
+
+This should feel polished and intentional, not gimmicky.
+
+## Guided flow animation: exact script
+
+Implement the scenario experience with a step-by-step sequence. This is mandatory.
+
+When a user clicks a scenario button, run this sequence:
+
+### Step 0: Reset / prepare
+
+* clear previous active highlights
+* reset section emphasis
+* optionally dim non-active sections slightly
+* ensure the selected scenario button shows active state
+
+Duration: immediate
+
+### Step 1: Trigger inbox event
+
+* scroll smoothly to the inbox if needed
+* highlight the inbox container with a soft glow or bordered emphasis
+* animate the selected message card:
+
+  * fade in if newly inserted, or
+  * pulse / rise slightly if already present
+* visually mark this as the active message
+
+Optional helper label:
+
+* “1. New message received”
+
+Duration: about 700–1000ms
+
+### Step 2: Focus the inbox message
+
+* keep inbox highlighted
+* subtly dim other inbox rows
+* selected row gets strong emphasis
+* after a short delay, automatically move attention downward to classification
+
+Optional helper label:
+
+* “Message selected for triage”
+
+Duration: about 800ms
+
+### Step 3: Reveal classification and routing
+
+* smooth scroll to classification if needed
+* classification container gets highlight ring or glow
+* reveal fields in sequence, not all at once:
+
+  1. category
+  2. urgency
+  3. owner
+  4. next action
+* each row should animate in with slight stagger
+
+Add explanatory helper text or microcopy:
+
+* “Detected as [category]”
+* “Priority set to [urgency]”
+* “Assigned to [owner]”
+* “Recommended next step: [action]”
+
+Optional helper label:
+
+* “2. Classified and routed”
+
+Duration: 1500–2200ms total
+
+### Step 4: Reveal task creation
+
+* classification section remains visible but no longer primary
+* task section gets primary highlight
+* task card animates in
+* include slight count-up or subtle emphasis on due date / assignee if possible
+
+Optional helper label:
+
+* “3. Task created”
+
+Duration: about 700–1000ms
+
+### Step 5: Reveal draft reply
+
+* draft area fades or slides in immediately after task creation
+* highlight a small line above it:
+
+  * “Reply prepared automatically”
+  * or “Draft ready in under a minute”
+* make the draft feel clearly generated from the workflow, not static filler
+
+Optional helper label:
+
+* “4. Reply ready”
+
+Duration: about 800–1200ms
+
+### Step 6: Update the workflow board
+
+* smooth scroll to workflow board if needed
+* board container gets highlight
+* the item appears in its destination column or visually moves there
+* if actual card movement is hard, it can:
+
+  * fade out from previous state and appear in the correct column
+  * or animate as a duplicated “ghost card” transition
+* the final board state should clearly show where the item now lives operationally
+
+Optional helper label:
+
+* “5. Tracked across the team”
+
+Duration: about 1000–1400ms
+
+### Step 7: Show final value state
+
+* remove the active animation intensity
+* keep subtle emphasis on the final item state
+* show one strong summary line beneath or above the board:
+
+Examples:
+
+* “Nothing gets missed. Everything has an owner.”
+* “From inbox message to tracked workflow in seconds.”
+* “Your team can see what’s open, who owns it, and what needs action.”
+
+Duration: final resting state
+
+## Animation behaviour requirements
+
+Use tasteful animation only. Keep it subtle and premium.
+
+Allowed animation styles:
+
+* fade
+* slide-up
+* pulse
+* highlight ring
+* soft glow
+* opacity transitions
+* staggered reveal
+* smooth scroll
+
+Avoid:
+
+* bouncing
+* flashy loaders
+* neon effects
+* spinning gimmicks
+* over-animated dashboards
+
+If using a JS library, keep it lightweight. If no library is needed, use CSS transitions and minimal JS.
+
+## UI text additions required
+
+Add stronger framing text in strategic places.
+
+### Near top / scenario section
+
+Add a short before/after framing line.
+
+### Near classification
+
+Add decision explanation microcopy.
+
+### Near draft
+
+Add a line that ties it to speed and admin reduction.
+
+Examples:
+
+* “Reply ready for review”
+* “Draft generated automatically”
+* “Prepared from the workflow decision”
+
+### Near workflow board
+
+Add a line that ties it to operational visibility.
+
+Examples:
+
+* “This is what your team sees every morning”
+* “No more chasing who owns what”
+* “Everything open, assigned, and visible”
+
+## Optional improvement: live step indicator
+
+If it fits the design, add a very subtle step indicator showing the current stage:
+
+* Received
+* Classified
+* Assigned
+* Reply ready
+* Tracked
+
+This should be minimal and elegant, not a loud progress bar.
+
+## Optional improvement: replay capability
+
+Keep the “Reset demo” behaviour, but improve it so the user can easily:
+
+* clear the current state
+* replay another scenario
+* understand the system is intentionally demonstrating one flow at a time
+
+## Technical implementation guidance
+
+Keep the current architecture lightweight.
+
+If the app already uses a simple backend and stored state:
+
+* do not rebuild it
+* extend the existing structure
+
+If needed, create or improve:
+
+* a central flow controller in JS
+* scenario configuration objects
+* animation state manager
+* active section IDs
+* scenario-to-workflow mapping
+
+Suggested pattern:
+
+* each scenario has a structured object containing:
+
+  * inbox message
+  * category
+  * urgency
+  * owner
+  * next action
+  * task details
+  * draft reply
+  * final board column
+
+Then run the same guided sequence regardless of scenario.
+
+## Maintainability requirement
+
+Refactor only enough to make the flow reusable and clear.
+
+Update `replit.md` with:
+
+* current system architecture
+* animation sequence logic
+* scenario data model
+* copy decisions
+* future extension notes
+
+## Final success criteria
+
+The demo is successful when:
+
+* it remains one page
+* the user can trigger any scenario
+* the interface guides their attention automatically
+* the user clearly sees inbox → classification → task → draft → board
+* the board feels like the operational end state
+* the experience feels persuasive, not just functional
+* a small property business owner could understand the value in under a minute
+
+## Implementation approach
+
+Work incrementally:
+
+1. audit current component structure
+2. add scenario flow state
+3. add highlight system
+4. add progressive reveal for classification/task/draft/board
+5. add scroll guidance
+6. add copy improvements
+7. polish transitions
+8. update `replit.md`
+
+When coding, preserve the current visual design as much as possible. Improve storytelling, emphasis, and guided motion — not the whole identity.
+
+Start now by inspecting the existing codebase and implementing the guided flow animation system first.

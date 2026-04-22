@@ -17,7 +17,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from scenarios import SCENARIOS
+from scenarios import PRESSURE_ITEMS, SCENARIOS
 from store import get_state, reset
 from workflow import ingest, update_status
 
@@ -44,6 +44,22 @@ def api_state() -> dict[str, Any]:
 def api_reset() -> dict[str, str]:
     reset()
     return {"status": "ok"}
+
+
+@app.post("/api/seed-pressure")
+def api_seed_pressure() -> dict[str, Any]:
+    """Idempotent: seed inbox-pressure messages only when the store is empty.
+    The whole check + seed runs under the store lock (RLock allows ingest's
+    inner add_* calls to re-acquire), so concurrent calls cannot double-seed.
+    Called once on first page view so the demo never starts from zero."""
+    from store import _lock  # type: ignore[attr-defined]
+
+    with _lock:
+        if get_state()["items"]:
+            return {"status": "skipped", "reason": "items already present"}
+        for payload in PRESSURE_ITEMS:
+            ingest(payload)
+    return {"status": "ok", "seeded": len(PRESSURE_ITEMS)}
 
 
 @app.post("/ingest")

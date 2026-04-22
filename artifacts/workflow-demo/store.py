@@ -16,7 +16,7 @@ from typing import Any
 DATA_DIR = Path(__file__).parent / "data"
 STORE_FILE = DATA_DIR / "store.json"
 
-_lock = threading.Lock()
+_lock = threading.RLock()  # reentrant so seed_if_empty() can wrap multiple ingest calls
 _EMPTY: dict[str, list[dict[str, Any]]] = {"items": [], "tasks": []}
 
 
