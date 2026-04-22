@@ -1,0 +1,19 @@
+kind = "web"
+previewPath = "/app"
+title = "PropertyFlow"
+version = "1.0.0"
+id = "artifacts/propertyflow"
+router = "path"
+
+[[services]]
+name = "web"
+paths = ["/app"]
+localPort = 8008
+
+[services.env]
+PORT = "8008"
+PROPERTYFLOW_DEV = "1"
+PROPERTYFLOW_URL_PREFIX = "/app"
+
+[services.development]
+run = "python -m uvicorn app.main:app --host 0.0.0.0 --port 8008"

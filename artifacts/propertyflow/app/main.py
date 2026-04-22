@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.db import SessionLocal, init_db
+from app.middleware.prefix import PrefixMiddleware
 from app.routes import admin, api, dashboard, owner, public
 from app.seed import seed_if_empty
 
@@ -58,6 +59,14 @@ app.add_middleware(
 )
 
 app.mount("/static", StaticFiles(directory=str(ROOT / "static")), name="static")
+
+# When hosted behind the Replit path-based proxy under /app, transparently
+# strip the prefix from incoming requests and prepend it to outgoing URLs so
+# routes and templates (which use root-relative paths) keep working unchanged.
+_url_prefix = os.environ.get("PROPERTYFLOW_URL_PREFIX", "").strip()
+if _url_prefix:
+    app.add_middleware(PrefixMiddleware, prefix=_url_prefix)
+    log.info("propertyflow URL prefix middleware enabled: %s", _url_prefix)
 
 app.include_router(public.router)
 app.include_router(dashboard.router)

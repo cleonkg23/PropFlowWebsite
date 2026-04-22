@@ -71,7 +71,7 @@ Only one flow runs at a time (`flowRunning` flag); polling skipped while a flow 
 - Add a new scenario by adding an entry to `SCENARIOS` in `scenarios.py` — the guided flow code is scenario-agnostic and will pick it up automatically
 
 ### `artifacts/propertyflow/` — multi-tenant FastAPI app (Python 3.11)
-Production-leaning version of the workflow-demo. Real persistence, real auth, real local AI, real role separation. Runs as workflow `propertyflow: web` on port **8008**.
+Production-leaning version of the workflow-demo. Real persistence, real auth, real local AI, real role separation. Registered as a `web` artifact (id `artifacts/propertyflow`, library `previewPath="/app"`, port **8008**) so it appears in the workspace library alongside the marketing site and api-server. Because templates use root-relative URLs (`/login`, `/dashboard`, …), `app/middleware/prefix.PrefixMiddleware` transparently makes the app prefix-aware when mounted at `/app`: it sets `scope["root_path"]` so Starlette's `get_route_path` strips the prefix during routing, rewrites HTML `href`/`action`/`src`/`formaction` attributes to prepend `/app`, and rewrites `Location` headers on redirects. The middleware is enabled by `PROPERTYFLOW_URL_PREFIX=/app` (set in the artifact toml); when that env var is empty the middleware is a no-op so direct port access still works for local dev.
 
 **Layout:**
 - `app/db.py` — SQLAlchemy engine, `SessionLocal`, `Base`, `get_db()`, `init_db()`. SQLite at `data/propertyflow.db`, override via `PROPERTYFLOW_DB_URL`.
