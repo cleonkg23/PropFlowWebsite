@@ -10,7 +10,14 @@
 {% set now_naive = now_utc.replace(tzinfo=None) %}
 {% set is_overdue = due_naive and due_naive < now_naive and item.status.value != 'done' %}
 {% set is_contractor = user.role.value == 'contractor' %}
-{% set is_ops = user.role.value in ['operator', 'admin', 'owner', 'contractor_admin'] %}
+{% set is_contractor_admin = user.role.value == 'contractor_admin' %}
+{# "Client ops" = the in-house team that owns the ticket lifecycle. Contractor
+   admins are dispatch-only and explicitly excluded from this group — they
+   shouldn't be drafting replies or marking the operator's own tasks done. #}
+{% set is_client_ops = user.role.value in ['operator', 'admin', 'owner'] %}
+{# Used to gate non-lifecycle UI like "Reassign task" — both client ops and
+   contractor admins see it, contractors don't. #}
+{% set is_ops = is_client_ops or is_contractor_admin %}
 
 <style>
   .due-banner {
@@ -141,9 +148,10 @@
     </article>
 
     {# --- Task & draft reply ---
-         Hidden from contractors entirely: the draft, regenerate, and send
-         controls are operator-side machinery they shouldn't see. --- #}
-    {% if not is_contractor %}
+         Hidden from contractors AND contractor admins: the draft, regenerate,
+         and send controls are operator-side machinery — only the client's own
+         ops staff should be sending replies on the company's behalf. --- #}
+    {% if is_client_ops %}
     <article class="card">
       <span class="eyebrow">Task &amp; draft reply</span>
       <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.25rem;">
@@ -215,9 +223,10 @@
   {# ---- RIGHT column: actions, timeline, assignment ---- #}
   <aside class="stack-lg">
     {# --- Workflow actions: ack / status / complete ---
-         Contractors don't drive ticket lifecycle — they just close their
-         own task and the auto-close logic handles the rest. --- #}
-    {% if not is_contractor %}
+         Lifecycle controls are client-ops-only. Contractors and contractor
+         admins never drive ticket status directly — the auto-close on the
+         last open task handles ticket completion. --- #}
+    {% if is_client_ops %}
     <div class="card">
       <span class="eyebrow">Actions</span>
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">{{ status_label[item.status.value] }}</h3>
@@ -315,9 +324,10 @@
       {% endif %}
     </div>
 
-    {# Assignment is an operations-only control: only ops decide who's on
-       a job. Contractors see who's assigned via the All Tasks panel below. #}
-    {% if not is_contractor %}
+    {# Item-level assignment is a client-ops control. Contractor admins
+       reassign the per-task handoff via the All Tasks panel below — they
+       don't change overall ticket ownership. #}
+    {% if is_client_ops %}
     <div class="card">
       <span class="eyebrow">Assignment</span>
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">
@@ -354,11 +364,16 @@
               </div>
               <span class="chip {{ 'chip-priority-normal' if t.status.value == 'done' else 'chip-general' }}">{{ t.status.value }}</span>
             </div>
-            {# Per-task complete: ops can close any open task here (handy
-               when a contractor reports back by phone). The assignee's own
-               panel above is the primary surface for contractors, so we
-               don't double up the form for them. #}
-            {% if t.status.value == 'open' and is_ops %}
+            {# Per-task complete:
+               - Client ops can close ANY open task (handy when a contractor
+                 reports back by phone, or to clear an operator task).
+               - Contractor admins can ONLY close tasks belonging to their
+                 contractors (or the unassigned handoff task). They cannot
+                 mark an operator's own triage task complete on their behalf.
+               - Contractors close their own task via the panel above. #}
+            {% set t_assignee_role = t.assigned_user.role.value if t.assigned_user else '' %}
+            {% set ca_can_close = is_contractor_admin and (t_assignee_role == 'contractor' or t_assignee_role == '' or t.assigned_user_id == user.id) %}
+            {% if t.status.value == 'open' and (is_client_ops or ca_can_close) %}
               <details style="margin-top: 0.45rem;">
                 <summary class="btn btn-sm" style="display:inline-flex;">Mark task complete</summary>
                 <form method="post" action="/tasks/{{ t.id }}/complete" class="compose-note" style="margin-top: 0.45rem;"
@@ -367,8 +382,11 @@
                   <div class="row"><button class="btn btn-sm" type="submit">Complete</button></div>
                 </form>
               </details>
-              {# Per-task reassign — primary use case is contractor admins
-                 dispatching a handoff task to a specific contractor. #}
+            {% endif %}
+            {# Per-task reassign — client ops always; contractor admins only
+               on the maintenance handoff task (backend enforces this too). #}
+            {% set is_handoff = item.category == 'maintenance' and 'On-site visit' in t.description %}
+            {% if t.status.value == 'open' and (is_client_ops or (is_contractor_admin and is_handoff)) %}
               <details style="margin-top: 0.4rem;">
                 <summary class="btn btn-sm" style="display:inline-flex;">Reassign task</summary>
                 <form method="post" action="/tasks/{{ t.id }}/assign" class="compose-note" style="margin-top: 0.45rem;">

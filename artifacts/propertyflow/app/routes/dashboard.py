@@ -17,9 +17,15 @@ from app.services import workflow_service
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
-# Mutating endpoints require at least operator (viewer is read-only).
-WRITE_ROLES = (Role.operator, Role.admin, Role.contractor_admin)
-_OPS_ROLES = (Role.operator, Role.admin, Role.owner, Role.contractor_admin)
+# Client-side ops staff who own the ticket lifecycle (draft, send, change
+# status, close, reopen). Contractor admins are NOT in this group — they're
+# dispatch-only and shouldn't be able to send replies on the operator's
+# behalf or close operator tasks.
+_CLIENT_OPS = (Role.operator, Role.admin, Role.owner)
+# Item-lifecycle endpoints (status / draft / send / acknowledge / complete /
+# reopen). Owner is granted via require_role automatically? No — explicitly
+# include here. Viewer stays read-only.
+WRITE_ROLES = (Role.operator, Role.admin)
 
 
 def _is_assigned(user: User, item: Item) -> bool:
@@ -33,14 +39,54 @@ def _is_assigned(user: User, item: Item) -> bool:
     return any(t.assigned_user_id == user.id for t in item.tasks)
 
 
+def _has_contractor_task(item: Item) -> bool:
+    return any(
+        t.assigned_user is not None and t.assigned_user.role is Role.contractor
+        for t in item.tasks
+    )
+
+
 def _can_act_on_item(user: User, item: Item) -> bool:
-    """Permission gate for posting timeline notes and (in future) other
-    contractor-allowed actions. Operators+ can always act; contractors only
-    if they're the assignee."""
-    if user.role in _OPS_ROLES:
+    """Permission gate for posting timeline notes and other item-level
+    contractor-allowed actions. Client ops always; contractors when they're
+    the assignee; contractor admins when there's a contractor task on the
+    item (so they can coordinate with their crew on the timeline)."""
+    if user.role in _CLIENT_OPS:
         return True
     if user.role is Role.contractor:
         return _is_assigned(user, item)
+    if user.role is Role.contractor_admin:
+        # Visibility was already gated to dispatchable categories upstream;
+        # if they can see the item they should be able to post timeline
+        # notes coordinating with their crew.
+        return True
+    return False
+
+
+def _can_manage_task(user: User, task: Task) -> bool:
+    """Permission gate for completing/postponing/handing back a single task.
+
+    - Client ops can manage any task on tickets they can see.
+    - The assignee can always manage their own task.
+    - Contractor admins can manage tasks whose assignee is a contractor
+      (their crew) OR the maintenance handoff task itself, even before it's
+      reassigned to a specific contractor.
+    """
+    if user.role in _CLIENT_OPS:
+        return True
+    if task.assigned_user_id == user.id:
+        return True
+    if user.role is Role.contractor_admin:
+        if task.assigned_user is not None and task.assigned_user.role is Role.contractor:
+            return True
+        # Unassigned handoff task fallback — still theirs to dispatch.
+        item = task.item
+        if (
+            item is not None
+            and item.category in workflow_service.HANDOFF_TASK
+            and task.description == workflow_service.HANDOFF_TASK[item.category]
+        ):
+            return True
     return False
 
 
@@ -410,9 +456,7 @@ def post_task_complete(
         raise HTTPException(404, "task not found")
     item = _load_item_for(user, db, task.item_id)  # also enforces tenant + visibility
 
-    is_assignee = task.assigned_user_id == user.id
-    is_ops = user.role in _OPS_ROLES
-    if not (is_assignee or is_ops):
+    if not _can_manage_task(user, task):
         raise HTTPException(403, "you can only complete tasks assigned to you")
 
     try:
@@ -427,7 +471,7 @@ def post_postpone_task(
     task_id: int,
     hours: int = Form(24),
     note: str = Form(""),
-    user: User = Depends(require_role(*WRITE_ROLES, Role.contractor)),
+    user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
     """Push a task's due date out. Assignee can postpone their own task;
@@ -436,9 +480,7 @@ def post_postpone_task(
     if not task:
         raise HTTPException(404, "task not found")
     item = _load_item_for(user, db, task.item_id)
-    is_assignee = task.assigned_user_id == user.id
-    is_ops = user.role in _OPS_ROLES
-    if not (is_assignee or is_ops):
+    if not _can_manage_task(user, task):
         raise HTTPException(403, "you can only postpone tasks assigned to you")
     try:
         workflow_service.postpone_task(db, task=task, actor=user, hours=hours, note=note)
@@ -451,7 +493,7 @@ def post_postpone_task(
 def post_handback_task(
     task_id: int,
     note: str = Form(""),
-    user: User = Depends(require_role(*WRITE_ROLES, Role.contractor)),
+    user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
     """Contractor hands a task back to the operator side. Restricted to the
@@ -460,7 +502,7 @@ def post_handback_task(
     if not task:
         raise HTTPException(404, "task not found")
     item = _load_item_for(user, db, task.item_id)
-    if task.assigned_user_id != user.id and user.role not in _OPS_ROLES:
+    if not _can_manage_task(user, task):
         raise HTTPException(403, "you can only hand back your own task")
     try:
         workflow_service.handback_task(db, task=task, actor=user, note=note)
@@ -473,7 +515,7 @@ def post_handback_task(
 def post_assign_task(
     task_id: int,
     assignee_id: str = Form(""),
-    user: User = Depends(require_role(*WRITE_ROLES)),
+    user: User = Depends(require_role(*WRITE_ROLES, Role.contractor_admin)),
     db: Session = Depends(get_db),
 ):
     """Reassign a single task — used by contractor admins to dispatch the
