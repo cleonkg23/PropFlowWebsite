@@ -1,0 +1,245 @@
+I need a detailed, polished explanation of the three connected builds in this workspace. Please write it as if you are explaining the full product suite to someone who needs to understand the vision, the implementation, and the role of each part in the overall system.
+
+The three builds are:
+
+1) The static editorial marketing website
+2) The guided single-tenant demo app
+3) The real multi-tenant production-style application
+
+I want a complete, organized explanation that covers what each one is, why it exists, how it works, what features it includes, and how the three pieces fit together as one product ecosystem.
+
+Important: be detailed and do not gloss over anything. I want enough depth that someone reading the response would fully understand the product, the architecture, the user experience, and the business purpose behind each build.
+
+Use the following structure and include substantial detail in every section:
+
+==================================================
+OVERVIEW
+==================================================
+Start with a high-level summary of the product suite:
+- Explain that the project is not just one app, but three coordinated builds serving different stages of the customer journey.
+- Describe the broader goal: a property workflow automation platform for letting/property management teams.
+- Explain how the marketing site, demo app, and real application each serve a distinct purpose but reinforce the same brand, workflow story, and product vision.
+- Describe the value proposition of the overall system: helping property teams classify incoming work, route it correctly, create drafts, assign responsibility, track tasks, and keep an audit trail, with AI assistance where possible and deterministic fallback where needed.
+
+==================================================
+1) STATIC EDITORIAL MARKETING WEBSITE
+==================================================
+Describe the marketing site in detail.
+
+What it is:
+- A static editorial / marketing website.
+- Designed to present the brand, product story, and value proposition clearly.
+- It is not the operational system itself, but the top-of-funnel presentation layer.
+
+What it aims to do:
+- Communicate the product’s purpose in a polished, persuasive way.
+- Make the product understandable to prospective users, clients, or investors.
+- Frame the system as a workflow automation product for property operations.
+- Help sell the idea of the platform by showing the pain points it solves and the benefits it creates.
+
+What it should feel like:
+- Editorial, polished, and brand-led.
+- More like a modern product marketing site than a dashboard.
+- Focused on clarity, trust, workflow transformation, and professionalism.
+
+What to explain about its content and role:
+- It should introduce the product story and the workflow concept.
+- It should explain how property teams handle incoming requests, emails, tasks, and follow-ups more efficiently.
+- It should set up the user for the demo and production app.
+- It should be viewed as the “front door” to the product ecosystem.
+- It exists to explain the “why” before the user sees the “how.”
+
+How it fits into the product system:
+- It supports sales, onboarding, and product positioning.
+- It is the first step in the customer journey.
+- It gives context for the demo and real app.
+- It helps unify the brand voice across the entire product family.
+
+Explain the intended audience:
+- Prospects evaluating the product.
+- Property management teams.
+- Decision makers who want to understand the business value quickly.
+- Anyone who needs a concise but convincing overview of the platform.
+
+==================================================
+2) GUIDED SINGLE-TENANT DEMO APP
+==================================================
+Describe the demo app in detail.
+
+What it is:
+- A single-tenant FastAPI guided demo.
+- Built to show the workflow in a controlled, easy-to-follow environment.
+- Designed as a sales/demo experience rather than a multi-client production platform.
+
+What it aims to do:
+- Give prospects a realistic but simplified view of the product.
+- Show the core workflow from ingesting work to classification, routing, drafting, and handling tasks.
+- Demonstrate the value of the system quickly and without requiring a full production setup.
+- Reduce complexity for sales conversations and guided walkthroughs.
+
+What it should feel like:
+- Hands-on, guided, and easy to understand.
+- Controlled and intentionally simple.
+- Designed to highlight the product’s power without overwhelming the viewer.
+
+What to explain about its behavior:
+- It is single-tenant, so it focuses on one example environment instead of multiple organizations.
+- It should show the typical journey of a workflow item through the system.
+- It is meant to illustrate the operational logic, not just display static screenshots.
+- It should feel like a polished demo environment that mirrors the real product logic but is optimized for selling and explaining.
+
+What to describe in terms of features:
+- Guided workflow examples.
+- Demonstrations of classification and routing.
+- Draft generation / response assistance.
+- A clear before-and-after view of how work gets processed.
+- Simple, memorable flows that make the product easy to explain.
+
+How it fits into the product system:
+- Bridges the gap between the marketing site and the real app.
+- Helps people understand the workflow model before they see production complexity.
+- Serves as a sales tool, training tool, and proof-of-concept.
+- Shows the “promise” of the platform in a lower-risk environment.
+
+Explain the intended audience:
+- Sales prospects.
+- Demo audiences.
+- Internal stakeholders.
+- Anyone evaluating whether the product is worth deeper adoption.
+
+==================================================
+3) REAL MULTI-TENANT PRODUCTION APPLICATION
+==================================================
+Describe the real application in detail and thoroughly.
+
+What it is:
+- The production-style multi-tenant FastAPI app.
+- The actual operational system for property workflow automation.
+- Built for real use by different clients / tenants with role-based access control and persistent data.
+
+What it aims to do:
+- Manage real operational work across multiple organizations.
+- Handle incoming items, classify them, assign them, track them, and generate responses.
+- Keep the system secure, auditable, and structured.
+- Support real property management workflows instead of just demo scenarios.
+
+Architecture and technical structure:
+- SQLAlchemy + SQLite persistence.
+- Session-based authentication using signed cookies.
+- Multi-tenant data model with tenant/client separation.
+- Role hierarchy: owner → admin → operator → viewer.
+- Audit logs for visibility and accountability.
+- Server-rendered Jinja2 UI for a polished editorial-style product interface.
+- Vanilla JS only where necessary for interaction.
+- FastAPI routing organized by functional area.
+- Explicit handling of sessions, access rules, and tenant boundaries.
+
+Authentication and access model:
+- Explain how the login system works.
+- Describe the Resend-backed magic-link flow.
+- Mention the `@test.test` bypass for development/demo accounts.
+- Explain that magic links are single-use and secured with nonce rotation.
+- Mention that token leakage is prevented in logs.
+- Explain the production-safe handling of secrets.
+- Clarify that the system uses no password-based login for this flow.
+
+Tenant and role model:
+- Owners can operate across tenants.
+- Admins manage their own tenant’s users and work.
+- Operators handle day-to-day processing.
+- Viewers have read-only access.
+- Explain why this hierarchy matters operationally and how it reflects real-world property operations.
+
+Core functionality:
+- Client/tenant CRUD from the owner side.
+- Admin-side user management with role guards.
+- Cascading deletes and foreign key enforcement.
+- Item ingestion and processing pipeline.
+- Classification and response drafting.
+- Assignment logic and status transitions.
+- Task generation and tracking.
+- Audit logs for important actions.
+- Dashboard views tailored to role and context.
+
+Dashboard and UI behavior:
+- Explain the owner dashboard and what visibility it provides.
+- Explain the admin dashboard and what tenant-level management it provides.
+- Explain the operator dashboard and how it focuses on work execution.
+- Explain how the UI uses editorial styling while still being operational.
+- Mention the status badges, task emphasis, assignment controls, and “my open tasks” workflow.
+- Describe how the system presents work in a way that supports clarity and fast action.
+
+AI behavior:
+- Explain that the system uses real AI via Gemma 4 through OpenRouter / Replit AI integrations.
+- Mention that the AI is used for classification and drafting.
+- Explain that there is a rule-based fallback if the model is unavailable.
+- Explain the AI status probe and why it matters.
+- Clarify that the goal is to use genuine AI where available without making the app fragile.
+
+Workflow engine behavior:
+- Explain that items move through a full processing pipeline.
+- Describe how ingested items are classified, assigned, drafted, and converted into tasks.
+- Mention status transitions and task lifecycle behavior.
+- Explain that the workflow engine centralizes the operational rules.
+- Explain that the app keeps a trail of activity for review and accountability.
+
+Important implementation details already completed:
+- Client CRUD added on the owner side.
+- Admin user CRUD with guards to prevent invalid or cross-tenant actions.
+- SQLite foreign key cascade fixed so deletes actually clean up related data.
+- Operator dashboard improved to emphasize urgent/open tasks.
+- AI status probe simplified and stabilized.
+- Magic-link authentication added with Resend.
+- `@test.test` instant-login bypass kept for test accounts.
+- Single-use magic-link security enforced with nonce rotation.
+- Token leakage removed from logs.
+- Session secret handling made production-safe.
+
+How it fits into the product system:
+- This is the real operational product.
+- The marketing site explains it.
+- The demo app sells it and demonstrates it.
+- This app is the version that actually performs the work.
+- It is the fullest expression of the product vision.
+
+Explain the intended audience:
+- Real customers.
+- Internal operators.
+- Admins and tenant managers.
+- Owners and system administrators.
+- Users who need the platform to run actual property workflows.
+
+==================================================
+RELATIONSHIP BETWEEN THE THREE BUILDS
+==================================================
+Include a clear explanation of how the three builds work together:
+- The marketing site introduces the value proposition.
+- The demo app proves the workflow in a simplified, guided setting.
+- The real application performs the actual work in a secure, multi-tenant environment.
+- Together, they form a complete product funnel: awareness → understanding → adoption → operation.
+- Explain that they are intentionally separate but aligned in branding, purpose, and workflow logic.
+
+==================================================
+CURRENT PROJECT STATUS
+==================================================
+Also describe the current status of the project as a whole:
+- What has already been built.
+- What is working now.
+- What was recently improved.
+- What is still considered future work or extension space.
+- Mention that the system is already operational enough to demonstrate the full workflow, manage users, manage clients, and exercise AI-assisted processing.
+- Mention that the codebase is intentionally structured to allow future expansion without redesigning the core model.
+
+==================================================
+STYLE REQUIREMENTS
+==================================================
+Please make the response:
+- Very detailed
+- Well organized
+- Easy to read
+- Professional and product-focused
+- Suitable for someone who wants a full explanation of the project
+- Long enough that it feels complete, not abbreviated
+- Written in clear English with a polished tone
+
+Use headings, subheadings, and bullet points where helpful, but do not make it too terse. I want a full, substantive explanation of all three builds and the entire product vision.
