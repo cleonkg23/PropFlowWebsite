@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import require_role, require_user
 from app.db import get_db
-from app.models import AuditLog, Item, ItemStatus, Role, Task, TaskStatus, Tenant, User
+from app.models import AuditLog, ContractorCompany, Item, ItemStatus, Role, Task, TaskStatus, Tenant, User
 from app.services import workflow_service
 from app.services.presentation import (
     extract_address,
@@ -151,25 +151,32 @@ def dashboard(
             pass
     if mine:
         base = base.filter(Item.assigned_user_id == user.id)
-    # Contractors only ever see items where they're the assignee on the item
-    # OR on a task. This is a hard filter (not optional like 'mine') because
-    # contractors are external users — exposing other tenants' work would be
-    # a confidentiality leak even if they couldn't act on it.
+    # Contractors see every item dispatched to their company (so the whole
+    # crew has shared visibility on what's on the firm's plate, not just the
+    # individual jobs each person is assigned to). Independent contractors
+    # (no company) fall back to per-assignment visibility.
     if user.role is Role.contractor:
-        contractor_item_ids = {
-            row[0] for row in db.query(Task.item_id)
-            .filter(Task.assigned_user_id == user.id)
-            .all()
-        }
-        base = base.filter(or_(
-            Item.assigned_user_id == user.id,
-            Item.id.in_(contractor_item_ids) if contractor_item_ids else Item.id == -1,
-        ))
+        if user.contractor_company_id is not None:
+            base = base.filter(Item.contractor_company_id == user.contractor_company_id)
+        else:
+            contractor_item_ids = {
+                row[0] for row in db.query(Task.item_id)
+                .filter(Task.assigned_user_id == user.id)
+                .all()
+            }
+            base = base.filter(or_(
+                Item.assigned_user_id == user.id,
+                Item.id.in_(contractor_item_ids) if contractor_item_ids else Item.id == -1,
+            ))
     # Contractor admins are dispatch-only — they don't need to see tenant
     # enquiries or landlord admin tickets cluttering the queue. Scope them
-    # to the categories that have a handoff workflow (currently maintenance).
+    # to the categories that have a handoff workflow (currently maintenance),
+    # and (when they belong to a contractor company) only items dispatched to
+    # that company. Independent dispatchers see all unassigned + their own.
     if user.role is Role.contractor_admin:
         base = base.filter(Item.category.in_(list(workflow_service.HANDOFF_TASK.keys())))
+        if user.contractor_company_id is not None:
+            base = base.filter(Item.contractor_company_id == user.contractor_company_id)
     now_naive = datetime.utcnow()
     if due == "overdue":
         base = base.filter(
@@ -291,12 +298,27 @@ def _load_item_for(user: User, db: Session, item_id: int) -> Item:
     # Contractors can only see tickets they're on. Returning 404 instead of
     # 403 here is deliberate: the existence of an unrelated ticket isn't
     # information they should be able to confirm.
-    if user.role is Role.contractor and not _is_assigned(user, item):
-        raise HTTPException(404, "item not found")
+    if user.role is Role.contractor:
+        # Crew members in a contractor company see every item dispatched to
+        # their company; independents fall back to per-assignment visibility.
+        if user.contractor_company_id is not None:
+            if item.contractor_company_id != user.contractor_company_id:
+                raise HTTPException(404, "item not found")
+        elif not _is_assigned(user, item):
+            raise HTTPException(404, "item not found")
     # Same idea for contractor admins — they only handle dispatchable
     # categories. 404 (not 403) keeps unrelated tickets invisible.
-    if user.role is Role.contractor_admin and item.category not in workflow_service.HANDOFF_TASK:
-        raise HTTPException(404, "item not found")
+    if user.role is Role.contractor_admin:
+        if item.category not in workflow_service.HANDOFF_TASK:
+            raise HTTPException(404, "item not found")
+        # Dispatchers in a company can only see items dispatched to that
+        # exact company. Undispatched items are NOT visible — they're
+        # operator-side until a company is picked. Independent dispatchers
+        # (no company) see every dispatchable ticket in the tenant; this is
+        # consistent with how the dashboard already scopes them.
+        if user.contractor_company_id is not None:
+            if item.contractor_company_id != user.contractor_company_id:
+                raise HTTPException(404, "item not found")
     return item
 
 
@@ -348,6 +370,17 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
     )
     open_tasks_count = sum(1 for t in item.tasks if t.status is TaskStatus.open)
 
+    # Contractor companies in this tenant — fed into the operator's dispatch
+    # picker. Loaded only for the in-house client side, not contractors.
+    contractor_companies: list[ContractorCompany] = []
+    if user.role in _CLIENT_OPS and item.tenant_id is not None:
+        contractor_companies = (
+            db.query(ContractorCompany)
+            .filter(ContractorCompany.tenant_id == item.tenant_id)
+            .order_by(ContractorCompany.name)
+            .all()
+        )
+
     return templates.TemplateResponse(
         request,
         "item_detail.html",
@@ -355,6 +388,7 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
             "user": user,
             "item": item,
             "assignees": assignees,
+            "contractor_companies": contractor_companies,
             "statuses": list(ItemStatus),
             "valid_next": list(workflow_service.VALID_TRANSITIONS.get(item.status, set())),
             "timeline": timeline,
@@ -408,6 +442,46 @@ def post_edit_draft(
 ):
     item = _load_item_for(user, db, item_id)
     workflow_service.edit_draft(db, item=item, text=draft_reply, actor=user)
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
+@router.post("/items/{item_id}/dispatch")
+def post_dispatch(
+    item_id: int,
+    contractor_company_id: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    """Operator picks which contractor company should receive this ticket
+    once it's sent. Empty string clears the assignment (back to undispatched).
+    Only meaningful for categories that go through the handoff workflow."""
+    item = _load_item_for(user, db, item_id)
+    if item.category not in workflow_service.HANDOFF_TASK:
+        raise HTTPException(400, "this item type isn't dispatched to a contractor")
+    new_id: int | None = None
+    if contractor_company_id.strip():
+        try:
+            new_id = int(contractor_company_id)
+        except ValueError:
+            raise HTTPException(400, "invalid contractor company")
+        company = db.get(ContractorCompany, new_id)
+        if company is None or company.tenant_id != item.tenant_id:
+            raise HTTPException(400, "invalid contractor company")
+    prev = item.contractor_company_id
+    item.contractor_company_id = new_id
+    item.updated_at = datetime.utcnow()
+    detail_bits = []
+    if prev != new_id:
+        if new_id is not None:
+            company = db.get(ContractorCompany, new_id)
+            detail_bits.append(f"dispatched to {company.name}")
+        else:
+            detail_bits.append("dispatch cleared")
+    db.add(AuditLog(
+        tenant_id=item.tenant_id, user_id=user.id, item_id=item.id,
+        action="item.dispatched", detail="; ".join(detail_bits) or "no change",
+    ))
+    db.commit()
     return RedirectResponse(f"/items/{item_id}", status_code=303)
 
 
@@ -567,6 +641,17 @@ def post_assign_task(
             raise HTTPException(403, "contractor admins can only dispatch handoff tasks")
         if new_user is not None and new_user.role is not Role.contractor:
             raise HTTPException(403, "contractor admins can only assign to contractors")
+        # Hard company match: a dispatcher in a contractor company can only
+        # assign work to contractors in THAT company. Without this a heating
+        # dispatcher could hand a job to an electrician in a sibling firm,
+        # which is exactly what the multi-company model is meant to prevent.
+        if new_user is not None and user.contractor_company_id is not None:
+            if new_user.contractor_company_id != user.contractor_company_id:
+                raise HTTPException(403, "you can only assign to contractors in your own company")
+        # And the item itself must be dispatched to the dispatcher's company
+        # — otherwise they're touching another firm's ticket via a stale URL.
+        if user.contractor_company_id is not None and item.contractor_company_id != user.contractor_company_id:
+            raise HTTPException(403, "this ticket isn't dispatched to your company")
     try:
         workflow_service.assign_task(db, task=task, new_user=new_user, actor=user)
     except ValueError as e:

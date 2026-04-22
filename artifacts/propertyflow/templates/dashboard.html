@@ -18,6 +18,42 @@
   </div>
 </div>
 
+{# ---- My open tasks (front and centre, above the full ticket list so the
+       very first thing every team member sees is what THEY personally need
+       to act on next, not the team-wide queue). ---- #}
+<div class="card" id="my-tasks" style="margin-bottom: 2rem; {% if my_tasks %}border-left: 3px solid var(--accent-strong);{% endif %}">
+  <div class="between" style="margin-bottom: 0.85rem;">
+    <div>
+      <span class="eyebrow">My open tasks</span>
+      <h3 class="h-card" style="margin-top:0.35rem;">Assigned to {{ user.name.split()[0] }}</h3>
+    </div>
+    {% if my_tasks %}
+      <span class="attn-loud">{{ my_tasks|length }} open</span>
+    {% endif %}
+  </div>
+  {% if my_tasks %}
+    <div>
+      {% for t in my_tasks %}
+        {% set tsplit = split_task_desc(t.description) %}
+        <div class="rule-top" style="padding: 0.85rem 0;">
+          <div class="between">
+            <div style="min-width:0;">
+              <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ tsplit[0] }}</a>
+              {% if tsplit[1] %}
+                <div class="muted" style="font-size:0.78rem; margin-top:0.15rem; font-style: italic;">Done when: {{ tsplit[1] }}.</div>
+              {% endif %}
+              <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
+            </div>
+            <span class="chip chip-general">open</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="deck" style="margin-top:0;">No open tasks assigned to you. 🎉</p>
+  {% endif %}
+</div>
+
 {# ---- Main editorial panel: bar + metrics + items table ---- #}
 <div class="panel" style="margin-bottom: 2.5rem;">
   <div class="panel-bar">
@@ -222,40 +258,6 @@
       <div class="empty-row">{% if f.q or f.status or f.mine or f.due %}Nothing matches those filters.{% else %}Nothing in the pipeline yet.{% endif %}</div>
     {% endif %}
   </div>
-</div>
-
-{# ---- My open tasks (front and centre) ---- #}
-<div class="card" id="my-tasks" style="margin-bottom: 2.5rem; {% if my_tasks %}border-left: 3px solid var(--accent-strong);{% endif %}">
-  <div class="between" style="margin-bottom: 0.85rem;">
-    <div>
-      <span class="eyebrow">My open tasks</span>
-      <h3 class="h-card" style="margin-top:0.35rem;">Assigned to {{ user.name.split()[0] }}</h3>
-    </div>
-    {% if my_tasks %}
-      <span class="attn-loud">{{ my_tasks|length }} open</span>
-    {% endif %}
-  </div>
-  {% if my_tasks %}
-    <div>
-      {% for t in my_tasks %}
-        {% set tsplit = split_task_desc(t.description) %}
-        <div class="rule-top" style="padding: 0.85rem 0;">
-          <div class="between">
-            <div style="min-width:0;">
-              <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ tsplit[0] }}</a>
-              {% if tsplit[1] %}
-                <div class="muted" style="font-size:0.78rem; margin-top:0.15rem; font-style: italic;">Done when: {{ tsplit[1] }}.</div>
-              {% endif %}
-              <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
-            </div>
-            <span class="chip chip-general">open</span>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="deck" style="margin-top:0;">No open tasks assigned to you. 🎉</p>
-  {% endif %}
 </div>
 
 {# ---- Bottom strip: status across the team ---- #}

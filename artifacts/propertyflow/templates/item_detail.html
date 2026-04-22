@@ -129,8 +129,8 @@
 
     {# --- Message --- #}
     <article class="card">
-      <div class="between" style="margin-bottom: 0.85rem;">
-        <span class="eyebrow">{% if item.sender_name %}Message from {{ item.sender_name }}{% else %}Inbound message{% endif %}</span>
+      <div class="between" style="margin-bottom: 0.4rem;">
+        <span class="eyebrow">Inbound message</span>
         <span>
           <span class="status status-{{ item.status.value }}">{{ status_label[item.status.value] }}</span>
           {% if item.due_at and item.status.value != 'done' %}
@@ -144,11 +144,21 @@
           {% endif %}
         </span>
       </div>
+      {# Make the sender prominent above the subject — anyone reading a
+         ticket needs to know WHO wrote in before WHAT they wrote about,
+         especially contractors landing on the page cold. #}
+      <div style="font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem;">
+        {% if item.sender_name %}{{ item.sender_name }}{% else %}Unknown sender{% endif %}
+        {% if item.sender_email %}<span class="muted" style="font-weight:400; font-size:0.92rem;"> &lt;{{ item.sender_email }}&gt;</span>{% endif %}
+      </div>
       <h1 class="h-display" style="font-size: 1.85rem; margin-bottom: 0.65rem;">{{ item.subject }}</h1>
       <div class="muted" style="font-size: 0.85rem; margin-bottom: 1.25rem;">
         <span class="chip {{ chip_for.get(item.category, 'chip-general') }}" style="margin-right: 0.5rem;">{{ chip_label.get(item.category, item.category.replace('_',' ')|capitalize) }}</span>
         Received {{ item.created_at.strftime('%a %d %b, %H:%M') }}
-        {% if item.sender_email %} &middot; &lt;{{ item.sender_email }}&gt;{% endif %}
+        {% if item.contractor_company_id %}
+          {% set _co = item.contractor_company %}
+          {% if _co %} &middot; Dispatched to <b style="color: var(--ink-soft); font-weight:500;">{{ _co.name }}</b>{% endif %}
+        {% endif %}
       </div>
       {% if address %}
         <div style="margin-bottom: 1rem; padding: 0.65rem 0.85rem; background: var(--bg-deep); border-radius: 6px; border: 1px solid var(--rule); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
@@ -159,6 +169,31 @@
       {% endif %}
       <div style="font-family: var(--serif); font-size: 1.05rem; line-height: 1.7; color: var(--ink); white-space: pre-wrap;">{{ item.body }}</div>
     </article>
+
+    {# --- Dispatch picker (operator chooses contractor company) ---
+         Only relevant for handoff categories (currently maintenance) and only
+         visible to client ops. We surface this BEFORE Send so the operator
+         picks the right firm before the handoff task gets routed. --- #}
+    {% if is_client_ops and item.category == 'maintenance' and contractor_companies %}
+    <article class="card">
+      <span class="eyebrow">Dispatch to contractor company</span>
+      <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.45rem;">
+        {% if item.contractor_company %}{{ item.contractor_company.name }}{% else %}Not yet dispatched{% endif %}
+      </h2>
+      <p class="deck" style="margin-bottom: 1rem;">
+        Pick which contractor firm should pick this up. Only that firm's dispatcher and crew will see the handoff.
+      </p>
+      <form method="post" action="/items/{{ item.id }}/dispatch" class="row" style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+        <select name="contractor_company_id" class="field" style="max-width: 22rem;">
+          <option value="">— Not dispatched —</option>
+          {% for co in contractor_companies %}
+            <option value="{{ co.id }}" {% if item.contractor_company_id == co.id %}selected{% endif %}>{{ co.name }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-sm">Save dispatch</button>
+      </form>
+    </article>
+    {% endif %}
 
     {# --- Task & draft reply ---
          Hidden from contractors AND contractor admins: the draft, regenerate,

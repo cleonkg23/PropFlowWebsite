@@ -74,6 +74,7 @@ def init_db() -> None:
     # scratch — for an MVP with seed-only data this is acceptable; a real
     # production migration would copy the rows out and back.
     inspector = inspect(engine)
+    rebuild = False
     if inspector.has_table("users"):
         from app.models import Role
         try:
@@ -84,30 +85,40 @@ def init_db() -> None:
                 ), {"r": Role.contractor_admin.value})
                 conn.execute(text("DELETE FROM users WHERE email = '__schemacheck__@local'"))
         except Exception:  # noqa: BLE001
-            # Old constraint is in place — rebuild from scratch.
-            import logging
-            logging.getLogger("propertyflow").info(
-                "Role enum changed; rebuilding schema (existing rows will be reseeded)."
-            )
-            Base.metadata.drop_all(engine)
+            rebuild = True
+
+    # Schema marker: if the old schema doesn't have the contractor_companies
+    # table, the multi-company contractor model isn't in place — easiest path
+    # for a demo MVP is to rebuild and reseed (no real production data yet).
+    if inspector.has_table("users") and not inspector.has_table("contractor_companies"):
+        rebuild = True
+
+    if rebuild:
+        import logging
+        logging.getLogger("propertyflow").info(
+            "Schema changed; rebuilding (existing rows will be reseeded)."
+        )
+        Base.metadata.drop_all(engine)
 
     Base.metadata.create_all(engine)
 
-    # Idempotent column adds for items table.
+    # Idempotent column adds for tables that may pre-date current columns.
+    # Safe across reboots; create_all only creates new tables, never ALTERs.
     inspector = inspect(engine)
-    existing_cols = {c["name"] for c in inspector.get_columns("items")}
-    additions = [
-        ("due_at",          "DATETIME"),
-        ("completed_at",    "DATETIME"),
-        ("completion_note", "TEXT"),
-    ]
     with engine.begin() as conn:
-        for name, ddl_type in additions:
-            if name not in existing_cols:
+        item_cols = {c["name"] for c in inspector.get_columns("items")}
+        for name, ddl_type in [
+            ("due_at",          "DATETIME"),
+            ("completed_at",    "DATETIME"),
+            ("completion_note", "TEXT"),
+            ("contractor_company_id", "INTEGER"),
+        ]:
+            if name not in item_cols:
                 conn.execute(text(f"ALTER TABLE items ADD COLUMN {name} {ddl_type}"))
-        # Indexes for the columns we filter on. CREATE INDEX IF NOT EXISTS is
-        # safe across reboots and across the case where the table pre-existed
-        # before due_at was introduced (create_all only creates indexes for new
-        # tables, not for tables it ALTERed via the path above).
+        user_cols = {c["name"] for c in inspector.get_columns("users")}
+        if "contractor_company_id" not in user_cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN contractor_company_id INTEGER"))
         conn.execute(text("CREATE INDEX IF NOT EXISTS ix_items_due_at ON items(due_at)"))
         conn.execute(text("CREATE INDEX IF NOT EXISTS ix_items_completed_at ON items(completed_at)"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_items_contractor_company_id ON items(contractor_company_id)"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_users_contractor_company_id ON users(contractor_company_id)"))

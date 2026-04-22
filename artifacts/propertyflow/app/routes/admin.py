@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import require_role
 from app.db import get_db
-from app.models import AuditLog, Item, Role, Tenant, User
+from app.models import AuditLog, ContractorCompany, Item, Role, Tenant, User
 
 _AUDIT_PAGE_SIZE = 25
 
@@ -95,6 +95,19 @@ def admin_home(
 
     tenant = db.get(Tenant, tenant_id) if tenant_id else None
 
+    # Contractor companies under this tenant — surfaced for the admin so they
+    # can spin up new firms and see who belongs to which. Contractor admins
+    # don't manage companies (they only manage their own crew), so we only
+    # populate this for client admins.
+    contractor_companies: list[ContractorCompany] = []
+    if tenant_id and user.role in (Role.admin, Role.owner):
+        contractor_companies = (
+            db.query(ContractorCompany)
+            .filter(ContractorCompany.tenant_id == tenant_id)
+            .order_by(ContractorCompany.name)
+            .all()
+        )
+
     flash = request.session.pop("flash", None)
     flash_kind = request.session.pop("flash_kind", "ok")
 
@@ -116,6 +129,7 @@ def admin_home(
             "audit_filters": audit_filters,
             "event_choices": event_choices,
             "actor_choices": actor_choices,
+            "contractor_companies": contractor_companies,
             "assignable_roles": [r for r in (Role.viewer, Role.contractor, Role.contractor_admin, Role.operator, Role.admin) if r in _assignable_for(user)],
             "flash": flash,
             "flash_kind": flash_kind,
@@ -159,6 +173,7 @@ def create_user(
     name: str = Form(...),
     email: str = Form(...),
     role: str = Form(...),
+    contractor_company_id: str = Form(""),
     user: User = Depends(require_role(Role.admin, Role.contractor_admin)),
     db: Session = Depends(get_db),
 ):
@@ -188,7 +203,25 @@ def create_user(
         _flash(request, f"Email {email} is already in use.", "err")
         return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
 
-    new_user = User(tenant_id=tenant_id, email=email, name=name, role=role_enum)
+    # Optional contractor company link, only meaningful for contractor +
+    # contractor_admin roles. We accept an empty string ("independent") and
+    # silently ignore the value for non-contractor roles.
+    company_id: int | None = None
+    if role_enum in (Role.contractor, Role.contractor_admin) and contractor_company_id.strip():
+        try:
+            company_id = int(contractor_company_id)
+        except ValueError:
+            _flash(request, "Invalid contractor company.", "err")
+            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+        company = db.get(ContractorCompany, company_id)
+        if company is None or company.tenant_id != tenant_id:
+            _flash(request, "Invalid contractor company.", "err")
+            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+
+    new_user = User(
+        tenant_id=tenant_id, email=email, name=name, role=role_enum,
+        contractor_company_id=company_id,
+    )
     db.add(new_user)
     _audit(
         db,
@@ -288,4 +321,136 @@ def delete_user(
     )
     db.commit()
     _flash(request, f"Removed {name}.")
+    return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+
+
+# ---------------------------------------------------------------------------
+# Contractor company CRUD — client admins only.
+# A "contractor company" groups dispatcher(s) + contractors so the operator
+# can route a maintenance handoff to the right firm. Independent contractors
+# (no company) keep working off per-assignment visibility.
+# ---------------------------------------------------------------------------
+
+
+@router.post("/admin/contractor-companies")
+def create_contractor_company(
+    request: Request,
+    name: str = Form(...),
+    user: User = Depends(require_role(Role.admin)),
+    db: Session = Depends(get_db),
+):
+    tenant_id = _resolve_tenant_id(user, db)
+    if not tenant_id:
+        _flash(request, "No client selected.", "err")
+        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    name = name.strip()
+    if not name:
+        _flash(request, "Company name is required.", "err")
+        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    existing = (
+        db.query(ContractorCompany)
+        .filter(ContractorCompany.tenant_id == tenant_id, ContractorCompany.name.ilike(name))
+        .first()
+    )
+    if existing:
+        _flash(request, f"{name} already exists.", "err")
+        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    co = ContractorCompany(tenant_id=tenant_id, name=name)
+    db.add(co)
+    _audit(db, tenant_id=tenant_id, user_id=user.id,
+           action="contractor_company_created", detail=f"Added {name}")
+    db.commit()
+    _flash(request, f"Added contractor company '{name}'.")
+    return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/admin/contractor-companies/{company_id}/rename")
+def rename_contractor_company(
+    request: Request,
+    company_id: int,
+    name: str = Form(...),
+    user: User = Depends(require_role(Role.admin)),
+    db: Session = Depends(get_db),
+):
+    tenant_id = _resolve_tenant_id(user, db)
+    co = db.get(ContractorCompany, company_id)
+    if co is None or co.tenant_id != tenant_id:
+        raise HTTPException(404, "Contractor company not found")
+    new_name = name.strip()
+    if not new_name:
+        _flash(request, "Name cannot be blank.", "err")
+        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    old = co.name
+    co.name = new_name
+    _audit(db, tenant_id=tenant_id, user_id=user.id,
+           action="contractor_company_renamed", detail=f"{old} → {new_name}")
+    db.commit()
+    _flash(request, f"Renamed to '{new_name}'.")
+    return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/admin/contractor-companies/{company_id}/delete")
+def delete_contractor_company(
+    request: Request,
+    company_id: int,
+    user: User = Depends(require_role(Role.admin)),
+    db: Session = Depends(get_db),
+):
+    tenant_id = _resolve_tenant_id(user, db)
+    co = db.get(ContractorCompany, company_id)
+    if co is None or co.tenant_id != tenant_id:
+        raise HTTPException(404, "Contractor company not found")
+    # Detach any users / items still pointing here so deletion is a clean
+    # "they're now independent / undispatched" operation, not a cascade.
+    db.query(User).filter(User.contractor_company_id == co.id).update(
+        {User.contractor_company_id: None}
+    )
+    from app.models import Item as _Item  # local import to avoid circulars
+    db.query(_Item).filter(_Item.contractor_company_id == co.id).update(
+        {_Item.contractor_company_id: None}
+    )
+    name = co.name
+    db.delete(co)
+    _audit(db, tenant_id=tenant_id, user_id=user.id,
+           action="contractor_company_deleted", detail=f"Removed {name}")
+    db.commit()
+    _flash(request, f"Removed contractor company '{name}'.")
+    return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+
+
+@router.post("/admin/users/{user_id}/contractor-company")
+def assign_user_to_contractor_company(
+    request: Request,
+    user_id: int,
+    contractor_company_id: str = Form(""),
+    user: User = Depends(require_role(Role.admin)),
+    db: Session = Depends(get_db),
+):
+    """Move a contractor or contractor admin between firms (or set to
+    independent with an empty value)."""
+    tenant_id = _resolve_tenant_id(user, db)
+    target = db.get(User, user_id)
+    if target is None or target.tenant_id != tenant_id:
+        raise HTTPException(404, "User not found")
+    if target.role not in (Role.contractor, Role.contractor_admin):
+        _flash(request, "Only contractors and dispatchers belong to a contractor company.", "err")
+        return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    new_id: int | None = None
+    if contractor_company_id.strip():
+        try:
+            new_id = int(contractor_company_id)
+        except ValueError:
+            _flash(request, "Invalid contractor company.", "err")
+            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+        co = db.get(ContractorCompany, new_id)
+        if co is None or co.tenant_id != tenant_id:
+            _flash(request, "Invalid contractor company.", "err")
+            return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)
+    target.contractor_company_id = new_id
+    label = "independent" if new_id is None else db.get(ContractorCompany, new_id).name
+    _audit(db, tenant_id=tenant_id, user_id=user.id,
+           action="user_company_changed",
+           detail=f"{target.email} → {label}")
+    db.commit()
+    _flash(request, f"{target.name} is now with {label}.")
     return RedirectResponse("/admin", status_code=status.HTTP_303_SEE_OTHER)

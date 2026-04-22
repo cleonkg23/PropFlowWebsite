@@ -86,7 +86,13 @@ def _audit(db: Session, *, tenant_id: Optional[int], user_id: Optional[int], act
     db.add(AuditLog(tenant_id=tenant_id, user_id=user_id, action=action, item_id=item_id, detail=detail))
 
 
-def _pick_least_loaded(db: Session, tenant_id: int, roles: list[Role]) -> Optional[User]:
+def _pick_least_loaded(
+    db: Session,
+    tenant_id: int,
+    roles: list[Role],
+    *,
+    contractor_company_id: Optional[int] = None,
+) -> Optional[User]:
     """Pick the candidate with the fewest currently-open tasks (round-robin
     by workload). Falls back to lowest user id on ties so the choice is
     stable. Returns None if no user in the tenant has one of the roles.
@@ -95,12 +101,10 @@ def _pick_least_loaded(db: Session, tenant_id: int, roles: list[Role]) -> Option
     operator from being buried while a colleague sits idle, without needing
     skill matrices or estimated-time data we don't have. If we later capture
     per-user availability or skills we can layer that on top of this."""
-    candidates = (
-        db.query(User)
-        .filter(User.tenant_id == tenant_id, User.role.in_(roles))
-        .order_by(User.id)
-        .all()
-    )
+    q = db.query(User).filter(User.tenant_id == tenant_id, User.role.in_(roles))
+    if contractor_company_id is not None:
+        q = q.filter(User.contractor_company_id == contractor_company_id)
+    candidates = q.order_by(User.id).all()
     if not candidates:
         return None
     open_counts: dict[int, int] = {u.id: 0 for u in candidates}
@@ -308,7 +312,19 @@ def send_reply(db: Session, *, item: Item, actor: User) -> Item:
                         detail=f"{t.description[:60]}{'…' if len(t.description) > 60 else ''} — auto-closed on reply",
                     )
 
-            dispatcher = _pick_least_loaded(db, item.tenant_id, [Role.contractor_admin])
+            # Route the handoff to a dispatcher in the contractor company
+            # the operator picked. If they picked a company but it has no
+            # dispatcher, the handoff stays UNASSIGNED rather than leaking
+            # to another firm — that's the whole point of company scoping.
+            # If the operator didn't pick a company at all, fall back to any
+            # tenant-wide contractor_admin so the work doesn't sit silent.
+            if item.contractor_company_id is not None:
+                dispatcher = _pick_least_loaded(
+                    db, item.tenant_id, [Role.contractor_admin],
+                    contractor_company_id=item.contractor_company_id,
+                )
+            else:
+                dispatcher = _pick_least_loaded(db, item.tenant_id, [Role.contractor_admin])
             handoff = Task(
                 tenant_id=item.tenant_id,
                 item_id=item.id,

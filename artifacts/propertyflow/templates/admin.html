@@ -96,6 +96,7 @@
         <tr>
           <th>Name &amp; email</th>
           <th>Role</th>
+          {% if contractor_companies %}<th>Contractor co.</th>{% endif %}
           <th>Joined</th>
           <th></th>
         </tr>
@@ -120,6 +121,22 @@
                 </form>
               {% endif %}
             </td>
+            {% if contractor_companies %}
+            <td>
+              {% if u.role.value in ('contractor', 'contractor_admin') %}
+                <form method="post" action="/admin/users/{{ u.id }}/contractor-company" class="role-form">
+                  <select name="contractor_company_id" onchange="this.form.submit()">
+                    <option value="">— Independent —</option>
+                    {% for co in contractor_companies %}
+                      <option value="{{ co.id }}" {% if u.contractor_company_id == co.id %}selected{% endif %}>{{ co.name }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              {% else %}
+                <span class="muted" style="font-size:0.78rem;">—</span>
+              {% endif %}
+            </td>
+            {% endif %}
             <td class="muted" style="font-size:0.78rem;">{{ u.created_at.strftime('%b %Y') }}</td>
             <td class="actions">
               {% if u.id != user.id and u.role.value != 'owner' %}
@@ -131,7 +148,7 @@
             </td>
           </tr>
         {% else %}
-          <tr><td colspan="4" class="muted" style="padding: 1.25rem 0; text-align:center; font-size:0.85rem;">No team members yet.</td></tr>
+          <tr><td colspan="{{ 5 if contractor_companies else 4 }}" class="muted" style="padding: 1.25rem 0; text-align:center; font-size:0.85rem;">No team members yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -155,12 +172,82 @@
         {% endfor %}
       </select>
     </div>
+    {% if contractor_companies %}
+    <div>
+      <label for="u-co">Contractor company</label>
+      <select id="u-co" name="contractor_company_id">
+        <option value="">— Independent / N/A —</option>
+        {% for co in contractor_companies %}
+          <option value="{{ co.id }}">{{ co.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
     <div>
       <button type="submit" class="btn-primary">Add member</button>
     </div>
   </form>
   {% endif %}
 </div>
+
+{# ---- Contractor companies (client admin only) ----
+     Lets the admin spin up new contractor firms (Acme Heating, Sparkright,
+     etc.) so operators can route handoffs to the right one. Hidden when the
+     viewer isn't a client admin. --- #}
+{% if user.role.value == 'admin' and tenant %}
+<div class="card" style="margin-bottom: 1.6rem;">
+  <div class="between" style="margin-bottom: 1rem;">
+    <div>
+      <span class="eyebrow">Contractor companies</span>
+      <h3 class="h-card" style="margin-top: 0.35rem;">{{ contractor_companies|length }} firm{{ '' if contractor_companies|length == 1 else 's' }} on this client</h3>
+    </div>
+  </div>
+  <div style="overflow-x: auto;">
+    <table class="users-table">
+      <thead>
+        <tr><th>Name</th><th>Roster</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for co in contractor_companies %}
+          {% set roster = users|selectattr('contractor_company_id','equalto', co.id)|list %}
+          <tr>
+            <td>
+              <form method="post" action="/admin/contractor-companies/{{ co.id }}/rename" class="role-form" style="display:flex; gap:0.4rem; align-items:center;">
+                <input type="text" name="name" value="{{ co.name }}" style="min-width: 14rem;" />
+                <button class="btn btn-sm" type="submit">Rename</button>
+              </form>
+            </td>
+            <td class="muted" style="font-size:0.82rem;">
+              {% if roster %}
+                {% for r in roster %}{{ r.name }} ({{ r.role.value }}){% if not loop.last %}, {% endif %}{% endfor %}
+              {% else %}
+                No one assigned yet.
+              {% endif %}
+            </td>
+            <td class="actions">
+              <form method="post" action="/admin/contractor-companies/{{ co.id }}/delete"
+                    onsubmit="return confirm('Remove {{ co.name }}? Anyone in it will become independent and any tickets dispatched to it will be marked undispatched.');">
+                <button type="submit" class="icon-btn">Remove</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="3" class="muted" style="padding: 1.25rem 0; text-align:center; font-size:0.85rem;">No contractor companies yet — add one below.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form method="post" action="/admin/contractor-companies" class="add-user-form" style="margin-top: 1rem;">
+    <div>
+      <label for="co-name">New contractor company</label>
+      <input id="co-name" name="name" type="text" required placeholder="e.g. Acme Heating &amp; Plumbing" autocomplete="off">
+    </div>
+    <div>
+      <button type="submit" class="btn-primary">Add company</button>
+    </div>
+  </form>
+</div>
+{% endif %}
 
 {# ---- Recent items ---- #}
 <div class="card" style="margin-bottom: 1.6rem;">

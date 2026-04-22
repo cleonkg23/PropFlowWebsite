@@ -75,6 +75,22 @@ class Tenant(Base):
     items: Mapped[list["Item"]] = relationship(back_populates="tenant", cascade="all, delete-orphan")
 
 
+class ContractorCompany(Base):
+    """A contracting firm working under a client tenant. Holds a roster of
+    contractor_admins (dispatchers) and contractors (the field crew). When
+    an operator dispatches a maintenance ticket they pick a company; only
+    that company's admins/contractors then see it. Independent contractors
+    have contractor_company_id = NULL — they only ever see their own work."""
+    __tablename__ = "contractor_companies"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_id: Mapped[int] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True)
+    name: Mapped[str] = mapped_column(String(120))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
+
+    tenant: Mapped[Tenant] = relationship()
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -83,12 +99,19 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     name: Mapped[str] = mapped_column(String(120))
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.operator)
+    # Only meaningful when role is contractor or contractor_admin. Scopes
+    # which contracting firm this user belongs to. NULL means "independent
+    # contractor" — they only see work explicitly assigned to them.
+    contractor_company_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("contractor_companies.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     # Rotated on every successful magic-link sign-in. Embedded in magic-link
     # tokens; verifying a token requires the nonce still match the user row.
     auth_nonce: Mapped[str] = mapped_column(String(32), default=_new_nonce)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     tenant: Mapped[Optional[Tenant]] = relationship(back_populates="users")
+    contractor_company: Mapped[Optional[ContractorCompany]] = relationship()
 
 
 class Item(Base):
@@ -107,6 +130,12 @@ class Item(Base):
     status: Mapped[ItemStatus] = mapped_column(Enum(ItemStatus), default=ItemStatus.new, index=True)
 
     assigned_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    # Picked by the operator when dispatching a maintenance ticket. Scopes
+    # which contractor company can see/manage the handoff. NULL until the
+    # operator chooses one.
+    contractor_company_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("contractor_companies.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     draft_reply: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     ai_mode: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)  # "ollama" or "fallback"
 
@@ -122,6 +151,7 @@ class Item(Base):
 
     tenant: Mapped[Tenant] = relationship(back_populates="items")
     assigned_user: Mapped[Optional[User]] = relationship(foreign_keys=[assigned_user_id])
+    contractor_company: Mapped[Optional[ContractorCompany]] = relationship(foreign_keys=[contractor_company_id])
     tasks: Mapped[list["Task"]] = relationship(back_populates="item", cascade="all, delete-orphan")
 
 

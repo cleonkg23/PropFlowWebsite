@@ -9,7 +9,17 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
-from app.models import Item, ItemStatus, Role, Task, TaskStatus, Tenant, Urgency, User
+from app.models import (
+    ContractorCompany,
+    Item,
+    ItemStatus,
+    Role,
+    Task,
+    TaskStatus,
+    Tenant,
+    Urgency,
+    User,
+)
 
 
 def seed_if_empty(db: Session) -> None:
@@ -31,17 +41,45 @@ def seed_if_empty(db: Session) -> None:
     maria = User(tenant_id=acme.id, email="maria.acme@test.test", name="Maria Operator", role=Role.operator)
     priya = User(tenant_id=acme.id, email="priya.acme@test.test", name="Priya Operator", role=Role.operator)
     viewer = User(tenant_id=acme.id, email="vince.acme@test.test", name="Vince Viewer", role=Role.viewer)
-    # External contractor — sees only items/tasks assigned to them, can post
-    # timeline notes and mark their own tasks complete.
-    carl = User(tenant_id=acme.id, email="carl.contractor@test.test", name="Carl Contractor", role=Role.contractor)
-    # Contractor-admin (dispatcher): receives the operator handoff and assigns
-    # the on-site visit to the right contractor.
-    mike = User(tenant_id=acme.id, email="mike.dispatch@test.test", name="Mike Dispatch", role=Role.contractor_admin)
+
+    # Two contractor companies under Acme so the multi-company demo shows
+    # immediately: a heating firm (Mike's team) and an electrical firm
+    # (Eve's team). The operator picks which one gets a given handoff.
+    heating_co = ContractorCompany(tenant_id=acme.id, name="Acme Heating & Plumbing")
+    electrical_co = ContractorCompany(tenant_id=acme.id, name="Sparkright Electricians")
+    db.add_all([heating_co, electrical_co])
+    db.flush()
+
+    # Heating company roster
+    mike = User(
+        tenant_id=acme.id, email="mike.dispatch@test.test", name="Mike Dispatch",
+        role=Role.contractor_admin, contractor_company_id=heating_co.id,
+    )
+    carl = User(
+        tenant_id=acme.id, email="carl.contractor@test.test", name="Carl Contractor",
+        role=Role.contractor, contractor_company_id=heating_co.id,
+    )
+    # Second contractor in the same company — used to demo "contractors see
+    # all of their company's work, not just their own assignments".
+    nina = User(
+        tenant_id=acme.id, email="nina.heating@test.test", name="Nina Heating",
+        role=Role.contractor, contractor_company_id=heating_co.id,
+    )
+
+    # Electrical company roster — different dispatcher + crew
+    eve = User(
+        tenant_id=acme.id, email="eve.sparkright@test.test", name="Eve Sparkright",
+        role=Role.contractor_admin, contractor_company_id=electrical_co.id,
+    )
+    sam = User(
+        tenant_id=acme.id, email="sam.sparkright@test.test", name="Sam Sparkright",
+        role=Role.contractor, contractor_company_id=electrical_co.id,
+    )
 
     # Beech: just an admin so the owner panel shows two tenants populated
     beech_admin = User(tenant_id=beech.id, email="tom.beech@test.test", name="Tom Admin", role=Role.admin)
 
-    db.add_all([owner, acme_admin, maria, priya, viewer, carl, mike, beech_admin])
+    db.add_all([owner, acme_admin, maria, priya, viewer, mike, carl, nina, eve, sam, beech_admin])
     db.flush()
 
     # Sample items in Acme (already classified, sitting in the board so it
@@ -57,8 +95,26 @@ def seed_if_empty(db: Session) -> None:
             urgency=Urgency.high,
             status=ItemStatus.in_progress,
             assigned_user_id=maria.id,
+            # Already dispatched to the heating firm — Mike + Carl + Nina see it.
+            contractor_company_id=heating_co.id,
             due_at=datetime.utcnow() + timedelta(hours=2),
             draft_reply="Hi Mr Patel,\n\nSorry to hear that — I've logged this as urgent and a contractor will be in touch within 2 hours.\n\nBest,\nAcme Lettings",
+            ai_mode="seed",
+        ),
+        Item(
+            tenant_id=acme.id,
+            subject="Lights flickering at 22 Elm Crescent",
+            body="The hallway lights have been flickering for two days and now the kitchen sockets are tripping the breaker. Tenant is worried about safety.",
+            sender_name="Ms Okafor",
+            sender_email="okafor@example.com",
+            category="maintenance",
+            urgency=Urgency.medium,
+            status=ItemStatus.in_progress,
+            assigned_user_id=priya.id,
+            # Dispatched to the electrical firm — Eve + Sam see this one.
+            contractor_company_id=electrical_co.id,
+            due_at=datetime.utcnow() + timedelta(hours=6),
+            draft_reply="Hi Ms Okafor,\n\nThanks for letting us know — an electrician will be in touch within the day to book a visit.\n\nBest,\nAcme Lettings",
             ai_mode="seed",
         ),
         Item(
@@ -144,9 +200,22 @@ def seed_if_empty(db: Session) -> None:
             due_at=datetime.utcnow() + timedelta(hours=4),
             status=TaskStatus.open,
         ),
+        # Electrical handoff already dispatched to Sparkright (Eve's team)
         Task(
             tenant_id=acme.id,
             item_id=samples[1].id,
+            description=(
+                "On-site visit at 22 Elm Crescent — investigate flickering "
+                "lights and tripping breaker. Done when: cause identified, "
+                "fix completed and a completion note added."
+            ),
+            assigned_user_id=sam.id,
+            due_at=datetime.utcnow() + timedelta(hours=6),
+            status=TaskStatus.open,
+        ),
+        Task(
+            tenant_id=acme.id,
+            item_id=samples[2].id,  # viewing item shifted from [1] to [2]
             description="Confirm second viewing slot. Done when: viewing date and time confirmed by tenant.",
             assigned_user_id=priya.id,
             due_at=datetime.utcnow() + timedelta(hours=24),
