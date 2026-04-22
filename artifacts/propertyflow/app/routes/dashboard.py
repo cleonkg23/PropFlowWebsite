@@ -113,6 +113,11 @@ def dashboard(
             Item.assigned_user_id == user.id,
             Item.id.in_(contractor_item_ids) if contractor_item_ids else Item.id == -1,
         ))
+    # Contractor admins are dispatch-only — they don't need to see tenant
+    # enquiries or landlord admin tickets cluttering the queue. Scope them
+    # to the categories that have a handoff workflow (currently maintenance).
+    if user.role is Role.contractor_admin:
+        base = base.filter(Item.category.in_(list(workflow_service.HANDOFF_TASK.keys())))
     now_naive = datetime.utcnow()
     if due == "overdue":
         base = base.filter(
@@ -234,6 +239,10 @@ def _load_item_for(user: User, db: Session, item_id: int) -> Item:
     # 403 here is deliberate: the existence of an unrelated ticket isn't
     # information they should be able to confirm.
     if user.role is Role.contractor and not _is_assigned(user, item):
+        raise HTTPException(404, "item not found")
+    # Same idea for contractor admins — they only handle dispatchable
+    # categories. 404 (not 403) keeps unrelated tickets invisible.
+    if user.role is Role.contractor_admin and item.category not in workflow_service.HANDOFF_TASK:
         raise HTTPException(404, "item not found")
     return item
 
