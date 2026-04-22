@@ -1,35 +1,33 @@
-{# Workflow board column. Expects: status (ItemStatus), items (list[Item]) #}
+{# Workflow board column — no outer card, just a header + stack of item cards. #}
 {% set labels = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
 {% set dots = {'new':'dot-new','in_progress':'dot-progress','awaiting_reply':'dot-await','done':'dot-done'} %}
 {% set urgency_pill = {'high':'pill-soft-red','low':'pill-soft-green','normal':'pill-soft-neutral'} %}
 {% set urgency_label = {'high':'urgent','low':'normal','normal':'normal'} %}
-<div class="card p-4 flex flex-col min-h-[240px]">
+<div class="flex flex-col">
   <div class="flex items-center justify-between mb-3 px-1">
     <span class="text-sm font-semibold flex items-center gap-2">
       <span class="dot {{ dots[status.value] }}"></span>
       {{ labels[status.value] }}
     </span>
-    <span class="badge pill-soft-neutral">{{ items|length }}</span>
+    <span class="text-xs" style="color: var(--pf-ink-muted);">{{ items|length }}</span>
   </div>
-  <div class="space-y-2.5">
+  <div class="space-y-3">
     {% for item in items %}
-      <a href="/items/{{ item.id }}" class="card-hover block p-3.5 rounded-lg" style="background: #fbf8f1; border: 1px solid var(--pf-border);">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-sm font-medium truncate" style="color: var(--pf-ink);">{{ item.subject }}</span>
+      <a href="/items/{{ item.id }}" class="card card-hover block p-4">
+        <div class="flex items-start justify-between gap-2">
+          <span class="text-sm font-medium leading-snug" style="color: var(--pf-ink);">{{ item.subject }}</span>
           {% set u = item.urgency.value %}
-          <span class="badge {{ urgency_pill[u] }}">{{ urgency_label[u] }}</span>
+          <span class="badge {{ urgency_pill[u] }} shrink-0">{{ urgency_label[u] }}</span>
         </div>
-        <div class="text-xs mt-1.5" style="color: var(--pf-ink-soft);">
-          {{ item.category.replace('_',' ')|capitalize }} · received {{ item.created_at.strftime('%H:%M') }}
-        </div>
-        <div class="text-xs mt-1" style="color: var(--pf-ink-muted);">
+        <div class="text-xs mt-2" style="color: var(--pf-ink-soft);">{{ item.category.replace('_',' ')|capitalize }}</div>
+        <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">Received {{ item.created_at.strftime('%H:%M') }}</div>
+        <div class="text-xs mt-2" style="color: var(--pf-ink-muted);">
           Owner: {% if item.assigned_user %}{{ item.assigned_user.name }} ({{ item.assigned_user.role.value|capitalize }}){% else %}unassigned{% endif %}
         </div>
-        {% if item.ai_mode %}
-          <div class="ai-note mt-1.5">
-            {% if item.ai_mode in ('ollama','fallback') %}AI classified as {{ item.category.replace('_',' ') }} · {{ u }} priority{% else %}Seeded example · {{ u }} priority{% endif %}
-            {% if item.draft_reply %} · draft generated automatically{% endif %}
-          </div>
+        {% if item.ai_mode == 'fallback' %}
+          <div class="text-xs mt-2" style="color: #7a5413;">Processed via fallback</div>
+        {% elif item.ai_mode %}
+          <div class="text-xs mt-2" style="color: var(--pf-ink-muted);">Processed automatically</div>
         {% endif %}
       </a>
     {% else %}

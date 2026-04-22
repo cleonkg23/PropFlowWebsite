@@ -173,6 +173,28 @@ def post_regen(item_id: int, user: User = Depends(require_role(*WRITE_ROLES)), d
     return RedirectResponse(f"/items/{item_id}", status_code=303)
 
 
+@router.post("/items/{item_id}/draft")
+def post_edit_draft(
+    item_id: int,
+    draft_reply: str = Form(...),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    item = _load_item_for(user, db, item_id)
+    workflow_service.edit_draft(db, item=item, text=draft_reply, actor=user)
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
+@router.post("/items/{item_id}/send")
+def post_send(item_id: int, user: User = Depends(require_role(*WRITE_ROLES)), db: Session = Depends(get_db)):
+    item = _load_item_for(user, db, item_id)
+    try:
+        workflow_service.send_reply(db, item=item, actor=user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
 @router.post("/items/{item_id}/assign")
 def post_assign(
     item_id: int,

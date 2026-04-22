@@ -3,63 +3,45 @@
 {% block content %}
 
 {# ---- Header ---- #}
-<div class="flex items-start justify-between gap-4 mb-5">
+<div class="flex items-start justify-between gap-4 mb-8">
   <div>
     <h1 class="text-2xl font-semibold">Today's operations</h1>
-    <p class="text-sm mt-1" style="color: var(--pf-ink-soft);">Everything your team needs to action — automatically organised.</p>
+    <p class="text-sm mt-1.5" style="color: var(--pf-ink-soft);">Everything your team needs to action — automatically organised.</p>
     <p class="text-xs mt-2" style="color: var(--pf-ink-muted);">
       Updated {{ updated_label }} · {{ processed_today }} item{{ '' if processed_today == 1 else 's' }} processed today
     </p>
   </div>
-  <div class="flex flex-wrap gap-2 justify-end">
-    <form method="post" action="/demo/boiler"><button class="btn">+ Boiler emergency</button></form>
-    <form method="post" action="/demo/viewing"><button class="btn">+ Viewing request</button></form>
-    <form method="post" action="/demo/landlord"><button class="btn">+ Landlord admin</button></form>
-    <form method="post" action="/demo/chase"><button class="btn">+ Chase</button></form>
-  </div>
-</div>
-
-{# ---- Workflow strip ---- #}
-<div class="card px-5 py-4 mb-5">
-  <div class="flex items-center flex-wrap gap-x-3 gap-y-2">
-    {% set steps = [('Received', metrics.received_today > 0),
-                    ('Classified', metrics.classified > 0),
-                    ('Assigned', metrics.assigned > 0),
-                    ('Reply ready', metrics.reply_ready > 0),
-                    ('Tracked', metrics.tracked > 0)] %}
-    {% for label, active in steps %}
-      <span class="strip-step {{ 'is-active' if active else '' }}">{{ label }}</span>
-      {% if not loop.last %}<span class="strip-arrow">→</span>{% endif %}
-    {% endfor %}
+  <div>
+    <a href="#add-item" class="btn-primary">+ Add item</a>
   </div>
 </div>
 
 {# ---- Metrics panel ---- #}
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-  <div class="card px-5 py-4">
-    <div class="metric-num">{{ metrics.active }}</div>
-    <div class="metric-label">Active items</div>
-    <div class="metric-sub">in the pipeline now</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+  <div class="card px-6 py-5">
+    <div class="text-3xl font-semibold tracking-tight">{{ metrics.active }}</div>
+    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Active items</div>
+    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">in the pipeline</div>
   </div>
-  <div class="card px-5 py-4">
-    <div class="metric-num">{{ metrics.action_needed }}</div>
-    <div class="metric-label">Action needed</div>
-    <div class="metric-sub">unassigned or new</div>
+  <div class="card px-6 py-5">
+    <div class="text-3xl font-semibold tracking-tight">{{ metrics.action_needed }}</div>
+    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Action needed</div>
+    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">unassigned or new</div>
   </div>
-  <div class="card px-5 py-4">
-    <div class="metric-num">{{ metrics.reply_ready }}</div>
-    <div class="metric-label">Replies drafted</div>
-    <div class="metric-sub">awaiting send</div>
+  <div class="card px-6 py-5">
+    <div class="text-3xl font-semibold tracking-tight">{{ metrics.reply_ready }}</div>
+    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Replies drafted</div>
+    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">awaiting send</div>
   </div>
-  <div class="card px-5 py-4">
-    <div class="metric-num">{{ metrics.done_today }}</div>
-    <div class="metric-label">Resolved today</div>
-    <div class="metric-sub">closed since midnight</div>
+  <div class="card px-6 py-5">
+    <div class="text-3xl font-semibold tracking-tight">{{ metrics.done_today }}</div>
+    <div class="text-sm mt-1" style="color: var(--pf-ink-soft);">Resolved today</div>
+    <div class="text-xs mt-0.5" style="color: var(--pf-ink-muted);">closed since midnight</div>
   </div>
 </div>
 
-{# ---- Inbox board ---- #}
-<div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+{# ---- Inbox board (no outer column boxes) ---- #}
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
   {% for status in statuses %}
     {% with items=columns[status] %}
       {% include "_components/board.html" %}
@@ -67,8 +49,8 @@
   {% endfor %}
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-  <div class="card p-5 md:col-span-2">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="card p-6 md:col-span-2">
     <h2 class="text-sm font-semibold mb-3">My open tasks</h2>
     {% if my_tasks %}
       <ul class="row-divide">
@@ -86,13 +68,13 @@
       <p class="text-sm" style="color: var(--pf-ink-muted);">No open tasks assigned to you.</p>
     {% endif %}
   </div>
-  <div class="card p-5">
-    <h2 class="text-sm font-semibold mb-3">Add an item manually</h2>
-    <form method="post" action="/api/items" id="manual-item" class="space-y-2 text-sm">
-      <input name="subject" placeholder="Subject" required class="field w-full px-3 py-2 rounded-lg" />
-      <textarea name="body" placeholder="Message body" required rows="4" class="field w-full px-3 py-2 rounded-lg"></textarea>
-      <input name="sender_name" placeholder="From (name)" class="field w-full px-3 py-2 rounded-lg" />
-      <input name="sender_email" type="email" placeholder="From (email)" class="field w-full px-3 py-2 rounded-lg" />
+  <div class="card p-6" id="add-item">
+    <h2 class="text-sm font-semibold mb-3">Add item</h2>
+    <form method="post" action="/api/items" id="manual-item" class="space-y-2.5 text-sm">
+      <input name="subject" placeholder="Subject" required class="field w-full px-3.5 py-2.5" />
+      <textarea name="body" placeholder="Message body" required rows="4" class="field w-full px-3.5 py-2.5"></textarea>
+      <input name="sender_name" placeholder="From (name)" class="field w-full px-3.5 py-2.5" />
+      <input name="sender_email" type="email" placeholder="From (email)" class="field w-full px-3.5 py-2.5" />
       <button class="btn-primary w-full justify-center">Run through workflow</button>
     </form>
   </div>

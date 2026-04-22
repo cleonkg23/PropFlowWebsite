@@ -10,8 +10,8 @@
       --pf-bg: #f7f3ea;
       --pf-card: #f2ede4;
       --pf-card-hover: #efe8db;
-      --pf-border: #e5ded2;
-      --pf-border-strong: #d8cfbf;
+      --pf-border: #ece4d3;
+      --pf-border-strong: #ddd2bb;
       --pf-ink: #2b2a26;
       --pf-ink-soft: #5b5a54;
       --pf-ink-muted: #8a8880;
@@ -26,65 +26,62 @@
     .card {
       background: var(--pf-card);
       border: 1px solid var(--pf-border);
-      border-radius: 0.875rem;
-      box-shadow: 0 1px 0 rgba(43, 42, 38, 0.02);
+      border-radius: 1rem;
+      box-shadow: 0 1px 2px rgba(43, 42, 38, 0.025);
     }
-    .card-hover { transition: background-color 120ms ease, border-color 120ms ease; }
-    .card-hover:hover { background: var(--pf-card-hover); border-color: var(--pf-border-strong); }
+    .card-hover { transition: background-color 140ms ease, box-shadow 140ms ease, transform 140ms ease; }
+    .card-hover:hover { background: var(--pf-card-hover); box-shadow: 0 2px 8px rgba(43, 42, 38, 0.05); }
     .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium; }
     .btn {
-      @apply inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium;
+      @apply inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-medium;
       background: #fbf8f1;
       border: 1px solid var(--pf-border);
       color: var(--pf-ink);
-      transition: background-color 120ms ease, border-color 120ms ease;
+      transition: background-color 140ms ease, border-color 140ms ease;
     }
     .btn:hover { background: var(--pf-card-hover); border-color: var(--pf-border-strong); }
     .btn-primary {
-      @apply inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium;
+      @apply inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-medium;
       background: #2b2a26;
       color: #f7f3ea;
       border: 1px solid #2b2a26;
-      transition: background-color 120ms ease;
+      transition: background-color 140ms ease;
     }
     .btn-primary:hover { background: #3a3933; }
+    .btn-ghost {
+      @apply inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--pf-ink-soft);
+      transition: background-color 140ms ease, color 140ms ease;
+    }
+    .btn-ghost:hover { background: var(--pf-card); color: var(--pf-ink); }
     .field {
       background: #fbf8f1;
       border: 1px solid var(--pf-border);
       color: var(--pf-ink);
+      border-radius: 0.875rem;
     }
-    .field:focus { outline: none; border-color: #b9ac90; box-shadow: 0 0 0 3px rgba(185, 172, 144, 0.18); }
+    .field:focus { outline: none; border-color: var(--pf-border-strong); box-shadow: 0 0 0 3px rgba(216, 202, 168, 0.25); }
     .row-divide > * + * { border-top: 1px solid var(--pf-border); }
     .pill-soft-red { background: #f3dad3; color: #8a3522; }
     .pill-soft-amber { background: #f0e3c4; color: #7a5413; }
     .pill-soft-green { background: #dde7d6; color: #3f5b34; }
     .pill-soft-neutral { background: #e8e2d3; color: #5b5a54; }
     .pill-soft-blue { background: #d9e3e6; color: #2c5363; }
-    .pill-soft-ink { background: #e0d9c8; color: #2b2a26; }
     .dot { display: inline-block; width: 6px; height: 6px; border-radius: 9999px; }
     .dot-new { background: #b9ac90; }
     .dot-progress { background: #c98a2b; }
     .dot-await { background: #2c5363; }
     .dot-done { background: #2f6b53; }
-    .strip-step {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.4rem 0.75rem; border-radius: 9999px;
-      background: #fbf8f1; border: 1px solid var(--pf-border);
-      color: var(--pf-ink-soft); font-size: 0.78rem; font-weight: 500;
-    }
-    .strip-step.is-active {
-      background: var(--pf-ink); color: #f7f3ea; border-color: var(--pf-ink);
-    }
-    .strip-arrow { color: var(--pf-ink-muted); font-size: 0.85rem; }
-    .ai-note { color: var(--pf-ink-muted); font-size: 0.72rem; font-style: italic; letter-spacing: 0; }
-    .metric-num { font-size: 1.75rem; font-weight: 600; color: var(--pf-ink); letter-spacing: -0.02em; }
-    .metric-label { font-size: 0.78rem; color: var(--pf-ink-soft); }
-    .metric-sub { font-size: 0.7rem; color: var(--pf-ink-muted); margin-top: 0.15rem; }
+    .scroll-soft { scrollbar-width: thin; scrollbar-color: var(--pf-border-strong) transparent; }
+    .scroll-soft::-webkit-scrollbar { width: 8px; }
+    .scroll-soft::-webkit-scrollbar-thumb { background: var(--pf-border-strong); border-radius: 9999px; }
   </style>
 </head>
 <body class="min-h-screen">
   {% include "_components/nav.html" ignore missing %}
-  <main class="max-w-7xl mx-auto px-4 py-6">
+  <main class="max-w-7xl mx-auto px-6 py-8">
     {% block content %}{% endblock %}
   </main>
   <script src="/static/app.js" defer></script>

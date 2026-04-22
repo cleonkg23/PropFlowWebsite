@@ -2,64 +2,73 @@
 {% block title %}Owner · PropertyFlow{% endblock %}
 {% block content %}
 <h1 class="text-2xl font-semibold mb-1">System owner</h1>
-<p class="text-sm mb-5" style="color: var(--pf-ink-soft);">Cross-tenant overview and AI status.</p>
+<p class="text-sm mb-6" style="color: var(--pf-ink-soft);">Cross-tenant overview and AI status.</p>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-  <div class="card p-5">
-    <h3 class="text-sm font-semibold mb-3">Local AI (Ollama)</h3>
-    <dl class="text-sm space-y-2">
-      <div class="flex justify-between"><dt style="color: var(--pf-ink-soft);">Status</dt>
-        <dd>
-          {% if ai_status.ollama == 'up' %}
-            <span class="badge pill-soft-green">up</span>
-          {% else %}
-            <span class="badge pill-soft-red">down — using fallback</span>
-          {% endif %}
-        </dd>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  {# ---- AI status ---- #}
+  <div class="card p-6">
+    <h3 class="text-sm font-semibold mb-3">AI</h3>
+    {% if ai_status.ollama == 'up' %}
+      <div class="flex items-center gap-2 mb-2">
+        <span class="dot dot-done"></span>
+        <span class="text-sm font-medium">AI running (remote)</span>
       </div>
-      <div class="flex justify-between"><dt style="color: var(--pf-ink-soft);">Model</dt><dd>{{ ai_status.model }}</dd></div>
-      <div class="flex justify-between"><dt style="color: var(--pf-ink-soft);">Model present</dt>
-        <dd>{% if ai_status.model_present == 'yes' %}<span class="badge pill-soft-green">yes</span>{% else %}<span class="badge pill-soft-amber">no</span>{% endif %}</dd>
+      <p class="text-sm" style="color: var(--pf-ink-soft);">Model: {{ ai_status.model }}</p>
+    {% else %}
+      <div class="flex items-center gap-2 mb-2">
+        <span class="dot dot-progress"></span>
+        <span class="text-sm font-medium">Using fallback (rule-based)</span>
       </div>
-      <div class="flex justify-between"><dt style="color: var(--pf-ink-soft);">Host</dt><dd class="text-xs font-mono" style="color: var(--pf-ink-soft);">{{ ai_status.host }}</dd></div>
-    </dl>
+      <p class="text-sm" style="color: var(--pf-ink-soft);">Model: {{ ai_status.model }}</p>
+      <p class="text-xs mt-1" style="color: var(--pf-ink-muted);">Local model not yet present.</p>
+    {% endif %}
   </div>
 
-  <div class="card p-5 md:col-span-2">
+  {# ---- Tenants ---- #}
+  <div class="card p-6 md:col-span-2">
     <h3 class="text-sm font-semibold mb-3">Tenants ({{ rows|length }})</h3>
     <table class="w-full text-sm">
       <thead class="text-xs text-left" style="color: var(--pf-ink-muted);">
-        <tr><th class="py-2">Tenant</th><th>Users</th><th>Items</th><th>Open</th></tr>
+        <tr>
+          <th class="py-2 font-normal">Tenant</th>
+          <th class="font-normal">Users</th>
+          <th class="font-normal">Items</th>
+          <th class="font-normal">Open</th>
+        </tr>
       </thead>
       <tbody class="row-divide">
         {% for r in rows %}
           <tr>
-            <td class="py-2.5">{{ r.tenant.name }}</td>
+            <td class="py-3">{{ r.tenant.name }}</td>
             <td>{{ r.users }}</td>
             <td>{{ r.items }}</td>
             <td>{{ r.open }}</td>
           </tr>
         {% else %}
-          <tr><td class="py-2" style="color: var(--pf-ink-muted);" colspan="4">No tenants.</td></tr>
+          <tr><td class="py-3" style="color: var(--pf-ink-muted);" colspan="4">No tenants.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
 
-<div class="card p-5">
-  <h3 class="text-sm font-semibold mb-3">System audit log</h3>
-  <ul class="text-xs row-divide font-mono">
-    {% for a in audit %}
-      <li class="py-2 flex items-center gap-2">
-        <span class="w-32" style="color: var(--pf-ink-muted);">{{ a.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
-        <span class="font-semibold w-24" style="color: var(--pf-ink);">{{ a.action }}</span>
-        <span style="color: var(--pf-ink-soft);">tenant={{ a.tenant_id }} item={{ a.item_id }} user={{ a.user_id }}</span>
-        <span class="ml-2" style="color: var(--pf-ink);">{{ a.detail }}</span>
-      </li>
-    {% else %}
-      <li class="py-2" style="color: var(--pf-ink-muted);">No activity yet.</li>
-    {% endfor %}
-  </ul>
+<div class="card p-6">
+  <h3 class="text-sm font-semibold mb-3">System activity</h3>
+  <div class="max-h-96 overflow-y-auto scroll-soft pr-2">
+    <ul class="text-sm row-divide">
+      {% for a in audit %}
+        <li class="py-3 flex items-start gap-4">
+          <span class="text-xs shrink-0 w-32" style="color: var(--pf-ink-muted);">{{ a.created_at.strftime('%b %d · %H:%M:%S') }}</span>
+          <span class="badge pill-soft-neutral shrink-0">{{ a.action.replace('_',' ') }}</span>
+          <span class="text-sm" style="color: var(--pf-ink);">
+            tenant #{{ a.tenant_id or '—' }}{% if a.item_id %} · item #{{ a.item_id }}{% endif %}
+            {% if a.detail %}<span style="color: var(--pf-ink-soft);"> — {{ a.detail }}</span>{% endif %}
+          </span>
+        </li>
+      {% else %}
+        <li class="py-2 text-sm" style="color: var(--pf-ink-muted);">No activity yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
 </div>
 {% endblock %}

@@ -174,6 +174,45 @@ def assign_user(db: Session, *, item: Item, new_user: Optional[User], actor: Use
     return item
 
 
+def edit_draft(db: Session, *, item: Item, text: str, actor: User) -> Item:
+    """Operator-edited draft content."""
+    item.draft_reply = (text or "").strip()
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="edit_draft",
+        item_id=item.id,
+        detail=f"len={len(item.draft_reply)}",
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def send_reply(db: Session, *, item: Item, actor: User) -> Item:
+    """Mark draft as sent — moves item into 'awaiting reply' from the recipient."""
+    if not item.draft_reply:
+        raise ValueError("no draft to send")
+    target = ItemStatus.awaiting_reply
+    if target not in VALID_TRANSITIONS.get(item.status, set()) and item.status is not target:
+        raise ValueError(f"cannot send from {item.status.value}")
+    old = item.status
+    if item.status is not target:
+        item.status = target
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="send_reply",
+        item_id=item.id,
+        detail=f"{old.value} -> {item.status.value}",
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
 def regenerate_draft(db: Session, *, item: Item, actor: User) -> Item:
     tenant = db.get(Tenant, item.tenant_id)
     draft = ai.generate_draft(

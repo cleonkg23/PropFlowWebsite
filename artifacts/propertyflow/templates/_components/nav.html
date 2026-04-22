@@ -1,5 +1,5 @@
-<header style="background: #f2ede4; border-bottom: 1px solid var(--pf-border);">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<header style="background: var(--pf-bg); border-bottom: 1px solid var(--pf-border);">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <a href="/" class="font-semibold flex items-center gap-2" style="color: var(--pf-ink);">
         <span class="inline-block w-2 h-2 rounded-full" style="background: #2f6b53;"></span>
@@ -11,18 +11,18 @@
     </div>
     {% if user %}
       <nav class="flex items-center gap-1 text-sm">
-        <a class="px-3 py-1.5 rounded-lg card-hover" href="/dashboard" style="color: var(--pf-ink-soft);">Dashboard</a>
+        <a class="btn-ghost" href="/dashboard">Dashboard</a>
         {% if user.role.value in ['admin', 'owner'] %}
-          <a class="px-3 py-1.5 rounded-lg card-hover" href="/admin" style="color: var(--pf-ink-soft);">Admin</a>
+          <a class="btn-ghost" href="/admin">Admin</a>
         {% endif %}
         {% if user.role.value == 'owner' %}
-          <a class="px-3 py-1.5 rounded-lg card-hover" href="/owner" style="color: var(--pf-ink-soft);">Owner</a>
+          <a class="btn-ghost" href="/owner">Owner</a>
         {% endif %}
         <span class="ml-3" style="color: var(--pf-ink-soft);">{{ user.name }}
           <span class="badge pill-soft-neutral ml-1">{{ user.role.value }}</span>
         </span>
         <form method="post" action="/logout" class="inline ml-2">
-          <button class="btn">Sign out</button>
+          <button class="btn-ghost">Sign out</button>
         </form>
       </nav>
     {% endif %}
