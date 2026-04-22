@@ -41,6 +41,8 @@ if not _session_secret:
     if os.environ.get("PROPERTYFLOW_DEV") == "1":
         import secrets as _secrets
         _session_secret = _secrets.token_urlsafe(48)
+        # Write back so auth.py (and any other consumer) sees the same secret.
+        os.environ["SESSION_SECRET"] = _session_secret
         log.warning("SESSION_SECRET not set — using ephemeral dev secret (PROPERTYFLOW_DEV=1)")
     else:
         raise RuntimeError(

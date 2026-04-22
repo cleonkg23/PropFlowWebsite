@@ -10,18 +10,22 @@
 
   <div class="card">
     {% if delivered %}
-      <p style="margin: 0 0 0.6rem;">We just sent a magic link to:</p>
+      <p style="margin: 0 0 0.6rem;">If an account exists for this address, we just sent a magic link to:</p>
       <p style="margin: 0 0 1rem; font-family: var(--mono, monospace); font-size: 1.05rem;"><strong>{{ email }}</strong></p>
       <p class="muted" style="font-size: 0.88rem; margin: 0;">
-        The link expires in 15 minutes. If you don't see it, check your spam folder.
+        The link expires in 15 minutes and can only be used once. If you don't see it, check your spam folder.
       </p>
-    {% else %}
+    {% elif fallback_url %}
       <div class="flash" style="background:#f5e1d2; border-color:#e6c8af; color:#7a3a13;">
-        We couldn't send the email right now. Use this one-time link instead (expires in 15 minutes):
+        <strong>DEV MODE</strong> — email delivery is unavailable. Use this one-time link (expires in 15 minutes):
       </div>
       <p style="word-break: break-all; font-family: var(--mono, monospace); font-size: 0.85rem; margin: 0.6rem 0 1rem;">
         <a href="{{ fallback_url }}">{{ fallback_url }}</a>
       </p>
+    {% else %}
+      <div class="flash" style="background:#f5e1d2; border-color:#e6c8af; color:#7a3a13;">
+        We couldn't send the sign-in email right now. Please try again in a few minutes, or contact your administrator.
+      </div>
     {% endif %}
   </div>
 

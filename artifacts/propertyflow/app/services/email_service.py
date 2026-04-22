@@ -59,12 +59,13 @@ def _get_credentials() -> Optional[dict]:
 def send_magic_link(to_email: str, magic_url: str) -> bool:
     """Send a sign-in magic link. Returns True on apparent success.
 
-    On failure, logs the magic URL to stdout so the operator can copy it
-    manually — the system never silently strands a user.
+    Tokens are bearer credentials — we never log the full magic URL.
+    Callers (auth route) decide whether to surface a fallback link to
+    the user, and only do so in dev mode.
     """
     creds = _get_credentials()
     if not creds:
-        log.error("EMAIL FALLBACK — magic link for %s: %s", to_email, magic_url)
+        log.error("Resend credentials unavailable — could not send magic link to %s", to_email)
         return False
 
     resend.api_key = creds["api_key"]
@@ -98,5 +99,5 @@ def send_magic_link(to_email: str, magic_url: str) -> bool:
         log.info("Sent magic link to %s", to_email)
         return True
     except Exception as e:
-        log.error("Resend send failed for %s: %s — link: %s", to_email, e, magic_url)
+        log.error("Resend send failed for %s: %s", to_email, e)
         return False

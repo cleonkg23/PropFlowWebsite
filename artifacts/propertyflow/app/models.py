@@ -6,6 +6,7 @@ system `owner` user has `tenant_id = NULL` and crosses tenant boundaries.
 from __future__ import annotations
 
 import enum
+import secrets as _secrets
 from datetime import datetime
 from typing import Optional
 
@@ -17,6 +18,12 @@ from app.db import Base
 
 def _utcnow() -> datetime:
     return datetime.utcnow()
+
+
+def _new_nonce() -> str:
+    """Per-user random nonce; rotated on every successful magic-link login
+    to enforce single-use semantics on outstanding tokens."""
+    return _secrets.token_urlsafe(16)
 
 
 class Role(str, enum.Enum):
@@ -70,6 +77,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     name: Mapped[str] = mapped_column(String(120))
     role: Mapped[Role] = mapped_column(Enum(Role), default=Role.operator)
+    # Rotated on every successful magic-link sign-in. Embedded in magic-link
+    # tokens; verifying a token requires the nonce still match the user row.
+    auth_nonce: Mapped[str] = mapped_column(String(32), default=_new_nonce)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
 
     tenant: Mapped[Optional[Tenant]] = relationship(back_populates="users")
