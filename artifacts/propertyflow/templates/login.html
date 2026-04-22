@@ -45,5 +45,6 @@
     </div>
   </div>
 </div>
-<script src="/static/app.js" defer></script>
+{# app.js is already loaded by base.html — including it here too caused a
+   duplicate `const BASE` declaration and broke the page's JS. #}
 {% endblock %}
