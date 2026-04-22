@@ -69,3 +69,34 @@ Only one flow runs at a time (`flowRunning` flag); polling skipped while a flow 
 - Swap JSON store for SQLite by replacing `store.py` functions; signatures stay the same
 - Add input connectors (Gmail, webhooks) by hitting `POST /ingest` with `{from_name, message, property, type?}`
 - Add a new scenario by adding an entry to `SCENARIOS` in `scenarios.py` — the guided flow code is scenario-agnostic and will pick it up automatically
+
+### `artifacts/propertyflow/` — multi-tenant FastAPI app (Python 3.11)
+Production-leaning version of the workflow-demo. Real persistence, real auth, real local AI, real role separation. Runs as workflow `propertyflow: web` on port **8008**.
+
+**Layout:**
+- `app/db.py` — SQLAlchemy engine, `SessionLocal`, `Base`, `get_db()`, `init_db()`. SQLite at `data/propertyflow.db`, override via `PROPERTYFLOW_DB_URL`.
+- `app/models.py` — `Tenant`, `User` (roles: `owner|admin|operator|viewer`), `Item` (status: `new|in_progress|awaiting_reply|done`, urgency: `low|medium|high`), `Task`, `AuditLog`. Multi-tenant by `tenant_id` FK on every operational row; `owner` users have `tenant_id = NULL` and cross tenants.
+- `app/auth.py` — Starlette `SessionMiddleware` signed-cookie auth keyed off `SESSION_SECRET`. Email-only login (looks up seeded user). `current_user` (optional), `require_user`, `require_role(*roles)` deps. `owner` passes every role check.
+- `app/seed.py` — runs once on first boot when DB is empty. Creates two tenants (Acme Lettings, Beech Property Group), one user per role plus a system owner, and a handful of pre-classified items + open tasks so the board never starts empty.
+- `app/services/ai_service.py` — `AIService` with `classify_item()` and `generate_draft()`. Calls local Ollama (`gemma3n:e4b`, default `http://localhost:11434`) via `httpx` non-streaming; on any failure (connection, timeout, malformed JSON) falls back to deterministic keyword rules. Returns the `mode` it used (`ollama` or `fallback`) which is recorded on the item and surfaced in the UI. `status()` is a 2s health probe used by the owner panel.
+- `app/services/workflow_service.py` — single engine. `ingest_item` runs the full pipeline (classify → assign → draft → task) inside one DB transaction and writes an audit log line. Routing rule = category → role; SLA hours = urgency → due_at offset. `update_status` enforces a transition table (`new→in_progress`, `in_progress→awaiting_reply|done`, `awaiting_reply→in_progress|done`, `done→∅`) and auto-closes open tasks on completion. `assign_user` mirrors the assignment onto the open task. `regenerate_draft` reruns the model only.
+- `app/services/connectors/` — adapter interface (`Connector` Protocol over `IngestPayload`) + `google_sheets.py` and `email_inbox.py` stubs, ready to wire real polling against the `ingest_item` entrypoint.
+- `app/routes/` —
+  - `public.py`: `/`, `/login` (GET+POST, email lookup, redirect by role), `/logout`
+  - `dashboard.py`: `/dashboard` (board grouped by status, "my open tasks", manual create form), `/items/{id}` (subject/body, classification, draft + Regenerate, assignment dropdown, status transition buttons), plus form-post handlers for status/assign/regenerate
+  - `admin.py`: `/admin` — tenant users + recent items + tenant audit log (admin/owner only; owner without tenant falls back to first tenant)
+  - `owner.py`: `/owner` — cross-tenant counts + AI health card + system audit log (owner only)
+  - `api.py`: `POST /api/items` (JSON ingest, scoped to caller's tenant), `POST /demo/{key}` (4 demo scenarios — boiler/viewing/landlord/chase — that go through the full real pipeline)
+- `app/main.py` — FastAPI factory + `lifespan` (init_db + seed_if_empty), `SessionMiddleware`, static mount at `/static`, all routers included.
+- `templates/` — server-rendered Jinja2 with Tailwind CDN. `base.html`, `_components/{nav,board}.html`, `login.html`, `dashboard.html`, `item_detail.html`, `admin.html`, `owner.html`. Role-aware nav, status-tone badges, AI-mode badge on every item card.
+- `static/app.js` — small vanilla JS for quick-login buttons and the manual-create JSON post.
+
+**Demo logins:** `owner@propertyflow.dev`, `admin@acme.dev`, `maria@acme.dev`, `priya@acme.dev`, `viewer@acme.dev`, `admin@beech.dev`. No password — type/click and you're in.
+
+**Local AI:** Ollama is installed under `~/.local/bin/ollama` and serves on `:11434`. Model is `gemma3n:e4b` (~4.5 GB). Service is the Ollama daemon, started in the background; install/pull logs at `/tmp/ollama_setup.log`. The app uses real AI when Ollama+model are present and silently degrades to deterministic rules otherwise — the owner panel surfaces which mode is live.
+
+**Extending:**
+- Add a connector: implement `Connector.fetch_new()` (yield `IngestPayload`s), then call `workflow_service.ingest_item(...)` for each — that's the entire integration point.
+- Add a category/route: extend `ROUTING`, `NEXT_ACTION`, `CATEGORY_KEYWORDS` and the AI prompt's enum in `ai_service.py`.
+- Swap SQLite for Postgres: set `PROPERTYFLOW_DB_URL` — no other changes.
+- Replace email-only auth with magic links: replace the body of `auth.authenticate_email` (and add a `/login/magic` route) — every dependency is funneled through it.

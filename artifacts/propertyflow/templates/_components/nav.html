@@ -1,0 +1,28 @@
+<header class="bg-white border-b border-slate-200">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/" class="font-semibold text-slate-900 flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+        PropertyFlow
+      </a>
+      {% if tenant %}
+        <span class="text-xs text-slate-500 ml-2">/ {{ tenant.name }}</span>
+      {% endif %}
+    </div>
+    {% if user %}
+      <nav class="flex items-center gap-1 text-sm">
+        <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/dashboard">Dashboard</a>
+        {% if user.role.value in ['admin', 'owner'] %}
+          <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/admin">Admin</a>
+        {% endif %}
+        {% if user.role.value == 'owner' %}
+          <a class="px-3 py-1.5 rounded-lg hover:bg-slate-100" href="/owner">Owner</a>
+        {% endif %}
+        <span class="ml-3 text-slate-500">{{ user.name }} <span class="badge bg-slate-100 text-slate-600 ml-1">{{ user.role.value }}</span></span>
+        <form method="post" action="/logout" class="inline ml-2">
+          <button class="btn">Sign out</button>
+        </form>
+      </nav>
+    {% endif %}
+  </div>
+</header>

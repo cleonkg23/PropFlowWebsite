@@ -1,0 +1,35 @@
+{# Workflow board column. Expects: status (ItemStatus), items (list[Item]) #}
+{% set labels = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set tones = {
+  'new':'bg-slate-100 text-slate-700',
+  'in_progress':'bg-amber-100 text-amber-800',
+  'awaiting_reply':'bg-sky-100 text-sky-800',
+  'done':'bg-emerald-100 text-emerald-800'
+} %}
+<div class="card p-3 flex flex-col min-h-[220px]">
+  <div class="flex items-center justify-between mb-2 px-1">
+    <span class="text-sm font-semibold">{{ labels[status.value] }}</span>
+    <span class="badge {{ tones[status.value] }}">{{ items|length }}</span>
+  </div>
+  <div class="space-y-2">
+    {% for item in items %}
+      <a href="/items/{{ item.id }}" class="block p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-sm font-medium truncate">{{ item.subject }}</span>
+          {% if item.urgency.value == 'high' %}
+            <span class="badge bg-red-100 text-red-700">high</span>
+          {% elif item.urgency.value == 'low' %}
+            <span class="badge bg-slate-100 text-slate-600">low</span>
+          {% endif %}
+        </div>
+        <div class="text-xs text-slate-500 mt-1 flex items-center gap-2">
+          <span class="badge bg-slate-100 text-slate-600">{{ item.category.replace('_',' ') }}</span>
+          {% if item.assigned_user %}<span>· {{ item.assigned_user.name }}</span>{% endif %}
+          {% if item.ai_mode %}<span class="ml-auto text-slate-400">{{ item.ai_mode }}</span>{% endif %}
+        </div>
+      </a>
+    {% else %}
+      <div class="text-xs text-slate-400 px-1 py-4 text-center">Nothing here.</div>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · PropertyFlow{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <h1 class="text-xl font-semibold">Workflow board</h1>
+    <p class="text-sm text-slate-500">Items captured, classified, assigned, and drafted automatically.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <form method="post" action="/demo/boiler"><button class="btn">+ Boiler emergency</button></form>
+    <form method="post" action="/demo/viewing"><button class="btn">+ Viewing request</button></form>
+    <form method="post" action="/demo/landlord"><button class="btn">+ Landlord admin</button></form>
+    <form method="post" action="/demo/chase"><button class="btn">+ Chase</button></form>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+  {% for status in statuses %}
+    {% with items=columns[status] %}
+      {% include "_components/board.html" %}
+    {% endwith %}
+  {% endfor %}
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+  <div class="card p-4 md:col-span-2">
+    <h2 class="text-sm font-semibold mb-3">My open tasks</h2>
+    {% if my_tasks %}
+      <ul class="divide-y divide-slate-100">
+        {% for t in my_tasks %}
+          <li class="py-2 flex items-center justify-between gap-3">
+            <div>
+              <a class="text-sm font-medium hover:underline" href="/items/{{ t.item_id }}">{{ t.description }}</a>
+              <div class="text-xs text-slate-500">item #{{ t.item_id }}{% if t.due_at %} · due {{ t.due_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}</div>
+            </div>
+            <span class="badge bg-slate-100 text-slate-600">open</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-sm text-slate-500">No open tasks assigned to you.</p>
+    {% endif %}
+  </div>
+  <div class="card p-4">
+    <h2 class="text-sm font-semibold mb-3">Add an item manually</h2>
+    <form method="post" action="/api/items" id="manual-item" class="space-y-2 text-sm">
+      <input name="subject" placeholder="Subject" required class="w-full px-3 py-2 rounded-lg border border-slate-200" />
+      <textarea name="body" placeholder="Message body" required rows="4" class="w-full px-3 py-2 rounded-lg border border-slate-200"></textarea>
+      <input name="sender_name" placeholder="From (name)" class="w-full px-3 py-2 rounded-lg border border-slate-200" />
+      <input name="sender_email" type="email" placeholder="From (email)" class="w-full px-3 py-2 rounded-lg border border-slate-200" />
+      <button class="btn-primary w-full justify-center">Run through workflow</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
