@@ -162,13 +162,18 @@
   </div>
   <div class="summary-tile">
     <span class="tile-label">AI engine</span>
-    {% if ai_status.ollama == 'up' %}
-      <span class="tile-val" style="font-size:1.1rem; font-style:normal; margin-top: 0.55rem;">
-        <span class="ai-badge up">Live — {{ ai_status.model }}</span>
+    {% if ai_status.engine == 'openrouter' %}
+      <span class="tile-val" style="font-size:1.05rem; font-style:normal; margin-top: 0.55rem;">
+        <span class="ai-badge up">Gemma 4 — live</span>
       </span>
-      <span class="tile-sub">Ollama model running</span>
+      <span class="tile-sub">{{ ai_status.model }}</span>
+    {% elif ai_status.engine == 'ollama' %}
+      <span class="tile-val" style="font-size:1.05rem; font-style:normal; margin-top: 0.55rem;">
+        <span class="ai-badge up">Ollama — local</span>
+      </span>
+      <span class="tile-sub">{{ ai_status.model }}</span>
     {% else %}
-      <span class="tile-val" style="font-size:1.1rem; font-style:normal; margin-top: 0.55rem;">
+      <span class="tile-val" style="font-size:1.05rem; font-style:normal; margin-top: 0.55rem;">
         <span class="ai-badge fallback">Rule-based</span>
       </span>
       <span class="tile-sub">Deterministic fallback — fully operational</span>
