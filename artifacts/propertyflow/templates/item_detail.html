@@ -5,7 +5,47 @@
 
 {% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
 {% set chip_label = {'tenant_enquiry':'Tenant','maintenance':'Maintenance','viewing':'Viewing','landlord':'Landlord'} %}
-{% set status_label = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set status_label = {'new':'New','acknowledged':'Acknowledged','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set due_naive = item.due_at.replace(tzinfo=None) if item.due_at else None %}
+{% set now_naive = now_utc.replace(tzinfo=None) %}
+{% set is_overdue = due_naive and due_naive < now_naive and item.status.value != 'done' %}
+
+<style>
+  .due-banner {
+    display: inline-flex; align-items: center; gap: 0.5em;
+    padding: 0.35em 0.85em; border-radius: 999px;
+    font-size: 0.8rem; margin-left: 0.65em;
+    border: 1px solid var(--rule); background: white; color: var(--ink-soft);
+  }
+  .due-banner.overdue { background: #fbe9e7; color: #9b2c2c; border-color: #f3c9c4; font-weight:600; }
+  .due-banner.soon { background: #fff7e0; color: #92400e; border-color: #fcd34d; }
+
+  /* Timeline */
+  .timeline { border-left: 2px solid var(--rule); margin-left: 0.5rem; padding-left: 1.2rem; }
+  .timeline-row { position: relative; padding: 0.55rem 0 0.65rem; }
+  .timeline-row + .timeline-row { border-top: 1px solid var(--rule); }
+  .timeline-row::before {
+    content: ''; position: absolute; left: -1.55rem; top: 1rem;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent-strong); box-shadow: 0 0 0 3px var(--surface);
+  }
+  .timeline-row.kind-note::before { background: var(--highlight); }
+  .timeline-row.kind-complete::before { background: #34c759; }
+  .timeline-row.kind-status::before { background: var(--accent); }
+  .timeline-row .when {
+    font-size: 0.74rem; color: var(--muted); letter-spacing: 0.04em;
+  }
+  .timeline-row .what { font-size: 0.92rem; color: var(--ink); margin-top: 0.15rem; line-height: 1.45; }
+  .timeline-row .what b { font-weight: 600; }
+  .timeline-row .who { font-weight: 500; color: var(--ink-soft); }
+  .compose-note { display: grid; gap: 0.5rem; margin-top: 1rem; }
+  .compose-note textarea {
+    width: 100%; padding: 0.55rem 0.7rem; font: inherit; font-size: 0.9rem;
+    border: 1px solid var(--rule); border-radius: 6px; resize: vertical; min-height: 3.5rem;
+    background: white;
+  }
+  .compose-note .row { display: flex; justify-content: flex-end; gap: 0.5rem; }
+</style>
 
 <div style="margin-bottom: 1.25rem;">
   <a href="/dashboard" style="font-size: 0.85rem; color: var(--ink-soft); text-decoration: none;">&larr; back to today</a>
@@ -19,7 +59,18 @@
     <article class="card">
       <div class="between" style="margin-bottom: 0.85rem;">
         <span class="eyebrow">{% if item.sender_name %}Message from {{ item.sender_name }}{% else %}Inbound message{% endif %}</span>
-        <span class="status status-{{ item.status.value }}">{{ status_label[item.status.value] }}</span>
+        <span>
+          <span class="status status-{{ item.status.value }}">{{ status_label[item.status.value] }}</span>
+          {% if item.due_at and item.status.value != 'done' %}
+            {% if is_overdue %}
+              <span class="due-banner overdue">Overdue · was due {{ item.due_at.strftime('%a %d %b, %H:%M') }}</span>
+            {% else %}
+              <span class="due-banner">Due {{ item.due_at.strftime('%a %d %b, %H:%M') }}</span>
+            {% endif %}
+          {% elif item.status.value == 'done' and item.completed_at %}
+            <span class="due-banner">Completed {{ item.completed_at.strftime('%a %d %b, %H:%M') }}</span>
+          {% endif %}
+        </span>
       </div>
       <h1 class="h-display" style="font-size: 1.85rem; margin-bottom: 0.65rem;">{{ item.subject }}</h1>
       <div class="muted" style="font-size: 0.85rem; margin-bottom: 1.25rem;">
@@ -98,22 +149,90 @@
     </article>
   </div>
 
-  {# ---- RIGHT column: status, assignment, tasks ---- #}
+  {# ---- RIGHT column: actions, timeline, assignment ---- #}
   <aside class="stack-lg">
+    {# --- Workflow actions: ack / status / complete --- #}
     <div class="card">
-      <span class="eyebrow">Move status</span>
+      <span class="eyebrow">Actions</span>
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">{{ status_label[item.status.value] }}</h3>
-      {% if valid_next %}
-        <div style="display:flex; flex-wrap:wrap; gap: 0.5rem;">
-          {% for s in valid_next %}
+
+      <div style="display:flex; flex-wrap:wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
+        {% if item.status.value == 'new' %}
+          <form method="post" action="/items/{{ item.id }}/acknowledge" style="display:inline;">
+            <button class="btn btn-sm" title="Tell the sender we've received the message">Acknowledge receipt</button>
+          </form>
+        {% endif %}
+        {% for s in valid_next %}
+          {% if s.value != 'done' %}
             <form method="post" action="/items/{{ item.id }}/status" style="display:inline;">
               <input type="hidden" name="to_status" value="{{ s.value }}" />
               <button class="btn btn-sm">&rarr; {{ status_label[s.value] }}</button>
             </form>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if item.status.value != 'done' %}
+        <details style="margin-top: 0.4rem;">
+          <summary class="btn btn-sm" style="display:inline-flex;">Mark complete</summary>
+          <form method="post" action="/items/{{ item.id }}/complete" class="compose-note" style="margin-top: 0.6rem;">
+            <label class="label" for="completion-note" style="margin-bottom:0;">Completion note (what was done?)</label>
+            <textarea id="completion-note" name="note" placeholder="Boiler reset, tenant confirmed heat is back."></textarea>
+            <div class="row">
+              <button class="btn-primary" type="submit">Close item</button>
+            </div>
+          </form>
+        </details>
+      {% else %}
+        {% if item.completion_note %}
+          <div class="card-inset" style="margin-top:0.6rem;">
+            <span class="eyebrow eyebrow-ink">Completion note</span>
+            <div style="font-family: var(--serif); font-size: 0.98rem; margin-top:0.25rem; white-space: pre-wrap;">{{ item.completion_note }}</div>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    {# --- Timeline + add note --- #}
+    <div class="card" id="timeline">
+      <span class="eyebrow">Timeline</span>
+      <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">{{ timeline|length }} event{{ '' if timeline|length == 1 else 's' }} on this item</h3>
+      {% if timeline %}
+        <div class="timeline">
+          {% for row in timeline %}
+            {% set a = row.entry %}
+            {% set actor = row.actor %}
+            {% set kind = 'kind-default' %}
+            {% if a.action == 'note' %}{% set kind = 'kind-note' %}
+            {% elif a.action == 'complete' %}{% set kind = 'kind-complete' %}
+            {% elif a.action in ['status_change', 'acknowledge', 'send_reply'] %}{% set kind = 'kind-status' %}
+            {% endif %}
+            <div class="timeline-row {{ kind }}">
+              <div class="when">{{ a.created_at.strftime('%b %d, %H:%M') }} &middot; <span class="who">{{ actor.name if actor else 'system' }}</span></div>
+              <div class="what">
+                <b>{{ a.action.replace('_',' ')|capitalize }}</b>
+                {% if a.detail %}
+                  &mdash;
+                  {% if a.action == 'note' %}
+                    <span style="font-family: var(--serif); white-space: pre-wrap;">{{ a.detail }}</span>
+                  {% else %}
+                    {{ a.detail|replace('awaiting_reply','Awaiting reply')|replace('in_progress','In progress')|replace('->','→') }}
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
           {% endfor %}
         </div>
       {% else %}
-        <p class="muted" style="font-size: 0.85rem;">No further transitions.</p>
+        <p class="muted" style="font-size: 0.85rem;">No events yet.</p>
+      {% endif %}
+
+      {% if user.role.value in ['operator', 'admin', 'owner'] %}
+        <form method="post" action="/items/{{ item.id }}/note" class="compose-note">
+          <label class="label" for="note-text" style="margin-bottom:0;">Add a note</label>
+          <textarea id="note-text" name="note" required placeholder="Called the contractor, they're booked for 2pm."></textarea>
+          <div class="row"><button class="btn btn-sm" type="submit">Post note</button></div>
+        </form>
       {% endif %}
     </div>
 

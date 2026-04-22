@@ -17,6 +17,8 @@ from app.services.ai_service import ai
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
+_AUDIT_PAGE_SIZE = 25
+
 # Minutes saved per AI-assisted item (manual draft ~15 min, reviewed AI draft ~3 min)
 _MINUTES_SAVED_PER_AI_ITEM = 12
 
@@ -40,7 +42,15 @@ def _audit(db: Session, *, tenant_id, user_id, action: str, detail: str = "") ->
 
 
 @router.get("/owner")
-def owner_home(request: Request, user: User = Depends(require_role(Role.owner)), db: Session = Depends(get_db)):
+def owner_home(
+    request: Request,
+    user: User = Depends(require_role(Role.owner)),
+    db: Session = Depends(get_db),
+    event: str = "",
+    tenant_filter: str = "",
+    q: str = "",
+    page: int = 1,
+):
     tenants = db.query(Tenant).order_by(Tenant.name).all()
     rows = []
     system_totals = {"total": 0, "done": 0, "ai_drafted": 0, "response_mins": []}
@@ -99,7 +109,29 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
         "ai_rate": system_ai_rate,
     }
 
-    audit = db.query(AuditLog).order_by(AuditLog.created_at.desc()).limit(50).all()
+    # Cross-tenant audit feed with the same filter contract as /admin —
+    # event type, optional tenant scope, free text on detail, paginated.
+    audit_q = db.query(AuditLog)
+    if event:
+        audit_q = audit_q.filter(AuditLog.action == event)
+    if tenant_filter:
+        try:
+            audit_q = audit_q.filter(AuditLog.tenant_id == int(tenant_filter))
+        except ValueError:
+            pass
+    q_clean = q.strip()
+    if q_clean:
+        audit_q = audit_q.filter(AuditLog.detail.ilike(f"%{q_clean}%"))
+    audit_total = audit_q.count()
+    page = max(1, page)
+    audit = (
+        audit_q.order_by(AuditLog.created_at.desc())
+        .offset((page - 1) * _AUDIT_PAGE_SIZE)
+        .limit(_AUDIT_PAGE_SIZE)
+        .all()
+    )
+    page_count = max(1, (audit_total + _AUDIT_PAGE_SIZE - 1) // _AUDIT_PAGE_SIZE)
+    event_choices = sorted(r[0] for r in db.query(AuditLog.action).distinct().all())
 
     # Tenant lookup for human-readable audit detail
     tenant_names = {t.id: t.name for t in tenants}
@@ -114,9 +146,15 @@ def owner_home(request: Request, user: User = Depends(require_role(Role.owner)),
             "user": user,
             "rows": rows,
             "audit": audit,
+            "audit_total": audit_total,
+            "audit_page": page,
+            "audit_page_count": page_count,
+            "audit_filters": {"event": event, "tenant": tenant_filter, "q": q_clean},
+            "event_choices": event_choices,
             "ai_status": ai.status(),
             "summary": summary,
             "tenant_names": tenant_names,
+            "tenants": tenants,
             "flash": flash,
             "flash_kind": flash_kind,
         },

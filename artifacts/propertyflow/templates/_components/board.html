@@ -1,6 +1,7 @@
 {# One column of the bottom "Status across the team" strip. #}
-{% set labels = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set labels = {'new':'New','acknowledged':'Acknowledged','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
 {% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
+{% set _now = (now_utc.replace(tzinfo=None) if now_utc is defined and now_utc else None) %}
 <div class="board-col">
   <div class="board-col-head">
     <span class="eyebrow">{{ labels[status.value] }}</span>
@@ -9,12 +10,18 @@
   {% if items %}
     {% for item in items %}
       {% set u = item.urgency.value %}
+      {% set due_naive = item.due_at.replace(tzinfo=None) if item.due_at else None %}
+      {% set is_overdue = (_now and due_naive and due_naive < _now and item.status.value != 'done') %}
       <a href="/items/{{ item.id }}" class="board-card">
         <div class="top">
           <strong>{{ item.subject }}</strong>
           <span class="chip chip-priority-{{ u }}">{{ u }}</span>
         </div>
-        <div class="meta">{{ item.category.replace('_',' ') }}</div>
+        <div class="meta">
+          {{ item.category.replace('_',' ') }}
+          {% if item.assigned_user %} &middot; <span title="{{ item.assigned_user.name }}" style="display:inline-block;width:1.3em;height:1.3em;line-height:1.3em;text-align:center;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);font-weight:600;font-size:0.7rem;">{{ item.assigned_user.name[0] }}</span>{% endif %}
+          {% if is_overdue %} &middot; <span style="color:#9b2c2c;font-weight:600;">● overdue</span>{% endif %}
+        </div>
       </a>
     {% endfor %}
   {% else %}

@@ -1,0 +1,249 @@
+You are working inside the existing PropertyFlow workspace. This is not a greenfield build. The workspace contains a full product suite, but for this task you must only make changes to the real multi-tenant production application unless a shared dependency absolutely requires a carefully scoped update.
+
+Do not make product, UX, copy, or feature changes to:
+- the static marketing website,
+- the guided single-tenant demo app.
+
+Only touch shared code if it is genuinely reused by the real app and the change is necessary, safe, and non-breaking.
+
+Your job is to implement the missing operational layer inside the full production app cleanly and professionally, without bloating the codebase, without adding fake placeholder UX, and without breaking the existing architecture.
+
+Before making changes, do this first:
+
+1. Inspect the full repository and understand the current architecture, file structure, routing, models, services, templates, styling patterns, and JS behavior.
+2. Identify exactly which parts belong to the real production app versus the demo app and marketing site.
+3. Confine your implementation scope to the real production app only.
+4. Find and apply any available Claude/Opus skills related to:
+   - coding best practices,
+   - refactoring / architecture,
+   - UI design / design systems / product UX.
+5. If multiple relevant skills exist, use the strongest relevant combination.
+6. In your first response, briefly state which skills you found and are applying.
+7. If a named skill is not available, explicitly fall back to equivalent best-practice behavior rather than ignoring the instruction.
+
+Non-negotiable implementation rules:
+
+- Respect the existing codebase and extend it intelligently.
+- Reuse existing models, routes, templates, services, helpers, naming conventions, and UI patterns wherever possible.
+- Do not create parallel abstractions when an existing one can be extended.
+- Do not add placeholder lorem ipsum, fake metrics, fake message bodies, or bloated explanatory UI text.
+- Do not dump large chunks of decorative copy into the interface.
+- Do not introduce messy temporary hacks that will obviously need deleting later.
+- Do not rewrite major parts of the system unless a focused refactor is clearly necessary.
+- Keep changes cohesive, modular, and production-minded.
+- Preserve tenant boundaries, role-based access rules, auth behavior, and current dashboard structure.
+- Preserve the editorial / premium feel of the real app.
+- Keep JavaScript minimal and purposeful.
+- Keep the UI clean, premium, readable, scrollable where appropriate, and not visually noisy.
+- Prefer compact, high-signal microcopy over verbose UI text.
+- If you need to add schema or model fields, do so carefully and consistently with the existing stack.
+- If migrations are needed, implement them properly for the existing environment.
+- If email sending is not fully wired, do not fake success: persist clear state and handle fallback honestly.
+
+Product context you must respect:
+
+PropertyFlow as a workspace includes:
+- a static editorial marketing site,
+- a guided single-tenant demo app,
+- a real multi-tenant FastAPI production application.
+
+For this task, ignore the first two from an implementation perspective.
+You may inspect them for context only if needed, but do not update them.
+
+The real app already has:
+- FastAPI,
+- SQLAlchemy,
+- SQLite,
+- tenant-aware data model,
+- role hierarchy: owner → admin → operator → viewer,
+- session auth,
+- Resend-backed magic links,
+- single-use nonce rotation,
+- Jinja2 server-rendered UI,
+- minimal JS,
+- owner/admin/operator dashboards,
+- workflow processing,
+- AI-assisted classification and drafting,
+- audit logging,
+- task tracking,
+- AI health reporting.
+
+You must build on top of that, not fight it.
+
+Primary objective:
+
+Implement the missing execution layer in the real multi-tenant production app so PropertyFlow feels like a serious operational workflow system for property teams, not just a classifier + draft generator.
+
+Implement these capabilities in the full production application only:
+
+A) Owner + due date + ageing model for operational work
+
+Every relevant workflow item / task should support:
+- clear ownership,
+- due date / due time where relevant,
+- ageing / age visibility,
+- overdue state,
+- action-oriented status visibility.
+
+Requirements:
+- Add or extend the data model so items/tasks can carry ownership and due metadata in a clean way.
+- Show this clearly in the real app where operators/admins/owners need it.
+- Surface overdue and ageing states visually, but do not make the UI loud or childish.
+- Use tasteful urgency signals.
+- Support sorting and filtering by due state / owner / status where it makes sense.
+- Ensure role permissions still make sense when assigning or reassigning work.
+
+B) Closed-loop workflow progression
+
+The product must no longer stop at “task created”.
+It must support actual execution flow from intake to confirmed completion.
+
+Requirements:
+- Extend workflow states so operational items can move through a meaningful lifecycle.
+- At minimum support a real closed-loop path such as:
+  intake / acknowledged / assigned / waiting / in progress / updated / proof received / completed confirmed
+- Adapt naming if the existing codebase already has a cleaner status model, but preserve the core idea.
+- Make this especially strong for maintenance-type workflows, but implement it in a way that can support other categories too.
+- Completion should capture enough metadata to make the action traceable.
+- Avoid turning this into a giant BPM engine. Keep it clean, practical, and product-focused.
+
+C) Unified communication timeline
+
+Each item should have a clean, readable activity / communication timeline.
+
+Requirements:
+- Show the lifecycle of an item in one place.
+- Timeline should include relevant events such as:
+  inbound creation,
+  classification,
+  draft generation,
+  send action,
+  assignment changes,
+  status changes,
+  notes or follow-up actions,
+  completion events.
+- Use the existing audit patterns if possible instead of creating a redundant logging system.
+- If existing audit logs are too system-centric, create the minimal additional structure needed so item-level timelines feel coherent and user-friendly.
+- The timeline UI should feel premium, compact, and scannable, not cluttered.
+- Avoid giant cards or over-boxing.
+- Make event types easy to distinguish without visual chaos.
+
+D) Actual send action from the product
+
+PropertyFlow should not just suggest a response; it should support action from within the product.
+
+Requirements:
+- Implement a visible “send” action or equivalent execution action from the operational UI.
+- Reuse any existing email / draft / integration service structure if present.
+- Implement the most honest and clean version allowed by the current codebase:
+  - use existing email integration if already available,
+  - otherwise create a clean service boundary that records the action and supports later expansion,
+  - never pretend something was sent if it was not.
+- Persist send-related events so they appear in the unified timeline and searchable logs.
+- Keep the UI action simple and credible.
+
+E) Searchable audit / activity log
+
+The current system already values auditability. Strengthen that into a genuinely usable operational log.
+
+Requirements:
+- Make the audit/activity log neater, clearer, searchable, and easier to scan.
+- Support searching / filtering by things like:
+  tenant,
+  item,
+  actor,
+  event type,
+  status,
+  date/time.
+- Make it scrollable or paginated where appropriate.
+- Give the log proper structure and headings so it no longer feels like raw system noise.
+- Preserve tenant visibility boundaries.
+- Keep owner-level and tenant-level audit visibility consistent with role access.
+- Where possible, unify the mental model between “audit log” and “activity timeline” without forcing them to be identical views.
+
+UX and product design requirements for the real app:
+
+- The real app should feel premium, editorial, and operationally mature.
+- Reduce visual clutter rather than adding more.
+- Avoid excessive boxes, hard corners, noisy icons, or badge overload.
+- Make hierarchy obvious.
+- Use spacing, typography, and restrained visual emphasis instead of gimmicks.
+- Make operator workflows feel focused and fast.
+- Make admin and owner views feel informative without becoming dense.
+- Do not add new UI sections unless they materially improve usability.
+- Keep microcopy short, crisp, and product-grade.
+- Make logs and timelines readable at a glance.
+
+Engineering / architecture requirements:
+
+- Inspect existing models first before adding new ones.
+- Prefer extending existing tables/entities for items, tasks, audit logs, and communications if appropriate.
+- Do not create generic junk tables with vague names.
+- Keep route responsibilities clear.
+- Keep business logic out of templates.
+- Keep templates lean.
+- Keep JS light.
+- Keep service boundaries readable.
+- Keep naming precise and consistent.
+- Add validations and guards where needed.
+- Respect role hierarchy and tenant isolation in all new actions and views.
+- If adding filters/search parameters, do it cleanly and predictably.
+- If a refactor is needed to avoid duplication, do the refactor rather than pasting similar code into multiple places.
+- Preserve current working auth/security behavior.
+- Do not regress the magic-link flow, session handling, or tenant enforcement.
+
+Scope control rules:
+
+- Do not edit the marketing site just because the feature set evolved.
+- Do not edit the demo app just to keep parity.
+- Do not spend time on cross-product consistency work in this pass.
+- Focus entirely on making the real app stronger, cleaner, and more credible as an operational system.
+- Only modify shared assets when the real app depends on them and the change will not create unnecessary knock-on work elsewhere.
+
+Expected workflow for this task:
+
+Phase 1:
+Audit the repository and identify exactly which files, models, routes, templates, styles, and services in the real app should change.
+
+Phase 2:
+Give a concise implementation plan grounded in the actual repo structure, including:
+- skills being applied,
+- key files to touch,
+- data model changes,
+- route/view changes,
+- UI changes,
+- any necessary refactors,
+- confirmation that demo and marketing builds will remain untouched.
+
+Phase 3:
+Implement the changes cleanly.
+
+Phase 4:
+Run through the real app behavior and verify:
+- auth still works,
+- tenant boundaries still hold,
+- role permissions still hold,
+- dashboards still render,
+- new workflow actions behave consistently,
+- timelines/logs show expected events,
+- operator/admin/owner flows remain coherent,
+- UI remains polished and uncluttered.
+
+Phase 5:
+Provide a concise summary of what was changed, why, and any follow-up recommendations only if truly necessary.
+
+Output style requirements:
+
+- Be decisive.
+- Be careful.
+- Be codebase-aware.
+- Do not flood the response with generic theory.
+- Do not pad with obvious best-practice lectures.
+- Keep written explanations concise and implementation-focused.
+- Use the repo as the source of truth.
+- If an assumption is needed, make the smallest safe assumption and continue.
+
+Important final instruction:
+
+This is not a request for mockups or a throwaway prototype pass.
+Implement it as a serious production-app improvement pass that makes the real PropertyFlow application materially stronger, cleaner, and more credible as an operational system for small property teams, while leaving the demo and marketing site alone for now.

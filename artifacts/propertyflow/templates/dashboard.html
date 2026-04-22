@@ -5,7 +5,7 @@
 
 {% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
 {% set chip_label = {'tenant_enquiry':'Tenant','maintenance':'Maintenance','viewing':'Viewing','landlord':'Landlord'} %}
-{% set status_label = {'new':'New','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
+{% set status_label = {'new':'New','acknowledged':'Acknowledged','in_progress':'In progress','awaiting_reply':'Awaiting reply','done':'Done'} %}
 
 <div class="page-head between">
   <div>
@@ -77,22 +77,101 @@
     html { scroll-behavior: smooth; }
   </style>
 
+  {# ---- Filter pills (querystring-driven; bookmarkable) ---- #}
+  <style>
+    .filter-bar {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+      padding: 0.85rem 1.1rem 0.5rem; border-bottom: 1px solid var(--rule);
+    }
+    .filter-bar form.search { flex: 1 1 14rem; min-width: 10rem; display:flex; gap:0.4rem; }
+    .filter-bar input.search-q {
+      flex: 1; padding: 0.4rem 0.65rem; border: 1px solid var(--rule);
+      border-radius: 6px; font: inherit; font-size: 0.85rem; background: white;
+    }
+    .filter-pill {
+      display: inline-block; padding: 0.28rem 0.75rem; border-radius: 999px;
+      border: 1px solid var(--rule); font-size: 0.78rem; color: var(--ink-soft);
+      text-decoration: none; background: white; line-height: 1.2;
+    }
+    .filter-pill:hover { border-color: var(--accent-strong); color: var(--accent-strong); }
+    .filter-pill.is-on {
+      background: var(--accent-strong); color: white; border-color: var(--accent-strong);
+    }
+    .filter-pill.is-clear { color: var(--muted); border-style: dashed; }
+    .due-chip {
+      display: inline-block; font-size: 0.72rem; padding: 0.1em 0.55em;
+      border-radius: 999px; vertical-align: middle;
+    }
+    .due-chip.ok { background: #f1f1ef; color: var(--muted); border: 1px solid var(--rule); }
+    .due-chip.soon { background: #fff7e0; color: #92400e; border: 1px solid #fcd34d; }
+    .due-chip.overdue { background: #fbe9e7; color: #9b2c2c; border: 1px solid #f3c9c4; font-weight: 600; }
+    .owner-init {
+      display: inline-block; width: 1.55em; height: 1.55em; line-height: 1.55em;
+      text-align: center; border-radius: 50%; font-size: 0.7rem;
+      background: var(--accent-soft); color: var(--accent-strong); font-weight: 600;
+      vertical-align: middle;
+    }
+    .owner-init.unassigned { background: #f1f1ef; color: var(--muted); }
+  </style>
+
+  {% set f = filters or {} %}
+  <div class="filter-bar">
+    <form method="get" action="/dashboard" class="search">
+      <input class="search-q" name="q" placeholder="Search subject or sender…" value="{{ f.q or '' }}">
+      {% if f.status %}<input type="hidden" name="status_filter" value="{{ f.status }}">{% endif %}
+      {% if f.mine %}<input type="hidden" name="mine" value="1">{% endif %}
+      {% if f.due %}<input type="hidden" name="due" value="{{ f.due }}">{% endif %}
+    </form>
+    <a class="filter-pill {{ 'is-on' if f.mine else '' }}"
+       href="/dashboard?mine={{ 0 if f.mine else 1 }}{% if f.q %}&q={{ f.q }}{% endif %}{% if f.status %}&status_filter={{ f.status }}{% endif %}{% if f.due %}&due={{ f.due }}{% endif %}">
+       Mine</a>
+    <a class="filter-pill {{ 'is-on' if f.due == 'overdue' else '' }}"
+       href="/dashboard?{% if f.due == 'overdue' %}{% else %}due=overdue{% endif %}{% if f.q %}&q={{ f.q }}{% endif %}{% if f.status %}&status_filter={{ f.status }}{% endif %}{% if f.mine %}&mine=1{% endif %}">
+       Overdue</a>
+    {% for s in statuses %}
+      {% if s.value != 'done' %}
+      <a class="filter-pill {{ 'is-on' if f.status == s.value else '' }}"
+         href="/dashboard?status_filter={{ '' if f.status == s.value else s.value }}{% if f.q %}&q={{ f.q }}{% endif %}{% if f.mine %}&mine=1{% endif %}{% if f.due %}&due={{ f.due }}{% endif %}">
+         {{ status_label[s.value] }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if f.q or f.status or f.mine or f.due %}
+      <a class="filter-pill is-clear" href="/dashboard">Clear</a>
+    {% endif %}
+  </div>
+
   <div class="items-table">
     <div class="items-row is-head">
       <span>Item</span><span>Type</span><span>Status</span><span></span>
     </div>
-    {% set all_items = (columns['new'] if 'new' in columns else []) + (columns['in_progress'] if 'in_progress' in columns else []) + (columns['awaiting_reply'] if 'awaiting_reply' in columns else []) + (columns['done'] if 'done' in columns else []) %}
-    {# Above won't work because columns is keyed by enum. Use the pre-flattened list passed by route, falling back to iterating statuses. #}
     {% set rows = [] %}
     {% for s in statuses %}{% for it in columns[s] %}{% set _ = rows.append(it) %}{% endfor %}{% endfor %}
     {% if rows %}
       {% for item in rows[:14] %}
+        {% set due_ts = (item.due_at.replace(tzinfo=None) if item.due_at else None) %}
+        {% set is_overdue = due_ts and due_ts < now_utc.replace(tzinfo=None) and item.status.value != 'done' %}
+        {% set hours_to_due = ((due_ts - now_utc.replace(tzinfo=None)).total_seconds() / 3600) if due_ts and not is_overdue else None %}
         <a href="/items/{{ item.id }}" class="items-row">
           <div class="name">
             <strong>{{ item.subject }}</strong>
             <small>
               {% if item.sender_name %}{{ item.sender_name }} &middot; {% endif %}received {{ item.created_at.strftime('%H:%M') }}
-              {% if item.assigned_user %} &middot; {{ item.assigned_user.name.split()[0] }}{% endif %}
+              {% if item.assigned_user %}
+                &middot; <span class="owner-init" title="{{ item.assigned_user.name }}">{{ item.assigned_user.name[0] }}</span>
+                {{ item.assigned_user.name.split()[0] }}
+              {% else %}
+                &middot; <span class="owner-init unassigned" title="Unassigned">·</span> Unassigned
+              {% endif %}
+              {% if item.due_at %}
+                &middot;
+                {% if is_overdue %}
+                  <span class="due-chip overdue">Overdue · was due {{ item.due_at.strftime('%a %H:%M') }}</span>
+                {% elif hours_to_due is not none and hours_to_due < 2 %}
+                  <span class="due-chip soon">Due in &lt;2h</span>
+                {% else %}
+                  <span class="due-chip ok">Due {{ item.due_at.strftime('%a %H:%M') }}</span>
+                {% endif %}
+              {% endif %}
             </small>
           </div>
           <span class="chip-cell">
@@ -105,7 +184,7 @@
         </a>
       {% endfor %}
     {% else %}
-      <div class="empty-row">Nothing in the pipeline yet.</div>
+      <div class="empty-row">{% if f.q or f.status or f.mine or f.due %}Nothing matches those filters.{% else %}Nothing in the pipeline yet.{% endif %}</div>
     {% endif %}
   </div>
 </div>

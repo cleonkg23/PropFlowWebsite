@@ -4,7 +4,7 @@
 {% block content %}
 
 {% set chip_for = {'tenant_enquiry':'chip-tenant','maintenance':'chip-maint','viewing':'chip-viewing','landlord':'chip-landlord'} %}
-{% set status_label = {'new':'New','in_progress':'In Progress','awaiting_reply':'Awaiting Reply','done':'Done'} %}
+{% set status_label = {'new':'New','acknowledged':'Acknowledged','in_progress':'In Progress','awaiting_reply':'Awaiting Reply','done':'Done'} %}
 {% set sl = status_label %}
 
 <style>
@@ -186,15 +186,70 @@
   </div>
 </div>
 
-{# ---- Audit log ---- #}
+{# ---- Audit log (searchable, paginated) ---- #}
+<style>
+  .audit-filter-form {
+    display:grid; grid-template-columns: 1fr 1fr 2fr auto; gap: 0.55rem;
+    align-items:end; margin-bottom: 1rem;
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 0.75rem 0.85rem;
+  }
+  .audit-filter-form label {
+    display:block; font-size:0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin-bottom: 0.2rem;
+  }
+  .audit-filter-form input, .audit-filter-form select {
+    width:100%; padding: 0.42rem 0.55rem; border: 1px solid var(--rule);
+    border-radius: 6px; font: inherit; font-size: 0.85rem; background: white;
+  }
+  .audit-pager {
+    display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;
+    margin-top: 0.85rem; font-size: 0.8rem; color: var(--muted);
+  }
+  .audit-pager a, .audit-pager span.disabled {
+    padding: 0.25rem 0.65rem; border: 1px solid var(--rule); border-radius: 6px;
+    text-decoration: none; color: var(--ink-soft); background: white;
+  }
+  .audit-pager span.disabled { color: var(--muted); opacity: 0.5; }
+  @media (max-width: 700px) { .audit-filter-form { grid-template-columns: 1fr; } }
+</style>
 <div class="card">
   <div class="between" style="margin-bottom: 1rem;">
     <div>
       <span class="eyebrow">System activity</span>
       <h3 class="h-card" style="margin-top: 0.35rem;">Everything the workflow has done</h3>
     </div>
-    <span class="muted tnum" style="font-size:0.78rem;">{{ audit|length }} entries</span>
+    <span class="muted tnum" style="font-size:0.78rem;">{{ audit_total }} entries total</span>
   </div>
+
+  <form method="get" action="/admin" class="audit-filter-form">
+    <div>
+      <label for="f-event">Event type</label>
+      <select id="f-event" name="event">
+        <option value="">All events</option>
+        {% for e in event_choices %}
+          <option value="{{ e }}" {% if audit_filters.event == e %}selected{% endif %}>{{ e.replace('_',' ') }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="f-actor">Actor</label>
+      <select id="f-actor" name="actor">
+        <option value="">Anyone</option>
+        {% for u in actor_choices %}
+          <option value="{{ u.id }}" {% if audit_filters.actor == u.id|string %}selected{% endif %}>{{ u.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="f-q">Search detail</label>
+      <input id="f-q" name="q" type="text" value="{{ audit_filters.q }}" placeholder="e.g. boiler, overdue, high">
+    </div>
+    <div>
+      <button class="btn-primary" type="submit">Filter</button>
+    </div>
+  </form>
+
   <div class="activity-row" style="border-top: none; border-bottom: 1px solid var(--rule-strong); padding-bottom: 0.5rem; margin-bottom: 0.1rem;">
     <span class="eyebrow" style="font-size:0.66rem;">Time</span>
     <span class="eyebrow" style="font-size:0.66rem;">Event</span>
@@ -207,13 +262,22 @@
         <span class="ts">{{ a.created_at.strftime('%b %d, %H:%M:%S') }}</span>
         <span class="action">{{ a.action.replace('_',' ') }}</span>
         <span class="what">
-          {% if a.item_id %}<b>Item {{ a.item_id }}</b>{% endif %}
+          {% if a.item_id %}<a href="/items/{{ a.item_id }}" style="color:inherit;"><b>Item {{ a.item_id }}</b></a>{% endif %}
           {% if det %}{% if a.item_id %} &mdash; {% endif %}{{ det }}{% endif %}
         </span>
       </div>
     {% else %}
-      <p class="muted" style="font-size:0.85rem;">No activity yet.</p>
+      <p class="muted" style="font-size:0.85rem;">No activity matches those filters.</p>
     {% endfor %}
   </div>
+
+  {% if audit_page_count > 1 %}
+    {% set qs = '&event=' ~ (audit_filters.event|urlencode) ~ '&actor=' ~ (audit_filters.actor|urlencode) ~ '&q=' ~ (audit_filters.q|urlencode) %}
+    <div class="audit-pager">
+      <span>Page {{ audit_page }} of {{ audit_page_count }}</span>
+      {% if audit_page > 1 %}<a href="/admin?page={{ audit_page - 1 }}{{ qs }}">‹ Prev</a>{% else %}<span class="disabled">‹ Prev</span>{% endif %}
+      {% if audit_page < audit_page_count %}<a href="/admin?page={{ audit_page + 1 }}{{ qs }}">Next ›</a>{% else %}<span class="disabled">Next ›</span>{% endif %}
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

@@ -4,11 +4,14 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.auth import require_role
 from app.db import get_db
 from app.models import AuditLog, Item, Role, Tenant, User
+
+_AUDIT_PAGE_SIZE = 25
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -37,7 +40,15 @@ def _resolve_tenant_id(user: User, db: Session) -> int | None:
 
 
 @router.get("/admin")
-def admin_home(request: Request, user: User = Depends(require_role(Role.admin)), db: Session = Depends(get_db)):
+def admin_home(
+    request: Request,
+    user: User = Depends(require_role(Role.admin)),
+    db: Session = Depends(get_db),
+    event: str = "",
+    actor: str = "",
+    q: str = "",
+    page: int = 1,
+):
     tenant_id = _resolve_tenant_id(user, db)
 
     users = (
@@ -48,18 +59,30 @@ def admin_home(request: Request, user: User = Depends(require_role(Role.admin)),
         db.query(Item).filter(Item.tenant_id == tenant_id).order_by(Item.created_at.desc()).limit(100).all()
         if tenant_id else []
     )
-    audit = (
-        db.query(AuditLog)
-        .filter(AuditLog.tenant_id == tenant_id)
-        .order_by(AuditLog.created_at.desc())
-        .limit(50)
-        .all()
-        if tenant_id else []
-    )
+
+    # Searchable, paginated audit feed. Uses the existing AuditLog table —
+    # no parallel "events" store. Filters: event type (action), actor (user
+    # id), free-text on detail.
+    audit_filters = {"event": event, "actor": actor, "q": q.strip()}
+    audit, total_audit, page = _query_audit(db, tenant_id, audit_filters, page)
+
+    # Facet values for the filter dropdowns — only show events / actors that
+    # actually exist within this tenant, so the UI doesn't lie about scope.
+    if tenant_id:
+        event_choices = [
+            r[0] for r in db.query(AuditLog.action).filter(AuditLog.tenant_id == tenant_id).distinct().all()
+        ]
+    else:
+        event_choices = []
+    event_choices.sort()
+
     tenant = db.get(Tenant, tenant_id) if tenant_id else None
 
     flash = request.session.pop("flash", None)
     flash_kind = request.session.pop("flash_kind", "ok")
+
+    page_count = max(1, (total_audit + _AUDIT_PAGE_SIZE - 1) // _AUDIT_PAGE_SIZE)
+    actor_choices = users  # already scoped to this tenant
 
     return templates.TemplateResponse(
         request,
@@ -70,11 +93,42 @@ def admin_home(request: Request, user: User = Depends(require_role(Role.admin)),
             "users": users,
             "items": items,
             "audit": audit,
+            "audit_total": total_audit,
+            "audit_page": page,
+            "audit_page_count": page_count,
+            "audit_filters": audit_filters,
+            "event_choices": event_choices,
+            "actor_choices": actor_choices,
             "assignable_roles": [Role.viewer, Role.operator, Role.admin],
             "flash": flash,
             "flash_kind": flash_kind,
         },
     )
+
+
+def _query_audit(db: Session, tenant_id, filters: dict, page: int):
+    if not tenant_id:
+        return [], 0, 1
+    query = db.query(AuditLog).filter(AuditLog.tenant_id == tenant_id)
+    if filters.get("event"):
+        query = query.filter(AuditLog.action == filters["event"])
+    if filters.get("actor"):
+        try:
+            query = query.filter(AuditLog.user_id == int(filters["actor"]))
+        except (TypeError, ValueError):
+            pass
+    if filters.get("q"):
+        like = f"%{filters['q']}%"
+        query = query.filter(AuditLog.detail.ilike(like))
+    total = query.count()
+    page = max(1, page)
+    rows = (
+        query.order_by(AuditLog.created_at.desc())
+        .offset((page - 1) * _AUDIT_PAGE_SIZE)
+        .limit(_AUDIT_PAGE_SIZE)
+        .all()
+    )
+    return rows, total, page
 
 
 # ---------------------------------------------------------------------------

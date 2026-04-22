@@ -39,6 +39,7 @@ class Role(str, enum.Enum):
 
 class ItemStatus(str, enum.Enum):
     new = "new"
+    acknowledged = "acknowledged"   # recipient told we've received it
     in_progress = "in_progress"
     awaiting_reply = "awaiting_reply"
     done = "done"
@@ -103,6 +104,13 @@ class Item(Base):
     assigned_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     draft_reply: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     ai_mode: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)  # "ollama" or "fallback"
+
+    # Operational metadata: due/SLA target on the item itself (mirrors the
+    # primary task's due_at, but lets the dashboard age items without joining)
+    # and completion proof captured when the item is closed.
+    due_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, index=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    completion_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, index=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)

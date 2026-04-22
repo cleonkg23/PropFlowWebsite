@@ -49,7 +49,8 @@ NEXT_ACTION: dict[str, str] = {
 SLA_HOURS: dict[str, int] = {"high": 2, "medium": 8, "low": 24}
 
 VALID_TRANSITIONS: dict[ItemStatus, set[ItemStatus]] = {
-    ItemStatus.new: {ItemStatus.in_progress},
+    ItemStatus.new: {ItemStatus.acknowledged, ItemStatus.in_progress},
+    ItemStatus.acknowledged: {ItemStatus.in_progress, ItemStatus.awaiting_reply, ItemStatus.done},
     ItemStatus.in_progress: {ItemStatus.awaiting_reply, ItemStatus.done},
     ItemStatus.awaiting_reply: {ItemStatus.in_progress, ItemStatus.done},
     ItemStatus.done: set(),
@@ -92,6 +93,7 @@ def ingest_item(
     draft = ai.generate_draft(subject, body, classification.category, sender_name, agent_name=agent_name)
     assignee = _pick_assignee(db, tenant_id, classification.category)
 
+    due = datetime.utcnow() + timedelta(hours=SLA_HOURS.get(classification.urgency, 8))
     item = Item(
         tenant_id=tenant_id,
         subject=subject,
@@ -104,11 +106,11 @@ def ingest_item(
         assigned_user_id=assignee.id if assignee else None,
         draft_reply=draft.text,
         ai_mode=classification.mode,
+        due_at=due,
     )
     db.add(item)
     db.flush()
 
-    due = datetime.utcnow() + timedelta(hours=SLA_HOURS.get(classification.urgency, 8))
     db.add(
         Task(
             tenant_id=tenant_id,
@@ -142,6 +144,8 @@ def update_status(db: Session, *, item: Item, to_status: ItemStatus, actor: User
         for task in item.tasks:
             if task.status is TaskStatus.open:
                 task.status = TaskStatus.done
+        if item.completed_at is None:
+            item.completed_at = datetime.utcnow()
     _audit(
         db,
         tenant_id=item.tenant_id,
@@ -207,6 +211,81 @@ def send_reply(db: Session, *, item: Item, actor: User) -> Item:
         action="send_reply",
         item_id=item.id,
         detail=f"{old.value} -> {item.status.value}",
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def acknowledge(db: Session, *, item: Item, actor: User) -> Item:
+    """Move a brand-new item into the 'acknowledged' state — used to record that
+    we've sent a holding reply (or otherwise let the sender know we received
+    their message) without committing to a substantive next step yet."""
+    if item.status is not ItemStatus.new:
+        raise ValueError(f"can only acknowledge new items (got {item.status.value})")
+    old = item.status
+    item.status = ItemStatus.acknowledged
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="acknowledge",
+        item_id=item.id,
+        detail=f"{old.value} -> {item.status.value}",
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def complete(db: Session, *, item: Item, actor: User, note: str = "") -> Item:
+    """Close out an item with a captured proof-of-completion note. Distinct
+    from a bare status flip to 'done' because we persist the note + timestamp
+    and only allow it from the active states."""
+    if item.status is ItemStatus.done:
+        raise ValueError("item is already done")
+    if item.status not in (ItemStatus.in_progress, ItemStatus.awaiting_reply, ItemStatus.acknowledged):
+        raise ValueError(f"cannot complete from {item.status.value}")
+    old = item.status
+    item.status = ItemStatus.done
+    item.completed_at = datetime.utcnow()
+    item.completion_note = (note or "").strip() or None
+    for task in item.tasks:
+        if task.status is TaskStatus.open:
+            task.status = TaskStatus.done
+    detail = f"{old.value} -> done"
+    if item.completion_note:
+        snippet = item.completion_note[:60] + ("…" if len(item.completion_note) > 60 else "")
+        detail += f" — {snippet}"
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="complete",
+        item_id=item.id,
+        detail=detail,
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def add_note(db: Session, *, item: Item, actor: User, text: str) -> Item:
+    """Operator note attached to the item timeline. Not a status change —
+    just a written observation that should be visible to anyone working
+    the item later."""
+    text = (text or "").strip()
+    if not text:
+        raise ValueError("note is empty")
+    if len(text) > 1000:
+        text = text[:1000]
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="note",
+        item_id=item.id,
+        detail=text,
     )
     db.commit()
     db.refresh(item)

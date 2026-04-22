@@ -56,8 +56,34 @@ def get_db():
 
 
 def init_db() -> None:
-    """Create all tables. Idempotent — safe to call on every boot."""
+    """Create all tables. Idempotent — safe to call on every boot.
+
+    Also runs a tiny in-place migration for the columns we've added since
+    the original schema was created. SQLite doesn't support full migrations
+    out of the box; for an MVP an idempotent ADD COLUMN check is enough,
+    and lets existing dev databases keep their data through the upgrade.
+    """
     # Importing models here registers them on Base.metadata before create_all.
     from app import models  # noqa: F401
+    from sqlalchemy import inspect, text
 
     Base.metadata.create_all(engine)
+
+    # Idempotent column adds for items table.
+    inspector = inspect(engine)
+    existing_cols = {c["name"] for c in inspector.get_columns("items")}
+    additions = [
+        ("due_at",          "DATETIME"),
+        ("completed_at",    "DATETIME"),
+        ("completion_note", "TEXT"),
+    ]
+    with engine.begin() as conn:
+        for name, ddl_type in additions:
+            if name not in existing_cols:
+                conn.execute(text(f"ALTER TABLE items ADD COLUMN {name} {ddl_type}"))
+        # Indexes for the columns we filter on. CREATE INDEX IF NOT EXISTS is
+        # safe across reboots and across the case where the table pre-existed
+        # before due_at was introduced (create_all only creates indexes for new
+        # tables, not for tables it ALTERed via the path above).
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_items_due_at ON items(due_at)"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS ix_items_completed_at ON items(completed_at)"))

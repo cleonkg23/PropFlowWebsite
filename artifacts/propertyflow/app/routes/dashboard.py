@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.auth import require_role, require_user
 from app.db import get_db
-from app.models import Item, ItemStatus, Role, Task, TaskStatus, Tenant, User
+from app.models import AuditLog, Item, ItemStatus, Role, Task, TaskStatus, Tenant, User
 from app.services import workflow_service
 
 router = APIRouter()
@@ -49,12 +49,43 @@ def _tenant_scope(user: User):
 
 
 @router.get("/dashboard")
-def dashboard(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
-    q = db.query(Item)
+def dashboard(
+    request: Request,
+    user: User = Depends(require_user),
+    db: Session = Depends(get_db),
+    q: str = "",                  # free-text on subject/sender
+    status_filter: str = "",      # one of ItemStatus values, or ""
+    mine: int = 0,                # 1 → only items assigned to me
+    due: str = "",                # "overdue" → only items past their due_at
+):
+    base = db.query(Item)
     scope = _tenant_scope(user)
     if scope is not None:
-        q = q.filter(scope)
-    items = q.order_by(Item.created_at.desc()).limit(200).all()
+        base = base.filter(scope)
+
+    # Filters are additive and persisted as querystring params so they're
+    # bookmarkable / shareable inside the team.
+    q = (q or "").strip()
+    if q:
+        like = f"%{q}%"
+        base = base.filter(or_(Item.subject.ilike(like), Item.sender_name.ilike(like)))
+    if status_filter:
+        try:
+            base = base.filter(Item.status == ItemStatus(status_filter))
+        except ValueError:
+            pass
+    if mine:
+        base = base.filter(Item.assigned_user_id == user.id)
+    now_naive = datetime.utcnow()
+    if due == "overdue":
+        base = base.filter(
+            Item.due_at.isnot(None),
+            Item.due_at < now_naive,
+            Item.status != ItemStatus.done,
+        )
+
+    items = base.order_by(Item.created_at.desc()).limit(200).all()
+    filters = {"q": q, "status": status_filter, "mine": int(bool(mine)), "due": due}
 
     # Group by status for the board.
     columns = {s: [] for s in ItemStatus}
@@ -128,6 +159,8 @@ def dashboard(request: Request, user: User = Depends(require_user), db: Session 
             "metrics": metrics,
             "updated_label": _format_updated(latest),
             "processed_today": processed_today,
+            "filters": filters,
+            "now_utc": now,
         },
     )
 
@@ -151,6 +184,21 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
         .order_by(User.name)
         .all()
     )
+
+    # Per-item timeline is just the system audit log filtered by item_id +
+    # joined to the actor — same source of truth as the admin/owner pages,
+    # so we never have two versions of "what happened" drifting apart.
+    timeline_rows = (
+        db.query(AuditLog, User)
+        .outerjoin(User, AuditLog.user_id == User.id)
+        .filter(AuditLog.item_id == item.id)
+        .order_by(AuditLog.created_at.asc())
+        .all()
+    )
+    timeline = [{"entry": entry, "actor": actor} for entry, actor in timeline_rows]
+
+    now = datetime.now(timezone.utc)
+
     return templates.TemplateResponse(
         request,
         "item_detail.html",
@@ -160,6 +208,8 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
             "assignees": assignees,
             "statuses": list(ItemStatus),
             "valid_next": list(workflow_service.VALID_TRANSITIONS.get(item.status, set())),
+            "timeline": timeline,
+            "now_utc": now,
         },
     )
 
@@ -210,6 +260,46 @@ def post_send(item_id: int, user: User = Depends(require_role(*WRITE_ROLES)), db
     except ValueError as e:
         raise HTTPException(400, str(e))
     return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
+@router.post("/items/{item_id}/acknowledge")
+def post_acknowledge(item_id: int, user: User = Depends(require_role(*WRITE_ROLES)), db: Session = Depends(get_db)):
+    item = _load_item_for(user, db, item_id)
+    try:
+        workflow_service.acknowledge(db, item=item, actor=user)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
+@router.post("/items/{item_id}/complete")
+def post_complete(
+    item_id: int,
+    note: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    item = _load_item_for(user, db, item_id)
+    try:
+        workflow_service.complete(db, item=item, actor=user, note=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
+
+
+@router.post("/items/{item_id}/note")
+def post_note(
+    item_id: int,
+    note: str = Form(...),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    item = _load_item_for(user, db, item_id)
+    try:
+        workflow_service.add_note(db, item=item, actor=user, text=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item_id}#timeline", status_code=303)
 
 
 @router.post("/items/{item_id}/assign")
