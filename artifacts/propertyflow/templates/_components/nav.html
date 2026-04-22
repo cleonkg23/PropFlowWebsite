@@ -1,7 +1,7 @@
 {% set page = page|default('') %}
 <header class="site-header">
   <div class="header-inner">
-    <a class="brand" href="/">
+    <a class="brand" href="/" aria-label="PropertyFlow home">
       <span class="brand-mark" aria-hidden="true"></span>
       <span>Property Workflow Co.</span>
       {% if tenant %}<span class="brand-suffix">{{ tenant.name }}</span>{% endif %}
@@ -21,7 +21,7 @@
         <span><b>{{ user.name }}</b></span>
         <span class="role-tag">{{ user.role.value }}</span>
         <form method="post" action="/logout" style="display:inline;">
-          <button class="btn-ghost btn-sm" type="submit">Sign out</button>
+          <button class="btn-ghost btn-sm" type="submit">Sign Out</button>
         </form>
       </div>
     {% endif %}

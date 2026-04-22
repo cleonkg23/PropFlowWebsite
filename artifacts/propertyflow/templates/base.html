@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f3eee4" />
   <title>{% block title %}PropertyFlow{% endblock %}</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -70,6 +71,7 @@
       margin: 0;
       line-height: 1.15;
       font-variation-settings: "opsz" 144;
+      text-wrap: balance;
     }
     .h-display { font-size: clamp(2rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
     .h-section { font-size: 1.6rem; }
@@ -294,6 +296,8 @@
       cursor: pointer; text-decoration: none;
       transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
       line-height: 1.2;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn {
       background: var(--surface);
@@ -301,17 +305,20 @@
       border-color: var(--rule-strong);
     }
     .btn:hover { background: var(--bg-deep); border-color: var(--ink-soft); }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .btn-primary {
       background: var(--ink); color: var(--bg);
       border-color: var(--ink);
     }
     .btn-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+    .btn-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
     .btn-ghost {
       background: transparent; color: var(--muted);
       border-color: transparent;
       padding: 0.45rem 0.7rem;
     }
     .btn-ghost:hover { color: var(--ink); background: rgba(28,42,37,0.04); }
+    .btn-ghost:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .btn-sm { font-size: 0.78rem; padding: 0.4rem 0.7rem; }
 
     /* ---------------- Form fields ---------------- */
@@ -325,7 +332,8 @@
       padding: 0.6rem 0.75rem;
       transition: border-color 120ms ease, box-shadow 120ms ease;
     }
-    .field:focus, select.field:focus, textarea.field:focus {
+    .field:focus { outline: none; }
+    .field:focus-visible, select.field:focus-visible, textarea.field:focus-visible {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(47,107,83,0.12);
@@ -461,6 +469,16 @@
       background: var(--ink); color: var(--bg); padding: 0.5rem 0.85rem;
     }
     .skip-link:focus { left: 1rem; top: 1rem; z-index: 100; }
+
+    /* Reduced-motion: strip all transitions and transform-based animations */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>

@@ -14,14 +14,14 @@
     <p class="deck">Updated {{ updated_label }} &mdash; {{ processed_today }} item{{ '' if processed_today == 1 else 's' }} processed today.</p>
   </div>
   <div class="row-actions">
-    <a href="#add-item" class="btn-primary">+ Add item</a>
+    <a href="#add-item" class="btn-primary">+ Add Item</a>
   </div>
 </div>
 
 {# ---- Main editorial panel: bar + metrics + items table ---- #}
 <div class="panel" style="margin-bottom: 2.5rem;">
   <div class="panel-bar">
-    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="dot" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span>
     <span class="label">Workflow &mdash; Today</span>
   </div>
 
@@ -128,14 +128,14 @@
       <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div>
           <label class="label" for="f-from">From</label>
-          <input id="f-from" name="sender_name" class="field" placeholder="Name" />
+          <input id="f-from" name="sender_name" class="field" autocomplete="name" placeholder="Sarah J.…" />
         </div>
         <div>
           <label class="label" for="f-email">Email</label>
-          <input id="f-email" name="sender_email" type="email" class="field" placeholder="name@example.com" />
+          <input id="f-email" name="sender_email" type="email" class="field" autocomplete="email" spellcheck="false" placeholder="name@example.com" />
         </div>
       </div>
-      <button class="btn-primary" style="width:100%;">Run through workflow &rarr;</button>
+      <button class="btn-primary" style="width:100%;">Run Through Workflow &rarr;</button>
     </form>
   </div>
 </div>

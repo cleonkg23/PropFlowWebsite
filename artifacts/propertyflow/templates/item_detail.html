@@ -69,30 +69,30 @@
             <div style="display: flex; align-items: center; gap: 1.25rem;">
               <span class="eyebrow">Status</span>
               <form method="post" action="/items/{{ item.id }}/send" style="display:inline;">
-                <button class="btn-primary">Send reply</button>
+                <button class="btn-primary">Send Reply</button>
               </form>
             </div>
             <div class="row-actions">
               <form method="post" action="/items/{{ item.id }}/regenerate-draft" style="display:inline;">
-                <button class="btn-ghost btn-sm">Regenerate</button>
+                <button class="btn-ghost btn-sm">Regenerate Draft</button>
               </form>
             </div>
           </div>
 
           <details id="edit-draft" style="margin-top: 1rem;">
-            <summary class="btn btn-sm" style="display:inline-flex;">Edit draft</summary>
+            <summary class="btn btn-sm" style="display:inline-flex;">Edit Draft</summary>
             <form method="post" action="/items/{{ item.id }}/draft" class="stack-md" style="margin-top: 0.85rem;">
               <div>
                 <label class="label" for="draft-text">Edit draft</label>
                 <textarea id="draft-text" name="draft_reply" rows="9" class="field">{{ item.draft_reply }}</textarea>
               </div>
-              <button class="btn-primary">Save draft</button>
+              <button class="btn-primary">Save Draft</button>
             </form>
           </details>
         </div>
       {% else %}
         <form method="post" action="/items/{{ item.id }}/regenerate-draft">
-          <button class="btn">Generate draft</button>
+          <button class="btn">Generate Draft</button>
         </form>
       {% endif %}
     </article>
@@ -134,7 +134,7 @@
             {% endfor %}
           </select>
         </div>
-        <button class="btn">Save assignment</button>
+        <button class="btn">Save Assignment</button>
       </form>
     </div>
 
