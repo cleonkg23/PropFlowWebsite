@@ -136,4 +136,8 @@ def role_home(user: User) -> str:
         return "/owner"
     if user.role is Role.admin:
         return "/admin"
+    if user.role is Role.contractor:
+        # Contractors land on the same dashboard but it self-filters to just
+        # their assignments — see dashboard.py.
+        return "/dashboard"
     return "/dashboard"

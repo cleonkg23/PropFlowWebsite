@@ -31,11 +31,14 @@ def seed_if_empty(db: Session) -> None:
     maria = User(tenant_id=acme.id, email="maria.acme@test.test", name="Maria Operator", role=Role.operator)
     priya = User(tenant_id=acme.id, email="priya.acme@test.test", name="Priya Operator", role=Role.operator)
     viewer = User(tenant_id=acme.id, email="vince.acme@test.test", name="Vince Viewer", role=Role.viewer)
+    # External contractor — sees only items/tasks assigned to them, can post
+    # timeline notes and mark their own tasks complete.
+    carl = User(tenant_id=acme.id, email="carl.contractor@test.test", name="Carl Contractor", role=Role.contractor)
 
     # Beech: just an admin so the owner panel shows two tenants populated
     beech_admin = User(tenant_id=beech.id, email="tom.beech@test.test", name="Tom Admin", role=Role.admin)
 
-    db.add_all([owner, acme_admin, maria, priya, viewer, beech_admin])
+    db.add_all([owner, acme_admin, maria, priya, viewer, carl, beech_admin])
     db.flush()
 
     # Sample items in Acme (already classified, sitting in the board so it
@@ -111,20 +114,37 @@ def seed_if_empty(db: Session) -> None:
     db.add_all(samples)
     db.flush()
 
-    # A couple of open tasks
+    # A couple of open tasks. Notice the maintenance task already includes a
+    # "Done when:" acceptance line — see workflow_service.NEXT_ACTION.
     db.add_all([
         Task(
             tenant_id=acme.id,
             item_id=samples[0].id,
-            description="Triage fault and dispatch contractor",
+            description=(
+                "Triage fault and dispatch contractor. "
+                "Done when: contractor confirmed and ETA recorded on this ticket."
+            ),
             assigned_user_id=maria.id,
             due_at=datetime.utcnow() + timedelta(hours=2),
+            status=TaskStatus.open,
+        ),
+        # Follow-up task already handed off to the contractor (Carl) — gives
+        # the contractor demo account something to see on first login.
+        Task(
+            tenant_id=acme.id,
+            item_id=samples[0].id,
+            description=(
+                "On-site visit at 14 Park Road — inspect and repair boiler. "
+                "Done when: heat restored and a completion note added with what was done."
+            ),
+            assigned_user_id=carl.id,
+            due_at=datetime.utcnow() + timedelta(hours=4),
             status=TaskStatus.open,
         ),
         Task(
             tenant_id=acme.id,
             item_id=samples[1].id,
-            description="Confirm second viewing slot",
+            description="Confirm second viewing slot. Done when: viewing date and time confirmed by tenant.",
             assigned_user_id=priya.id,
             due_at=datetime.utcnow() + timedelta(hours=24),
             status=TaskStatus.open,

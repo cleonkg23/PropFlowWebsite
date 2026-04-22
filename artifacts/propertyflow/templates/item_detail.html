@@ -9,6 +9,8 @@
 {% set due_naive = item.due_at.replace(tzinfo=None) if item.due_at else None %}
 {% set now_naive = now_utc.replace(tzinfo=None) %}
 {% set is_overdue = due_naive and due_naive < now_naive and item.status.value != 'done' %}
+{% set is_contractor = user.role.value == 'contractor' %}
+{% set is_ops = user.role.value in ['operator', 'admin', 'owner'] %}
 
 <style>
   .due-banner {
@@ -55,6 +57,33 @@
   {# ---- LEFT column: message + draft reply ---- #}
   <div class="stack-lg">
 
+    {# --- Contractor's own assignment surfaces FIRST so they don't have to
+         scroll past internal ops content to find what they need to do. --- #}
+    {% if is_contractor and my_open_task %}
+      <article class="card" style="border-left: 3px solid var(--accent-strong);">
+        <span class="eyebrow">Your assignment</span>
+        <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">{{ my_open_task.description }}</h2>
+        <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
+          {% if my_open_task.due_at %}Target: {{ my_open_task.due_at.strftime('%a %d %b, %H:%M') }} &middot; {% endif %}
+          When you're done, leave a quick note describing what was done and mark it complete.
+        </p>
+        <form method="post" action="/tasks/{{ my_open_task.id }}/complete" class="compose-note"
+              {% if completing_will_close %}
+              onsubmit="return confirm('This is the only open task on this ticket. Marking it complete will close the whole ticket. Continue?');"
+              {% else %}
+              onsubmit="return confirm('Mark this task as complete?');"
+              {% endif %}>
+          <label class="label" for="task-note" style="margin-bottom:0;">Completion note</label>
+          <textarea id="task-note" name="note" required placeholder="e.g. Replaced thermostat, ran heat for 15 mins, all good."></textarea>
+          <div class="row">
+            <button class="btn-primary" type="submit">
+              {% if completing_will_close %}Complete &amp; close ticket{% else %}Mark complete{% endif %}
+            </button>
+          </div>
+        </form>
+      </article>
+    {% endif %}
+
     {# --- Message --- #}
     <article class="card">
       <div class="between" style="margin-bottom: 0.85rem;">
@@ -81,7 +110,10 @@
       <div style="font-family: var(--serif); font-size: 1.05rem; line-height: 1.7; color: var(--ink); white-space: pre-wrap;">{{ item.body }}</div>
     </article>
 
-    {# --- Task & draft reply --- #}
+    {# --- Task & draft reply ---
+         Hidden from contractors entirely: the draft, regenerate, and send
+         controls are operator-side machinery they shouldn't see. --- #}
+    {% if not is_contractor %}
     <article class="card">
       <span class="eyebrow">Task &amp; draft reply</span>
       <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.25rem;">
@@ -147,11 +179,15 @@
         </form>
       {% endif %}
     </article>
+    {% endif %}
   </div>
 
   {# ---- RIGHT column: actions, timeline, assignment ---- #}
   <aside class="stack-lg">
-    {# --- Workflow actions: ack / status / complete --- #}
+    {# --- Workflow actions: ack / status / complete ---
+         Contractors don't drive ticket lifecycle — they just close their
+         own task and the auto-close logic handles the rest. --- #}
+    {% if not is_contractor %}
     <div class="card">
       <span class="eyebrow">Actions</span>
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">{{ status_label[item.status.value] }}</h3>
@@ -190,8 +226,21 @@
             <div style="font-family: var(--serif); font-size: 0.98rem; margin-top:0.25rem; white-space: pre-wrap;">{{ item.completion_note }}</div>
           </div>
         {% endif %}
+        {# Reopen: only operators+ should be able to undo a closure. The
+           reason text gets stamped into the audit log so the timeline
+           explains why a "done" ticket suddenly went back into rotation. #}
+        <details style="margin-top: 0.6rem;">
+          <summary class="btn btn-sm" style="display:inline-flex;">Reopen item</summary>
+          <form method="post" action="/items/{{ item.id }}/reopen" class="compose-note" style="margin-top: 0.6rem;"
+                onsubmit="return confirm('Reopen this ticket? It will go back to In progress.');">
+            <label class="label" for="reopen-reason" style="margin-bottom:0;">Why are you reopening?</label>
+            <textarea id="reopen-reason" name="reason" placeholder="Tenant called back — issue isn't fully resolved."></textarea>
+            <div class="row"><button class="btn-primary" type="submit">Reopen</button></div>
+          </form>
+        </details>
       {% endif %}
     </div>
+    {% endif %}
 
     {# --- Timeline + add note --- #}
     <div class="card" id="timeline">
@@ -227,15 +276,18 @@
         <p class="muted" style="font-size: 0.85rem;">No events yet.</p>
       {% endif %}
 
-      {% if user.role.value in ['operator', 'admin', 'owner'] %}
+      {% if can_act %}
         <form method="post" action="/items/{{ item.id }}/note" class="compose-note">
           <label class="label" for="note-text" style="margin-bottom:0;">Add a note</label>
-          <textarea id="note-text" name="note" required placeholder="Called the contractor, they're booked for 2pm."></textarea>
+          <textarea id="note-text" name="note" required placeholder="{% if is_contractor %}On site now, will update once the part is in.{% else %}Called the contractor, they're booked for 2pm.{% endif %}"></textarea>
           <div class="row"><button class="btn btn-sm" type="submit">Post note</button></div>
         </form>
       {% endif %}
     </div>
 
+    {# Assignment is an operations-only control: only ops decide who's on
+       a job. Contractors see who's assigned via the All Tasks panel below. #}
+    {% if not is_contractor %}
     <div class="card">
       <span class="eyebrow">Assignment</span>
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">
@@ -256,6 +308,7 @@
         <button class="btn">Save Assignment</button>
       </form>
     </div>
+    {% endif %}
 
     {% if item.tasks %}
     <div class="card">
@@ -271,6 +324,20 @@
               </div>
               <span class="chip {{ 'chip-priority-normal' if t.status.value == 'done' else 'chip-general' }}">{{ t.status.value }}</span>
             </div>
+            {# Per-task complete: ops can close any open task here (handy
+               when a contractor reports back by phone). The assignee's own
+               panel above is the primary surface for contractors, so we
+               don't double up the form for them. #}
+            {% if t.status.value == 'open' and is_ops %}
+              <details style="margin-top: 0.45rem;">
+                <summary class="btn btn-sm" style="display:inline-flex;">Mark task complete</summary>
+                <form method="post" action="/tasks/{{ t.id }}/complete" class="compose-note" style="margin-top: 0.45rem;"
+                      onsubmit="return confirm({% if open_tasks_count == 1 %}'This is the last open task — completing it will close the ticket. Continue?'{% else %}'Mark this task complete?'{% endif %});">
+                  <textarea name="note" placeholder="What was done?" rows="2"></textarea>
+                  <div class="row"><button class="btn btn-sm" type="submit">Complete</button></div>
+                </form>
+              </details>
+            {% endif %}
           </div>
         {% endfor %}
       </div>

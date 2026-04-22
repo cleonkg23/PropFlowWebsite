@@ -84,7 +84,7 @@ Production-leaning version of the workflow-demo. Real persistence, real auth, re
 - `app/services/connectors/` — adapter interface (`Connector` Protocol over `IngestPayload`) + `google_sheets.py` and `email_inbox.py` stubs, ready to wire real polling against the `ingest_item` entrypoint.
 - `app/routes/` —
   - `public.py`: `/`, `/login` (GET+POST, email lookup, redirect by role), `/logout`
-  - `dashboard.py`: `/dashboard` (board grouped by status, "my open tasks", manual create form), `/items/{id}` (subject/body, classification, draft + Regenerate, assignment dropdown, status transition buttons), plus form-post handlers for status/assign/regenerate
+  - `dashboard.py`: `/dashboard` (board grouped by status, "my open tasks", manual create form — contractors only see items they're assigned to), `/items/{id}` (subject/body, classification, draft + Regenerate, assignment dropdown, status transition buttons; contractors see a focused "Your assignment" panel and can mark their own tasks complete with a note), plus form-post handlers for status/assign/regenerate, per-task complete (`POST /tasks/{id}/complete`, auto-closes the parent item when no open tasks remain; auto-spawns a contractor handoff task when ops completes a maintenance triage), and reopen (`POST /items/{id}/reopen`, ops-only)
   - `admin.py`: `/admin` — tenant users + recent items + tenant audit log (admin/owner only; owner without tenant falls back to first tenant)
   - `owner.py`: `/owner` — cross-tenant counts + AI health card + system audit log (owner only)
   - `api.py`: `POST /api/items` (JSON ingest, scoped to caller's tenant), `POST /demo/{key}` (4 demo scenarios — boiler/viewing/landlord/chase — that go through the full real pipeline)

@@ -21,6 +21,28 @@ templates = Jinja2Templates(directory="templates")
 WRITE_ROLES = (Role.operator, Role.admin)
 
 
+def _is_assigned(user: User, item: Item) -> bool:
+    """True if the user is the assignee on the item or on any of its tasks.
+
+    Used to decide whether a contractor can interact with an item — they
+    cannot see tickets they aren't on, and they cannot act on tickets they
+    aren't on, full stop."""
+    if item.assigned_user_id == user.id:
+        return True
+    return any(t.assigned_user_id == user.id for t in item.tasks)
+
+
+def _can_act_on_item(user: User, item: Item) -> bool:
+    """Permission gate for posting timeline notes and (in future) other
+    contractor-allowed actions. Operators+ can always act; contractors only
+    if they're the assignee."""
+    if user.role in (Role.operator, Role.admin, Role.owner):
+        return True
+    if user.role is Role.contractor:
+        return _is_assigned(user, item)
+    return False
+
+
 def _format_updated(dt: datetime | None) -> str:
     if not dt:
         return "just now"
@@ -76,6 +98,20 @@ def dashboard(
             pass
     if mine:
         base = base.filter(Item.assigned_user_id == user.id)
+    # Contractors only ever see items where they're the assignee on the item
+    # OR on a task. This is a hard filter (not optional like 'mine') because
+    # contractors are external users — exposing other tenants' work would be
+    # a confidentiality leak even if they couldn't act on it.
+    if user.role is Role.contractor:
+        contractor_item_ids = {
+            row[0] for row in db.query(Task.item_id)
+            .filter(Task.assigned_user_id == user.id)
+            .all()
+        }
+        base = base.filter(or_(
+            Item.assigned_user_id == user.id,
+            Item.id.in_(contractor_item_ids) if contractor_item_ids else Item.id == -1,
+        ))
     now_naive = datetime.utcnow()
     if due == "overdue":
         base = base.filter(
@@ -171,6 +207,11 @@ def _load_item_for(user: User, db: Session, item_id: int) -> Item:
         raise HTTPException(404, "item not found")
     if user.role is not Role.owner and item.tenant_id != user.tenant_id:
         raise HTTPException(404, "item not found")
+    # Contractors can only see tickets they're on. Returning 404 instead of
+    # 403 here is deliberate: the existence of an unrelated ticket isn't
+    # information they should be able to confirm.
+    if user.role is Role.contractor and not _is_assigned(user, item):
+        raise HTTPException(404, "item not found")
     return item
 
 
@@ -199,6 +240,15 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
 
     now = datetime.now(timezone.utc)
 
+    # The current user's open task on this item (if any). Drives the
+    # "Complete this task" panel for the assignee — including contractors,
+    # whose entire interaction with the system is via that one panel.
+    my_open_task = next(
+        (t for t in item.tasks if t.assigned_user_id == user.id and t.status is TaskStatus.open),
+        None,
+    )
+    open_tasks_count = sum(1 for t in item.tasks if t.status is TaskStatus.open)
+
     return templates.TemplateResponse(
         request,
         "item_detail.html",
@@ -210,6 +260,12 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
             "valid_next": list(workflow_service.VALID_TRANSITIONS.get(item.status, set())),
             "timeline": timeline,
             "now_utc": now,
+            "my_open_task": my_open_task,
+            "open_tasks_count": open_tasks_count,
+            # Used by the template's confirm prompt: "completing this will
+            # close the ticket".
+            "completing_will_close": my_open_task is not None and open_tasks_count == 1,
+            "can_act": _can_act_on_item(user, item),
         },
     )
 
@@ -291,15 +347,64 @@ def post_complete(
 def post_note(
     item_id: int,
     note: str = Form(...),
-    user: User = Depends(require_role(*WRITE_ROLES)),
+    user: User = Depends(require_user),
     db: Session = Depends(get_db),
 ):
+    """Anyone with permission to act on this item can post a timeline note —
+    operators+admins always, contractors only when they're the assignee.
+    Pure viewers are blocked."""
     item = _load_item_for(user, db, item_id)
+    if not _can_act_on_item(user, item):
+        raise HTTPException(403, "you can only post notes on items assigned to you")
     try:
         workflow_service.add_note(db, item=item, actor=user, text=note)
     except ValueError as e:
         raise HTTPException(400, str(e))
     return RedirectResponse(f"/items/{item_id}#timeline", status_code=303)
+
+
+@router.post("/tasks/{task_id}/complete")
+def post_task_complete(
+    task_id: int,
+    note: str = Form(""),
+    user: User = Depends(require_user),
+    db: Session = Depends(get_db),
+):
+    """Per-task completion. The assignee can always close their own task;
+    operators+admins+owners can close anyone's. Contractors can ONLY close
+    tasks assigned to them — even if they have other tasks on the same item."""
+    task = db.get(Task, task_id)
+    if not task:
+        raise HTTPException(404, "task not found")
+    item = _load_item_for(user, db, task.item_id)  # also enforces tenant + visibility
+
+    is_assignee = task.assigned_user_id == user.id
+    is_ops = user.role in (Role.operator, Role.admin, Role.owner)
+    if not (is_assignee or is_ops):
+        raise HTTPException(403, "you can only complete tasks assigned to you")
+
+    try:
+        workflow_service.complete_task(db, task=task, actor=user, note=note)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item.id}#timeline", status_code=303)
+
+
+@router.post("/items/{item_id}/reopen")
+def post_reopen(
+    item_id: int,
+    reason: str = Form(""),
+    user: User = Depends(require_role(*WRITE_ROLES)),
+    db: Session = Depends(get_db),
+):
+    """Reopen a closed item. Operators+ only — contractors can't undo a
+    closure, even on items they were on."""
+    item = _load_item_for(user, db, item_id)
+    try:
+        workflow_service.reopen_item(db, item=item, actor=user, reason=reason)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return RedirectResponse(f"/items/{item_id}", status_code=303)
 
 
 @router.post("/items/{item_id}/assign")

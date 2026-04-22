@@ -67,6 +67,30 @@ def init_db() -> None:
     from app import models  # noqa: F401
     from sqlalchemy import inspect, text
 
+    # Migration guard: SQLite emits a CHECK constraint listing the enum values
+    # at table-creation time. When we add a new Role value (e.g. "contractor"),
+    # existing tables still carry the old constraint and will reject inserts
+    # of the new value. Detect that case and rebuild the users table from
+    # scratch — for an MVP with seed-only data this is acceptable; a real
+    # production migration would copy the rows out and back.
+    inspector = inspect(engine)
+    if inspector.has_table("users"):
+        from app.models import Role
+        try:
+            with engine.begin() as conn:
+                conn.execute(text(
+                    "INSERT INTO users (tenant_id, email, name, role, auth_nonce) "
+                    "VALUES (NULL, '__schemacheck__@local', 'check', :r, 'x')"
+                ), {"r": Role.contractor.value})
+                conn.execute(text("DELETE FROM users WHERE email = '__schemacheck__@local'"))
+        except Exception:  # noqa: BLE001
+            # Old constraint is in place — rebuild from scratch.
+            import logging
+            logging.getLogger("propertyflow").info(
+                "Role enum changed; rebuilding schema (existing rows will be reseeded)."
+            )
+            Base.metadata.drop_all(engine)
+
     Base.metadata.create_all(engine)
 
     # Idempotent column adds for items table.

@@ -17,7 +17,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Roles an admin is allowed to assign to other users in their own client.
-_ADMIN_ASSIGNABLE = {Role.viewer, Role.operator, Role.admin}
+_ADMIN_ASSIGNABLE = {Role.viewer, Role.contractor, Role.operator, Role.admin}
 
 
 def _audit(db: Session, *, tenant_id, user_id, action: str, detail: str = "") -> None:
@@ -99,7 +99,7 @@ def admin_home(
             "audit_filters": audit_filters,
             "event_choices": event_choices,
             "actor_choices": actor_choices,
-            "assignable_roles": [Role.viewer, Role.operator, Role.admin],
+            "assignable_roles": [Role.viewer, Role.contractor, Role.operator, Role.admin],
             "flash": flash,
             "flash_kind": flash_kind,
         },

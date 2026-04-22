@@ -39,11 +39,36 @@ ROUTING: dict[str, list[Role]] = {
 }
 
 NEXT_ACTION: dict[str, str] = {
-    "maintenance": "Triage fault and dispatch contractor",
-    "viewing": "Confirm slot and send follow-up",
-    "tenant_enquiry": "Reply with availability and next steps",
-    "landlord_admin": "Pull figures and reply to landlord",
-    "general": "Review and reply",
+    # Each task description includes a "Done when:" line so the assignee
+    # always knows what completion looks like — fixes the "task too vague"
+    # problem when the inbound message itself is vague.
+    "maintenance": (
+        "Triage fault and dispatch contractor. "
+        "Done when: contractor confirmed and ETA recorded on this ticket."
+    ),
+    "viewing": (
+        "Confirm slot and send follow-up. "
+        "Done when: viewing date and time confirmed with the prospect."
+    ),
+    "tenant_enquiry": (
+        "Reply with availability and next steps. "
+        "Done when: a substantive reply has been sent."
+    ),
+    "landlord_admin": (
+        "Pull figures and reply to landlord. "
+        "Done when: requested figures sent and queries answered."
+    ),
+    "general": "Review and reply. Done when: a reply has been sent or the issue is otherwise resolved.",
+}
+
+# When an operator completes a task on a maintenance ticket, the work moves
+# from "dispatch" to "the contractor actually doing the job". This template
+# generates the contractor follow-up so nothing falls through the cracks.
+HANDOFF_TASK: dict[str, str] = {
+    "maintenance": (
+        "On-site visit — inspect and repair the reported issue. "
+        "Done when: issue resolved and a completion note added with what was done."
+    ),
 }
 
 SLA_HOURS: dict[str, int] = {"high": 2, "medium": 8, "low": 24}
@@ -286,6 +311,135 @@ def add_note(db: Session, *, item: Item, actor: User, text: str) -> Item:
         action="note",
         item_id=item.id,
         detail=text,
+    )
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+def complete_task(
+    db: Session,
+    *,
+    task: Task,
+    actor: User,
+    note: str = "",
+) -> tuple[Task, Optional[Task], bool]:
+    """Mark a single task done with a completion note.
+
+    Returns ``(task, follow_up_task_or_none, item_auto_closed)``.
+
+    Side-effects:
+      - Audits a 'task_complete' entry with the note (so the timeline reads
+        like a human-written log even though it's a button click).
+      - For maintenance tickets: when an OPS task completes and no contractor
+        task exists yet, auto-creates a follow-up task per HANDOFF_TASK so
+        the work actually gets dispatched. The follow-up is left unassigned —
+        ops then assigns the contractor manually.
+      - When ALL tasks on the parent item are done, auto-closes the item
+        (status=done, completed_at, completion_note rolled up from the
+        last task's note). This is the "auto-close" behaviour the user
+        asked for. Operators can reopen via reopen_item.
+    """
+    if task.status is TaskStatus.done:
+        raise ValueError("task is already done")
+    note = (note or "").strip()
+    task.status = TaskStatus.done
+    detail = "task complete"
+    if note:
+        snippet = note[:80] + ("…" if len(note) > 80 else "")
+        detail = f"{task.description[:60]}{'…' if len(task.description) > 60 else ''} — {snippet}"
+    _audit(
+        db,
+        tenant_id=task.tenant_id,
+        user_id=actor.id,
+        action="task_complete",
+        item_id=task.item_id,
+        detail=detail,
+    )
+
+    item = task.item
+    follow_up: Optional[Task] = None
+
+    # Operator-completed maintenance triage → spawn the on-site visit task,
+    # but only if we don't already have an open contractor follow-up. This
+    # prevents duplicate handoffs if the operator clicks complete twice.
+    is_ops_actor = actor.role in (Role.operator, Role.admin, Role.owner)
+    if (
+        is_ops_actor
+        and item.category in HANDOFF_TASK
+        and not any(t.status is TaskStatus.open and t.id != task.id for t in item.tasks)
+    ):
+        follow_up = Task(
+            tenant_id=item.tenant_id,
+            item_id=item.id,
+            description=HANDOFF_TASK[item.category],
+            assigned_user_id=None,  # ops will assign the contractor next
+            due_at=item.due_at,
+            status=TaskStatus.open,
+        )
+        db.add(follow_up)
+        _audit(
+            db,
+            tenant_id=item.tenant_id,
+            user_id=actor.id,
+            action="task_created",
+            item_id=item.id,
+            detail=f"handoff: {follow_up.description[:80]}",
+        )
+
+    # Auto-close the item if no open tasks remain (and we didn't just create
+    # a follow-up). The completion note is rolled up so anyone reading the
+    # ticket can see how it ended without scrolling the timeline.
+    auto_closed = False
+    db.flush()  # make the new follow-up visible to the next query
+    open_left = (
+        db.query(Task)
+        .filter(Task.item_id == item.id, Task.status == TaskStatus.open)
+        .count()
+    )
+    if open_left == 0 and item.status is not ItemStatus.done:
+        old_status = item.status
+        item.status = ItemStatus.done
+        item.completed_at = datetime.utcnow()
+        item.completion_note = note or item.completion_note
+        auto_closed = True
+        _audit(
+            db,
+            tenant_id=item.tenant_id,
+            user_id=actor.id,
+            action="auto_close",
+            item_id=item.id,
+            detail=f"{old_status.value} -> done (last task complete)",
+        )
+
+    db.commit()
+    db.refresh(task)
+    if follow_up is not None:
+        db.refresh(follow_up)
+    return task, follow_up, auto_closed
+
+
+def reopen_item(db: Session, *, item: Item, actor: User, reason: str = "") -> Item:
+    """Re-open a closed item (operators/admins/owners only — enforced at
+    the route layer). Restores the item to `in_progress` and clears the
+    completion timestamp. The completion note is preserved on the timeline
+    via the audit log so the closure history isn't lost."""
+    if item.status is not ItemStatus.done:
+        raise ValueError("only closed items can be reopened")
+    item.status = ItemStatus.in_progress
+    item.completed_at = None
+    detail = "done -> in_progress"
+    reason = (reason or "").strip()
+    if reason:
+        snippet = reason[:120] + ("…" if len(reason) > 120 else "")
+        detail += f" — {snippet}"
+    _audit(
+        db,
+        tenant_id=item.tenant_id,
+        user_id=actor.id,
+        action="reopen",
+        item_id=item.id,
+        detail=detail,
     )
     db.commit()
     db.refresh(item)

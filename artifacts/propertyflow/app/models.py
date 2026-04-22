@@ -30,11 +30,15 @@ class Role(str, enum.Enum):
     owner = "owner"      # system-level (no tenant or any tenant)
     admin = "admin"      # tenant manager
     operator = "operator"  # day-to-day staff
+    contractor = "contractor"  # external party — read-only EXCEPT on items/tasks assigned to them
     viewer = "viewer"    # read-only
 
     @property
     def rank(self) -> int:
-        return {"viewer": 1, "operator": 2, "admin": 3, "owner": 4}[self.value]
+        # Contractors sit between viewer and operator: more capability than a
+        # pure viewer (they can act on their own assignments) but less than an
+        # operator (they can't create, assign, or touch other people's work).
+        return {"viewer": 1, "contractor": 2, "operator": 3, "admin": 4, "owner": 5}[self.value]
 
 
 class ItemStatus(str, enum.Enum):
