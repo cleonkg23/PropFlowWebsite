@@ -1,0 +1,505 @@
+You are a senior backend-focused full-stack engineer.
+
+You are building a **production-minded MVP** called **PropertyFlow**.
+
+This is a **multi-tenant workflow automation system** for property businesses.
+
+This version MUST:
+
+* use REAL AI (Gemma)
+* support multiple users and roles
+* support multiple clients (tenants)
+* be modular and easy to refactor
+* run on Replit with minimal cost
+* avoid overengineering
+
+Persist ALL architecture, decisions, and explanations in `replit.md`.
+
+---
+
+# 🎯 PRODUCT PURPOSE
+
+PropertyFlow turns messy inbox-driven work into structured workflows.
+
+Core system:
+
+1. ingest incoming work
+2. classify using AI
+3. assign owner
+4. generate draft reply
+5. create task
+6. track in workflow board
+
+---
+
+# ⚠️ STRICT TECH STACK
+
+Backend:
+
+* Python
+* FastAPI
+
+Frontend:
+
+* Jinja2 templates (server-rendered)
+* Tailwind CSS
+* minimal JavaScript only
+
+Database:
+
+* SQLite
+* SQLAlchemy ORM
+
+AI:
+
+* Gemma 4 E4B (primary target)
+* Must support local AND fallback modes
+
+---
+
+# 🧠 MULTI-TENANT SYSTEM
+
+## Core concepts:
+
+### Tenant (client business)
+
+* isolated data
+* isolated users
+* isolated workflows
+
+### User
+
+Belongs to a tenant
+
+### Roles:
+
+* owner (you)
+* admin (client manager)
+* operator (staff)
+* viewer (read-only)
+
+---
+
+# 🗄️ DATABASE SCHEMA
+
+## Tenant
+
+* id
+* name
+* created_at
+
+---
+
+## User
+
+* id
+* tenant_id
+* email
+* name
+* role
+* created_at
+
+---
+
+## Item (core object)
+
+* id
+* tenant_id
+* subject
+* body
+* category
+* urgency
+* status
+* assigned_user_id
+* draft_reply
+* created_at
+* updated_at
+
+---
+
+## Task
+
+* id
+* tenant_id
+* item_id
+* description
+* assigned_user_id
+* due_at
+* status
+* created_at
+
+---
+
+## AuditLog
+
+* id
+* tenant_id
+* user_id
+* action
+* item_id
+* created_at
+
+---
+
+# 🔐 AUTHENTICATION
+
+Implement simple auth:
+
+* email-based login
+* session cookies
+* no OAuth
+* no passwords (magic link OR simple login)
+
+---
+
+# 🔑 ROLE-BASED DASHBOARDS
+
+## OWNER PANEL (/owner)
+
+System-level view:
+
+* all tenants
+* all users
+* debug tools
+* system health
+
+---
+
+## ADMIN PANEL (/admin)
+
+Tenant-level:
+
+* manage users
+* assign roles
+* view all items
+* assign tasks
+* configure rules (future)
+
+---
+
+## OPERATOR DASHBOARD (/dashboard)
+
+* see "My Tasks"
+* see assigned items
+* update status
+* view draft replies
+
+---
+
+## VIEWER
+
+* read-only access
+
+---
+
+# ⚙️ CRUD CAPABILITIES
+
+Admins + operators must be able to:
+
+* create items manually
+* update items
+* assign users
+* update status
+* edit tasks
+* mark complete
+
+---
+
+# 🤖 AI SYSTEM (REAL IMPLEMENTATION REQUIRED)
+
+You MUST implement a real AI service.
+
+---
+
+# 🎯 MODEL REQUIREMENT
+
+Primary model target:
+
+**Gemma 4 E4B**
+
+---
+
+# ⚠️ DEPLOYMENT REALITY
+
+Replit may not reliably run Gemma locally.
+
+Therefore you MUST implement:
+
+## AI Service with dual mode:
+
+### Mode 1: Local (Ollama)
+
+### Mode 2: Remote API fallback
+
+---
+
+# 📁 AI SERVICE DESIGN
+
+Create file:
+`services/ai_service.py`
+
+---
+
+## Class: AIService
+
+Must support:
+
+### config:
+
+* mode: "local" or "remote"
+
+---
+
+## Functions:
+
+### classify_item(subject, body)
+
+Return JSON:
+
+* category
+* urgency
+
+---
+
+### generate_draft(subject, body, category)
+
+Return:
+
+* professional reply string
+
+---
+
+# 🔌 LOCAL AI IMPLEMENTATION (OLLAMA)
+
+Use:
+
+Model:
+`gemma4:e4b`
+
+---
+
+## Requirements:
+
+* call Ollama via HTTP:
+  `http://localhost:11434/api/generate`
+
+* send prompt
+
+* receive response
+
+---
+
+## Prompt design:
+
+### Classification prompt:
+
+Return ONLY JSON:
+
+{
+"category": "...",
+"urgency": "low|medium|high"
+}
+
+---
+
+### Draft prompt:
+
+Return concise, professional reply.
+
+---
+
+# 🌐 REMOTE FALLBACK
+
+If local fails:
+
+* fallback to API call (stub structure)
+
+Must be modular:
+
+* easy to replace later
+
+---
+
+# ⚙️ WORKFLOW ENGINE
+
+Create:
+`services/workflow_service.py`
+
+---
+
+Functions:
+
+* ingest_item()
+* classify_item()
+* assign_item()
+* create_task()
+* generate_draft()
+* update_status()
+
+---
+
+# 🔌 CONNECTOR SYSTEM (MODULAR)
+
+Create:
+`services/connectors/`
+
+---
+
+## Must support future:
+
+### Google Sheets
+
+* ingest rows
+* map to items
+
+---
+
+### Email ingestion
+
+* parse emails
+* create items
+
+---
+
+## Use adapter pattern
+
+Each connector:
+
+* converts source → internal Item
+
+---
+
+# 📊 UI REQUIREMENTS
+
+Server-rendered pages.
+
+---
+
+## DASHBOARD
+
+Sections:
+
+### Inbox
+
+incoming items
+
+### Item detail
+
+classification + draft
+
+### Tasks
+
+assigned tasks
+
+### Workflow board
+
+columns:
+
+* New
+* In Progress
+* Awaiting Reply
+* Done
+
+---
+
+## FILTERS
+
+* My tasks
+* Team tasks
+* All items (admin only)
+
+---
+
+# 🧪 DEMO MODE
+
+Include:
+
+* Tenant enquiry
+* Maintenance request
+* Viewing follow-up
+* Landlord admin
+
+Each triggers full workflow
+
+---
+
+# 🧠 SYSTEM RULE
+
+There is ONE workflow engine.
+
+Different “workflows” = different rules
+
+---
+
+# ⚠️ DO NOT BUILD
+
+* billing
+* notifications system
+* microservices
+* websocket infra
+* scaling infra
+
+---
+
+# 📁 PROJECT STRUCTURE
+
+app/
+
+* main.py
+* models.py
+* auth.py
+* routes/
+* services/
+
+  * ai_service.py
+  * workflow_service.py
+  * connectors/
+* templates/
+* static/
+
+---
+
+# 🧾 replit.md REQUIREMENTS
+
+Document:
+
+* architecture
+* AI system
+* workflow design
+* auth design
+* connector design
+* extension plan
+
+---
+
+# 🚀 BUILD ORDER
+
+1. database
+2. auth
+3. role system
+4. workflow engine
+5. AI service (local + fallback)
+6. dashboard UI
+7. admin panel
+8. owner panel
+9. connectors scaffold
+
+---
+
+# 🎯 FINAL GOAL
+
+System supports:
+
+* real AI classification + drafting
+* multi-client usage
+* role-based dashboards
+* assignable tasks
+* real operational workflow
+
+User must feel:
+
+“This runs our operations”
+
+---
+
+Start building now.
