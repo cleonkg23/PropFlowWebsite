@@ -67,9 +67,15 @@
     {# --- Contractor's own assignment surfaces FIRST so they don't have to
          scroll past internal ops content to find what they need to do. --- #}
     {% if is_contractor and my_open_task %}
+      {% set my_split = split_task_desc(my_open_task.description) %}
       <article class="card" style="border-left: 3px solid var(--accent-strong);">
         <span class="eyebrow">Your assignment</span>
-        <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">{{ my_open_task.description }}</h2>
+        <h2 class="h-card" style="margin-top: 0.4rem; margin-bottom: 0.5rem;">{{ my_split[0] }}</h2>
+        {% if my_split[1] %}
+          <p class="muted" style="font-size: 0.85rem; margin-bottom: 0.5rem;">
+            <b style="color: var(--ink-soft); font-weight:500;">Done when:</b> {{ my_split[1] }}.
+          </p>
+        {% endif %}
         <p class="muted" style="font-size: 0.85rem; margin-bottom: 1rem;">
           {% if my_open_task.due_at %}Target: {{ my_open_task.due_at.strftime('%a %d %b, %H:%M') }} &middot; {% endif %}
           When you're done on site, choose one of the three actions below.
@@ -144,6 +150,13 @@
         Received {{ item.created_at.strftime('%a %d %b, %H:%M') }}
         {% if item.sender_email %} &middot; &lt;{{ item.sender_email }}&gt;{% endif %}
       </div>
+      {% if address %}
+        <div style="margin-bottom: 1rem; padding: 0.65rem 0.85rem; background: var(--bg-deep); border-radius: 6px; border: 1px solid var(--rule); display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+          <span class="eyebrow eyebrow-ink" style="margin:0;">Property</span>
+          <span style="font-weight:500;">{{ address }}</span>
+          <a href="{{ address_maps_url }}" target="_blank" rel="noopener" class="btn btn-sm" style="margin-left:auto; text-decoration:none;">Open in Maps &rarr;</a>
+        </div>
+      {% endif %}
       <div style="font-family: var(--serif); font-size: 1.05rem; line-height: 1.7; color: var(--ink); white-space: pre-wrap;">{{ item.body }}</div>
     </article>
 
@@ -167,9 +180,13 @@
 
       {% if item.tasks %}
         {% for t in item.tasks[:1] %}
+          {% set tsplit = split_task_desc(t.description) %}
           <div class="card-inset" style="margin-bottom: 1.25rem;">
             <span class="eyebrow eyebrow-ink">Task created</span>
-            <div style="font-family: var(--serif); font-size: 1.05rem; font-weight: 500; margin-top: 0.35rem;">{{ t.description }}</div>
+            <div style="font-family: var(--serif); font-size: 1.05rem; font-weight: 500; margin-top: 0.35rem;">{{ tsplit[0] }}</div>
+            {% if tsplit[1] %}
+              <div class="muted" style="font-size: 0.82rem; margin-top: 0.25rem; font-style: italic;">Done when: {{ tsplit[1] }}.</div>
+            {% endif %}
             <div class="muted" style="font-size: 0.82rem; margin-top: 0.35rem;">
               {% if t.assigned_user %}Assigned to <b style="color: var(--ink-soft); font-weight:500;">{{ t.assigned_user.name }}</b>{% else %}Unassigned{% endif %}
               {% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}
@@ -292,20 +309,18 @@
             {% set actor = row.actor %}
             {% set kind = 'kind-default' %}
             {% if a.action == 'note' %}{% set kind = 'kind-note' %}
-            {% elif a.action == 'complete' %}{% set kind = 'kind-complete' %}
+            {% elif a.action in ['complete', 'task_complete', 'auto_close'] %}{% set kind = 'kind-complete' %}
             {% elif a.action in ['status_change', 'acknowledge', 'send_reply'] %}{% set kind = 'kind-status' %}
             {% endif %}
             <div class="timeline-row {{ kind }}">
               <div class="when">{{ a.created_at.strftime('%b %d, %H:%M') }} &middot; <span class="who">{{ actor.name if actor else 'system' }}</span></div>
               <div class="what">
-                <b>{{ a.action.replace('_',' ')|capitalize }}</b>
-                {% if a.detail %}
+                <b>{{ row.label }}</b>
+                {% if a.action == 'note' %}
                   &mdash;
-                  {% if a.action == 'note' %}
-                    <span style="font-family: var(--serif); white-space: pre-wrap;">{{ a.detail }}</span>
-                  {% else %}
-                    {{ a.detail|replace('awaiting_reply','Awaiting reply')|replace('in_progress','In progress')|replace('->','→') }}
-                  {% endif %}
+                  <span style="font-family: var(--serif); white-space: pre-wrap;">{{ a.detail }}</span>
+                {% elif row.pretty_detail %}
+                  &mdash; {{ row.pretty_detail }}
                 {% endif %}
               </div>
             </div>
@@ -356,10 +371,14 @@
       <h3 class="h-card" style="margin-top: 0.35rem; margin-bottom: 0.85rem;">{{ item.tasks|length }} on this item</h3>
       <div>
         {% for t in item.tasks %}
+          {% set tsplit = split_task_desc(t.description) %}
           <div class="rule-top" style="padding: 0.7rem 0;">
             <div class="between" style="align-items: flex-start;">
               <div style="min-width:0;">
-                <div style="font-size:0.92rem;">{{ t.description }}</div>
+                <div style="font-size:0.92rem; font-weight:500;">{{ tsplit[0] }}</div>
+                {% if tsplit[1] %}
+                  <div class="muted" style="font-size:0.78rem; margin-top:0.15rem; font-style: italic;">Done when: {{ tsplit[1] }}.</div>
+                {% endif %}
                 <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">{% if t.assigned_user %}{{ t.assigned_user.name }}{% endif %}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
               </div>
               <span class="chip {{ 'chip-priority-normal' if t.status.value == 'done' else 'chip-general' }}">{{ t.status.value }}</span>

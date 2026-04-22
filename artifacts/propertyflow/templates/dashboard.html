@@ -184,7 +184,10 @@
               {% else %}
                 &middot; <span class="owner-init unassigned" title="Unassigned">·</span> Unassigned
               {% endif %}
-              {% if item.due_at %}
+              {% if item.status.value == 'done' %}
+                &middot;
+                <span class="due-chip ok">Completed{% if item.completed_at %} {{ item.completed_at.strftime('%a %H:%M') }}{% endif %}</span>
+              {% elif item.due_at %}
                 &middot;
                 {% if is_overdue %}
                   <span class="due-chip overdue">Overdue · was due {{ item.due_at.strftime('%a %H:%M') }}</span>
@@ -235,10 +238,14 @@
   {% if my_tasks %}
     <div>
       {% for t in my_tasks %}
+        {% set tsplit = split_task_desc(t.description) %}
         <div class="rule-top" style="padding: 0.85rem 0;">
           <div class="between">
             <div style="min-width:0;">
-              <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ t.description }}</a>
+              <a href="/items/{{ t.item_id }}" style="font-weight:500; color: var(--ink); text-decoration:none;">{{ tsplit[0] }}</a>
+              {% if tsplit[1] %}
+                <div class="muted" style="font-size:0.78rem; margin-top:0.15rem; font-style: italic;">Done when: {{ tsplit[1] }}.</div>
+              {% endif %}
               <div class="muted" style="font-size:0.78rem; margin-top:0.2rem;">item #{{ t.item_id }}{% if t.due_at %} &middot; due {{ t.due_at.strftime('%a %d %b, %H:%M') }}{% endif %}</div>
             </div>
             <span class="chip chip-general">open</span>

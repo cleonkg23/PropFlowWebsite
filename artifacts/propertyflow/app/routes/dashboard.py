@@ -13,6 +13,12 @@ from app.auth import require_role, require_user
 from app.db import get_db
 from app.models import AuditLog, Item, ItemStatus, Role, Task, TaskStatus, Tenant, User
 from app.services import workflow_service
+from app.services.presentation import (
+    extract_address,
+    humanize_event,
+    maps_url_for,
+    split_task_desc,
+)
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -271,6 +277,7 @@ def dashboard(
             "filters": filters,
             "now_utc": now,
             "my_state_by_item": my_state_by_item,
+            "split_task_desc": split_task_desc,
         },
     )
 
@@ -314,7 +321,21 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
         .order_by(AuditLog.created_at.asc())
         .all()
     )
-    timeline = [{"entry": entry, "actor": actor} for entry, actor in timeline_rows]
+    timeline = []
+    for entry, actor in timeline_rows:
+        label, pretty_detail = humanize_event(entry.action, entry.detail)
+        timeline.append({
+            "entry": entry,
+            "actor": actor,
+            "label": label,
+            "pretty_detail": pretty_detail,
+        })
+
+    # Best-effort property address pulled from the subject line. If we can
+    # find one and it's a maintenance ticket, the template surfaces an
+    # inline address strip with a Google Maps link for the contractor.
+    address = extract_address(item.subject) if item.category in workflow_service.HANDOFF_TASK else None
+    address_maps_url = maps_url_for(address) if address else None
 
     now = datetime.now(timezone.utc)
 
@@ -344,6 +365,10 @@ def item_detail(item_id: int, request: Request, user: User = Depends(require_use
             # close the ticket".
             "completing_will_close": my_open_task is not None and open_tasks_count == 1,
             "can_act": _can_act_on_item(user, item),
+            "address": address,
+            "address_maps_url": address_maps_url,
+            # Helpers exposed to the template for inline use.
+            "split_task_desc": split_task_desc,
         },
     )
 
