@@ -1,0 +1,272 @@
+You are improving the existing Property Workflow Co. landing page.
+
+Goal:
+Turn the page from a polished but slightly abstract concept page into a clear, buyer-facing SaaS-style landing page for small UK estate agents, letting agents and property managers.
+
+Do not redesign from scratch.
+Keep the premium minimal visual style.
+Keep the current dark green/off-white brand direction.
+Keep the site lightweight and static.
+Do not add unnecessary frameworks.
+Do not make the page visually noisy.
+
+Main diagnosis:
+The current page looks polished, but it still uses too much abstract SaaS language. A cold property business owner may not instantly understand what is being sold, whether it is software or a service, or how it helps their daily work.
+
+The page must answer within 10 seconds:
+1. Who is this for?
+2. What problem does it solve?
+3. What does the system actually do?
+4. How does it fit with existing tools?
+5. What should the visitor click next?
+
+Core positioning:
+PropertyFlow is a lightweight workflow system configured for small UK letting agents, estate agents and property managers.
+
+It helps teams stop tenant messages, maintenance jobs, landlord admin and viewing follow-ups from slipping through the cracks.
+
+It turns incoming emails and requests into:
+- tracked tasks
+- owners/assignees
+- draft replies
+- contractor updates
+- overdue reminders
+- one shared status board
+
+It does not replace existing property software.
+It sits around the tools they already use: inbox, spreadsheets, contractors, CRM/PMS, Fixflo, Arthur, Re-Leased, Alto, Street, etc.
+
+Tone rules:
+Use plain English.
+Write for a busy agency owner, not a SaaS investor.
+Avoid jargon and buzzwords.
+Avoid: operational layer, primitives, leverage, AI-powered, seamless, robust, next-generation, workflow transformation, unified operating system.
+Prefer: email, task, owner, reply, contractor, overdue, chase, repair, viewing, landlord, tenant, spreadsheet, inbox.
+
+Hero section:
+Rewrite the hero to be clearer and more concrete.
+
+Use this structure:
+
+Eyebrow:
+"Property workflow software for small UK letting and estate agencies"
+
+Headline:
+"Stop repairs, tenant messages and viewing follow-ups slipping through the cracks."
+
+Subheadline:
+"PropertyFlow turns incoming emails and requests into clear tasks, draft replies and status updates — so your team can see what is open, who owns it and what needs chasing."
+
+CTA buttons:
+Primary: "See the workflow demo"
+Secondary: "Book a 15-minute walkthrough"
+
+Support line:
+"Built for small UK property teams using email, spreadsheets, contractors and existing CRMs."
+
+Above-the-fold product panel:
+Keep the current workflow card, but make it feel more like a real product snapshot.
+
+Show realistic rows:
+- "Leaking tap reported — Flat 3B"
+- "Viewing follow-up due — James W."
+- "Landlord statement request — Mr Khan"
+- "Boiler repair awaiting contractor update"
+- "Draft reply ready — Sarah J."
+
+Each row should show:
+- type: Maintenance / Viewing / Landlord / Tenant
+- owner: internal person or contractor
+- status: New / Assigned / Reply drafted / Awaiting contractor / Overdue soon
+- timestamp or due time
+
+Avoid technical labels.
+Avoid clutter.
+
+Add a simple micro-flow below the card:
+"Inbox → Task created → Owner assigned → Reply drafted → Status tracked"
+
+Section order:
+1. Hero
+2. Product demo snapshot / workflow flow
+3. Problem
+4. What it helps with
+5. How it works
+6. Where it fits with existing software
+7. Prototype proof / honest credibility
+8. CTA
+
+Problem section:
+Make it more concrete and less abstract.
+
+Title:
+"The work is not hard to understand. It is just too easy to lose."
+
+Bullets:
+- "A tenant reports a repair, then chases three days later."
+- "A viewing happens, but nobody follows up."
+- "A landlord asks for an update and the answer is buried in someone’s inbox."
+- "A contractor says they will attend, but nobody tracks the next step."
+- "The manager only finds the issue when someone complains."
+
+What it helps with section:
+Replace abstract workflow cards with concrete cards.
+
+Title:
+"What PropertyFlow helps with"
+
+Cards:
+1. Tenant and landlord messages
+"Turn incoming messages into tracked tasks instead of loose email threads."
+
+2. Maintenance jobs
+"Create repair tasks, assign them internally or to contractors, and track the status."
+
+3. Viewing follow-ups
+"Remind the team when applicants, documents or next steps need chasing."
+
+4. Document chasing
+"Track references, ID, deposits and signed agreements until they are complete."
+
+5. Contractor updates
+"See which jobs are waiting on a contractor and which ones need chasing."
+
+6. Manager visibility
+"Give owners and managers one view of what is open, overdue and completed."
+
+How it works section:
+Make the process more buyer-friendly.
+
+Title:
+"How it works"
+
+Steps:
+1. "Pick one messy workflow"
+"Choose the process causing the most admin: repairs, viewings, landlord updates or document chasing."
+
+2. "Map how it works today"
+"We look at where the work currently lives: inboxes, spreadsheets, WhatsApp, CRMs and contractors."
+
+3. "Configure the board"
+"Set up categories, owners, statuses, reminders and draft reply templates."
+
+4. "Run it on real work"
+"Use it alongside your current tools before expanding it."
+
+5. "Add more workflows later"
+"Start small. Add the next process when the first one is working."
+
+Where this fits section:
+Make the competitor comparison clearer and less defensive.
+
+Title:
+"This does not replace your existing property software."
+
+Copy:
+"Keep Arthur, Re-Leased, Fixflo, Alto, Street or whatever you already use. PropertyFlow handles the messy work around them: the emails, follow-ups, contractor updates, reminders and internal handovers that usually live in inboxes and spreadsheets."
+
+Comparison bullets:
+- "Arthur / Re-Leased / Alto: property records, tenancies and management"
+- "Fixflo: maintenance reporting"
+- "Front / Help Scout: shared inbox"
+- "PropertyFlow: turns property work into assigned tasks with draft replies, owners and status tracking"
+
+Remove this phrase:
+"Roles, contractor companies, categories and SLAs are the primitives — not bolt-ons."
+
+Replace with:
+"PropertyFlow is shaped around the work small property teams already do every day."
+
+Proof section:
+Remove the fake testimonial entirely:
+"[Client name] [Role] · [Agency name], [City]"
+
+Replace with an honest prototype proof block.
+
+Title:
+"Built from a real workflow automation prototype"
+
+Copy:
+"This is an early product built from real automation work: replacing spreadsheet tracking, manual follow-ups and unclear handovers with a shared workflow board. No fake client logos. No inflated case study. The current goal is to run focused pilots with small UK property teams."
+
+Add proof bullets:
+- "Based on real internal workflow automation experience"
+- "Designed for teams using inboxes and spreadsheets today"
+- "Built for a short pilot, not a six-month software rollout"
+- "Human-reviewed replies and actions, not blind automation"
+
+CTA section:
+Make the final CTA clearer.
+
+Title:
+"Want to see this on one of your real workflows?"
+
+Copy:
+"Send one messy workflow — repairs, viewing follow-ups, landlord updates or document chasing — and I’ll show how it would look on a live board."
+
+Buttons/links:
+- "Book a 15-minute walkthrough"
+- "Email about a workflow"
+
+Replace placeholder email:
+Use a real email address if available. If no real email is available, use "your@email.com" only in development but mark it clearly as TODO in code comments.
+
+Readability changes:
+- Increase body font size slightly
+- Increase line height
+- Make paragraph text darker
+- Avoid overly thin font weights for body text
+- Keep decorative/editorial font mainly for headings or section labels
+- Make CTAs visually stronger
+- Reduce tiny text where it carries important meaning
+- Ensure mobile readability is strong
+
+Visual hierarchy:
+- The hero headline should be the clearest element on the page
+- The primary CTA should be visually dominant
+- Product snapshots should look real, not decorative
+- Reduce repeated section numbering if it makes the page feel overly editorial
+- Keep whitespace, but avoid making the page feel sparse or vague
+
+Conversion improvements:
+- Add a small "Who this is for" strip near the hero:
+  "Best for: letting agents · estate agents · property managers · small teams · contractor-heavy workflows"
+- Add a "Start with one workflow" message to reduce fear of complexity
+- Make the demo CTA appear at least twice: hero and demo section
+- Make the final CTA specific: "Show me one messy workflow"
+
+Demo section:
+Rename:
+"The shared view your team has been missing"
+to:
+"See the workflow in action"
+
+Copy:
+"Watch a tenant message become a tracked task, assigned owner, draft reply and status update."
+
+Make the demo feel like a product:
+- Show before/after: Inbox mess vs PropertyFlow board
+- Or show a 5-step visual flow
+- Keep it simple
+
+Quality checks before finishing:
+Read the page as if you are a 45-year-old letting agency owner with no SaaS background.
+
+Remove any sentence that sounds clever but does not answer:
+- What is this?
+- What problem does it solve?
+- What happens when I use it?
+- Why should I trust it?
+- What do I click?
+
+Definition of done:
+The page should feel:
+- clearer
+- less jargon-heavy
+- more product-like
+- more trustworthy
+- easier to scan
+- still premium and minimal
+
+The visitor should leave thinking:
+"This helps my team stop losing track of repairs, tenant messages, landlord admin and viewing follow-ups."

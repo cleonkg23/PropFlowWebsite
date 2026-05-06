@@ -46,8 +46,8 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   font-family: var(--sans);
-  font-size: 16.5px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.7;
   color: var(--ink);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
@@ -410,11 +410,12 @@ ul, ol { margin: 0; padding: 0; }
 }
 
 .lede {
-  font-size: clamp(1.08rem, 1.3vw, 1.18rem);
-  line-height: 1.6;
-  color: var(--ink-soft);
+  font-size: clamp(1.1rem, 1.4vw, 1.22rem);
+  line-height: 1.65;
+  color: var(--ink);
   max-width: 52ch;
   margin-bottom: 2rem;
+  font-weight: 400;
 }
 
 .cta-row {
@@ -2266,4 +2267,90 @@ em, i, blockquote {
 @media (max-width: 880px) {
   .diff-grid { grid-template-columns: 1fr; gap: 1.75rem; }
   .diff-copy { max-width: none; }
+}
+
+/* ========================================================
+   Honest proof section
+   ======================================================== */
+.section-proof-honest {
+  background: var(--bg-deep);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.proof-honest-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.proof-honest-copy .section-marker { display: block; margin-bottom: 0.85rem; }
+.proof-honest-copy h2 { margin: 0 0 1rem; max-width: 28ch; }
+.proof-honest-copy p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.proof-honest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  align-self: center;
+}
+.proof-honest-list li {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr;
+  gap: 0.7rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.97rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  align-items: baseline;
+}
+.proof-check {
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+@media (max-width: 820px) {
+  .proof-honest-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+}
+
+/* ========================================================
+   Readability: paragraph / body text colour bump
+   ======================================================== */
+.problem-copy .inline-list .il-body,
+.automate-card .ac-body-inner p,
+.diff-copy p,
+.proof-honest-copy p,
+.ps-detail-inner p,
+.intro-card p,
+.demo-sub,
+p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.demo-lead):not(.demo-foot):not(.contact-meta):not(.eyebrow):not(.cred-line):not(.footer-tag):not(.footer-copy) {
+  color: var(--ink-soft);
+}
+
+/* wf-progress strip: 5-step horizontal layout */
+.wf-progress {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.35rem;
+}
+.wf-prog-step {
+  font-size: 0.68rem;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.wf-prog-step strong {
+  display: none; /* hide counts in the 5-step strip */
+}
+.wf-prog-arrow {
+  font-size: 0.75rem;
+  color: var(--rule-strong);
+  flex: 0 0 auto;
 }
