@@ -2354,3 +2354,70 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   color: var(--rule-strong);
   flex: 0 0 auto;
 }
+
+/* ========================================================
+   Refinement pass: clarity, contrast, warmth
+   ======================================================== */
+
+/* Stronger primary CTA — forest green instead of near-black */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+/* Outline button — cleaner contrast on cream */
+.btn-outline {
+  font-weight: 500;
+}
+
+/* Section intro line — one-liner subtitle below h2 */
+.section-intro-line {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  font-family: var(--sans);
+  font-weight: 400;
+  max-width: 52ch;
+}
+
+/* Subtle section background differentiation */
+.section-intro  { background: var(--bg); }
+#problem        { background: var(--bg-deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+#workflows      { background: var(--bg); }
+#differs        { background: var(--bg-deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+#proof          { background: var(--bg); border-top: 1px solid var(--rule); }
+#demo           { background: var(--bg-deep); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+#how            { background: var(--bg); }
+#contact        { background: var(--bg-deep); }
+
+/* Tighten up inline-list spacing for problem bullets */
+.inline-list { margin-top: 1.25rem; }
+.inline-list li { margin-bottom: 0.55rem; }
+.il-body { font-size: 1rem; color: var(--ink); line-height: 1.6; }
+
+/* Section spacing — add more air between heading and content */
+.section-head-compact { margin-bottom: 2rem; }
+.section-head-row { margin-bottom: 1.75rem; }
+
+/* Demo copy block — tighten gap between lead and CTA */
+.demo-copy { gap: 1.1rem; }
+.demo-lead { font-size: 1.05rem; font-weight: 500; color: var(--ink); margin-bottom: 0.25rem; }
+
+/* Intro card num labels (role tags) */
+.intro-num {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+/* Proof honest section on plain bg */
+.section-proof-honest { background: var(--bg); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }

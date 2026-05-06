@@ -1,0 +1,69 @@
+Improve the overall clarity, simplicity and visual feel of the existing PropertyFlow landing page.
+
+Do not redesign the layout.
+Do not change the core colour palette.
+Do not heavily modify the product/demo UI.
+Focus only on tone, structure, readability and visual clarity.
+
+Goals:
+- Make the page instantly understandable to a non-technical property business owner
+- Reduce wordiness
+- Improve scanability
+- Add light visual contrast between sections
+- Make the page feel warmer and more practical, less abstract
+
+Content changes:
+- Reduce total copy by ~30–40%
+- Keep paragraphs to max 1–2 lines
+- Replace any abstract or SaaS language with plain English
+- Prefer concrete words: email, repair, tenant, landlord, task, owner, reply, overdue
+- Remove any sentence that does not clearly explain what the product does
+- Keep headings simple and direct (no clever phrasing)
+
+Structure:
+- Ensure each section can be understood by scanning only headings + first line
+- Use more bullet points instead of paragraphs
+- Add spacing between content blocks to avoid dense reading
+- Avoid long continuous text sections
+
+Demo section:
+- Keep title: "See the workflow in action"
+- Keep current demo visuals mostly unchanged
+- Ensure surrounding text is minimal and clear
+- Add a short one-line explanation above demo:
+  "Watch a property request move from email to task, owner and status"
+
+Visual adjustments:
+- Introduce subtle section contrast (slightly different background shades)
+- Strengthen CTA buttons with clearer contrast
+- Add light colour accents (used sparingly) for:
+  - important actions
+  - key highlights
+- Do not add heavy colours or clutter
+
+Typography:
+- Slightly increase body text size
+- Increase line height
+- Ensure text contrast is strong enough for readability
+- Avoid very thin font weights for body text
+
+Tone:
+- Make the page feel like a simple, useful tool
+- Not a concept or abstract system
+- Not a consultancy explanation
+- Not a generic SaaS pitch
+
+CTA:
+- Keep primary actions clear and consistent
+- Ensure each CTA feels like a natural next step
+- Avoid vague wording
+
+Remove:
+- Any placeholder content (e.g. fake testimonial)
+- Any overly technical or unnecessary wording
+
+Definition of done:
+- A user can understand the product within 10 seconds
+- The page is easy to scan without reading everything
+- The tone feels simple, practical and confident
+- The design still feels clean and premium, but less cold and more usable
