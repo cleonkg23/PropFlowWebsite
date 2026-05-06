@@ -1,0 +1,114 @@
+You are improving the existing Property Workflow Co. landing page.
+
+Goal:
+Make the page feel more like a credible SaaS product and less like a vague freelance service, while keeping the current premium editorial style.
+
+Context:
+The current page looks visually polished but the positioning is ambiguous. It says “Workflow automation for small UK property teams” and “I build lightweight systems…”. This makes it feel like a custom service, not a product. Competitors like Arthur feel clearer because they immediately communicate “property management software” and show SaaS depth through product framing, features, pricing-style structure, and navigation.
+
+Do not rebuild the site from scratch.
+Do not change the core colour palette, typography direction, or overall premium minimal aesthetic.
+Do not make it look like Arthur, Fixflo, or Front.
+Improve clarity, product confidence, and perceived depth.
+
+Primary positioning shift:
+Change the page from:
+“I build workflow systems”
+to:
+“A system that handles tenant, landlord, maintenance, and viewing requests from inbox to resolution.”
+
+New hero direction:
+Use a clearer SaaS-style headline such as:
+“Handle every property request from inbox to resolution.”
+or
+“One system for tenant, landlord, maintenance, and viewing workflows.”
+
+Supporting copy should explain:
+- Incoming emails and requests are captured
+- AI/smart rules categorise them
+- Tasks are created and assigned
+- Draft replies are prepared
+- Teams and contractors can track status
+- Managers get one shared operational view
+
+Hero UI card:
+Make the right-side workflow panel feel more like a real product, not a decorative concept card.
+
+Replace the abstract steps with realistic live workflow examples:
+- “Leaking tap reported — Maintenance”
+- “Viewing follow-up due — Lettings”
+- “Landlord document request — Admin”
+- “Contractor assigned — Awaiting update”
+- “Draft reply ready — Needs review”
+
+Add small realistic details:
+- timestamps
+- assignee names or roles
+- status pills
+- priority labels
+- contractor/internal ownership
+- “Inbox → Assigned → Reply drafted” style progress
+
+Keep it clean, not cluttered.
+
+Navigation:
+Change nav labels to feel more SaaS/product-led:
+- Problem
+- Workflows
+- Demo
+- How it works
+- Contact
+
+Add/adjust section after hero:
+Create a “Built for property workflows” section with 3 concise cards:
+1. Enquiries
+   “Turn tenant, landlord, and applicant messages into tracked tasks.”
+2. Maintenance
+   “Route issues to the right person or contractor with status visibility.”
+3. Follow-ups
+   “Keep viewings, documents, and landlord admin from slipping.”
+
+Add a differentiation section:
+Title:
+“Not another full property management system.”
+
+Copy:
+“This is not trying to replace your CRM or accounting software. It sits between your inbox, spreadsheets, team, and contractors — handling the operational work that usually gets lost.”
+
+Include 3 comparison points:
+- Not as heavy as a full PMS like Arthur
+- Not only maintenance-focused like Fixflo
+- Not generic like a shared inbox tool
+- Built specifically around property team workflows
+
+CTA changes:
+Replace generic CTA language with:
+Primary: “See the workflow demo”
+Secondary: “Book a 15-minute walkthrough”
+
+Add one small credibility line near CTA:
+“Designed for small UK estate agents, letting agents, and property managers.”
+
+Visual style instructions:
+- Keep premium off-white background and dark green brand tone
+- Use more product-like UI states
+- Add subtle motion if already supported: step transitions, hover expansion, or card reveal
+- Avoid excessive boxes, icons, emojis, or visual clutter
+- Use hairline dividers and clean spacing
+- Keep the page simple and fast
+
+Implementation constraints:
+- Preserve existing responsive layout
+- Preserve existing file structure where possible
+- Do not introduce unnecessary frameworks
+- Do not break existing buttons, anchors, or demo links
+- Keep copy concise
+- Make changes incrementally
+- After implementation, review the page for ambiguity and remove any language that sounds like a vague consultancy
+
+Definition of done:
+A stranger should understand within 10 seconds:
+1. This is a product-like system for property teams
+2. It handles requests from inbox to resolution
+3. It is lighter than full property management software
+4. It has a clear demo they can view

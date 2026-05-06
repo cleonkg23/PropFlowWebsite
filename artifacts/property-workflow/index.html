@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Workflow automation for small UK estate agents, letting agents and property managers. Reduce admin, improve follow-ups, and gain visibility over your team's work." />
+  <meta name="description" content="One system that handles tenant, landlord, maintenance and viewing requests from inbox to resolution. Built for small UK estate agents, letting agents and property managers." />
   <meta name="theme-color" content="#1c2a25" />
 
-  <title>Property Workflow Automation | Less admin, faster follow-ups for UK property teams</title>
+  <title>Property Workflow Co. | Handle every property request from inbox to resolution</title>
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Workflow automation for small UK property teams" />
-  <meta property="og:description" content="I help small estate agents and property managers reduce admin, improve follow-ups, and gain visibility by automating their workflows." />
+  <meta property="og:title" content="Handle every property request from inbox to resolution" />
+  <meta property="og:description" content="One system for tenant, landlord, maintenance and viewing workflows. Captures requests, drafts replies, assigns owners, tracks resolution — without replacing your CRM." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,10 +34,10 @@
 
       <nav class="primary-nav" id="primary-nav" aria-label="Primary">
         <a href="#problem">Problem</a>
-        <a href="#automate">What I do</a>
+        <a href="#workflows">Workflows</a>
         <a href="#demo">Demo</a>
-        <a href="#how">How</a>
-        <a href="#contact" class="nav-cta">Get in touch</a>
+        <a href="#how">How it works</a>
+        <a href="#contact" class="nav-cta">Contact</a>
       </nav>
 
       <button class="menu-toggle" id="menu-toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Open menu">
@@ -54,69 +54,138 @@
         <div class="reveal">
           <p class="hero-eyebrow">
             <span class="dot" aria-hidden="true"></span>
-            For UK estate agents, letting agents &amp; property managers
+            Property workflow software &middot; UK
           </p>
 
-          <h1>Workflow automation for small UK property teams.</h1>
+          <h1>Handle every property request from inbox to resolution.</h1>
 
-          <p class="lede">I build lightweight systems that turn scattered emails and spreadsheets into one shared view of what&rsquo;s open, who owns it, and what&rsquo;s overdue.</p>
+          <p class="lede">One system for tenant, landlord, maintenance and viewing workflows. Incoming requests are captured, categorised, assigned and replied to &mdash; and your team, contractors and managers all see the same status.</p>
 
           <div class="cta-row">
             <a class="btn btn-primary" href="#demo">
-              See how it works
+              See the workflow demo
               <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <a class="btn btn-outline" href="#contact">Book a 15-min call</a>
+            <a class="btn btn-outline" href="#contact">Book a 15-minute walkthrough</a>
           </div>
+
+          <p class="cred-line"><span class="cred-dot" aria-hidden="true"></span>Designed for small UK estate agents, letting agents and property managers.</p>
         </div>
 
-        <aside class="workflow-card reveal" aria-label="Live workflow snapshot">
+        <aside class="workflow-card reveal" aria-label="Today's workflow queue">
           <header class="wf-header">
             <span class="wf-dot" aria-hidden="true"></span>
             <span class="wf-title">Workflow &middot; today</span>
             <span class="wf-meta">Updated 10:42</span>
           </header>
 
-          <ol class="wf-steps">
-            <li class="wf-step is-done">
-              <span class="wf-num" aria-hidden="true">1</span>
-              <div class="wf-body">
-                <span class="wf-label">Enquiry received</span>
-                <span class="wf-detail">Sarah J. &middot; 14 Park Road</span>
+          <ul class="wf-rows" role="list">
+            <li class="wf-row wf-row-priority">
+              <span class="wf-flag" aria-label="High priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Leaking tap reported</span>
+                <span class="wf-row-meta">Flat 3B &middot; Oak House &middot; 09:14</span>
               </div>
-              <span class="chip chip-tenant">Tenant</span>
-            </li>
-            <li class="wf-step is-done">
-              <span class="wf-num" aria-hidden="true">2</span>
-              <div class="wf-body">
-                <span class="wf-label">Categorised</span>
-                <span class="wf-detail">Intent: viewing request</span>
+              <div class="wf-row-side">
+                <span class="chip chip-maint">Maintenance</span>
+                <span class="status status-progress">Contractor assigned</span>
+                <span class="wf-owner">Acme Heating</span>
               </div>
-              <span class="chip chip-viewing">Viewing</span>
             </li>
-            <li class="wf-step is-done">
-              <span class="wf-num" aria-hidden="true">3</span>
-              <div class="wf-body">
-                <span class="wf-label">Owner assigned</span>
-                <span class="wf-detail">Alex &middot; due in 4h</span>
+
+            <li class="wf-row">
+              <span class="wf-flag wf-flag-amber" aria-label="Medium priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Viewing follow-up due</span>
+                <span class="wf-row-meta">James W. &middot; 14 Park Road &middot; due 14:00</span>
               </div>
-              <span class="chip chip-muted">Auto</span>
-            </li>
-            <li class="wf-step is-active">
-              <span class="wf-num" aria-hidden="true">4</span>
-              <div class="wf-body">
-                <span class="wf-label">Draft reply ready</span>
-                <span class="wf-detail">Awaiting team review</span>
+              <div class="wf-row-side">
+                <span class="chip chip-viewing">Lettings</span>
+                <span class="status status-followup">Follow-up due</span>
+                <span class="wf-owner">Priya &middot; internal</span>
               </div>
-              <span class="chip chip-active">Now</span>
             </li>
-          </ol>
+
+            <li class="wf-row wf-row-active">
+              <span class="wf-flag wf-flag-mute" aria-label="Standard priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Draft reply ready &mdash; needs review</span>
+                <span class="wf-row-meta">Sarah J. &middot; viewing request &middot; 10:38</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-tenant">Tenant</span>
+                <span class="status status-new">Awaiting review</span>
+                <span class="wf-owner">Alex &middot; internal</span>
+              </div>
+            </li>
+
+            <li class="wf-row">
+              <span class="wf-flag wf-flag-mute" aria-hidden="true"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Landlord document request</span>
+                <span class="wf-row-meta">Mr Khan &middot; statement Q4 &middot; 09:02</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-landlord">Admin</span>
+                <span class="status status-progress">In progress</span>
+                <span class="wf-owner">Maria &middot; internal</span>
+              </div>
+            </li>
+
+            <li class="wf-row wf-row-faded">
+              <span class="wf-flag wf-flag-mute" aria-hidden="true"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Boiler repair &mdash; awaiting update</span>
+                <span class="wf-row-meta">Mrs Patel &middot; SLA in 2h &middot; 08:21</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-maint">Maintenance</span>
+                <span class="status status-followup">Awaiting reply</span>
+                <span class="wf-owner">Sparkright Ltd</span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="wf-progress" aria-hidden="true">
+            <span class="wf-prog-step is-done">Inbox <strong>17</strong></span>
+            <span class="wf-prog-arrow">&rsaquo;</span>
+            <span class="wf-prog-step is-done">Assigned <strong>14</strong></span>
+            <span class="wf-prog-arrow">&rsaquo;</span>
+            <span class="wf-prog-step is-active">Reply drafted <strong>9</strong></span>
+          </div>
 
           <footer class="wf-foot">
             <span class="wf-stat"><strong>38s</strong><span>inbox &rarr; assigned</span></span>
             <span class="wf-stat"><strong>0</strong><span>overdue</span></span>
           </footer>
         </aside>
+      </div>
+    </section>
+
+    <!-- BUILT FOR PROPERTY WORKFLOWS (intro) -->
+    <section class="section section-tight section-intro" id="intro" aria-label="Built for property workflows">
+      <div class="container">
+        <div class="intro-head reveal">
+          <span class="section-marker">&sect; 00 &mdash; Built for property workflows</span>
+          <h2 class="h-supporting">A single operational layer for the work that lives between your CRM, your inbox and your contractors.</h2>
+        </div>
+        <div class="intro-grid reveal">
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">01</span>
+            <h3>Enquiries</h3>
+            <p>Turn tenant, landlord and applicant messages into tracked tasks &mdash; categorised, owned and replied to.</p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">02</span>
+            <h3>Maintenance</h3>
+            <p>Route issues to the right person or contractor company with status visibility from report to resolution.</p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">03</span>
+            <h3>Follow-ups</h3>
+            <p>Keep viewings, documents and landlord admin from slipping &mdash; reminders run on a schedule, not on memory.</p>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -180,12 +249,12 @@
       </div>
     </section>
 
-    <!-- WHAT I AUTOMATE -->
-    <section class="section section-alt" id="automate">
+    <!-- WORKFLOWS -->
+    <section class="section section-alt" id="workflows">
       <div class="container">
         <div class="section-head-compact reveal">
-          <span class="section-marker">&sect; 02 &mdash; What I do</span>
-          <h2>Workflows that quietly remove most of the admin from a small property team.</h2>
+          <span class="section-marker">&sect; 02 &mdash; Workflows</span>
+          <h2>Six workflows that cover the operational work a small property team does every day.</h2>
         </div>
 
         <div class="grid grid-3 grid-tight">
@@ -246,6 +315,25 @@
       </div>
     </section>
 
+    <!-- DIFFERENTIATION -->
+    <section class="section section-tight section-diff" id="differs" aria-label="Where this fits">
+      <div class="container">
+        <div class="diff-grid reveal">
+          <div class="diff-copy">
+            <span class="section-marker">&sect; 02b &mdash; Where this fits</span>
+            <h2 class="h-supporting">Not another full property management system.</h2>
+            <p>This isn&rsquo;t trying to replace your CRM or your accounting software. It sits between your inbox, your spreadsheets, your team and your contractors &mdash; handling the operational work that usually gets lost.</p>
+          </div>
+          <ul class="diff-list">
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not as heavy as a full PMS</strong><span>You keep Arthur, Re-Leased or whatever you use for tenancies and ledgers.</span></div></li>
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not only maintenance</strong><span>Fixflo handles repairs. This handles every category, including viewings, landlord admin and follow-ups.</span></div></li>
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not a generic shared inbox</strong><span>Front and Help Scout aren&rsquo;t shaped for properties, contractors or SLAs.</span></div></li>
+            <li><span class="diff-plus" aria-hidden="true">+</span><div><strong>Built specifically around property team workflows</strong><span>Roles, contractor companies, categories and SLAs are the primitives &mdash; not bolt-ons.</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <!-- PROOF STRIP -->
     <section class="proof-strip-wrap" aria-label="Built around real property workflows">
       <div class="container">
@@ -295,10 +383,10 @@
 
             <!-- TODO: when you have a hosted live demo, replace href with that URL and change copy to "Open the live demo" -->
             <a class="btn btn-primary" href="#contact">
-              Walk me through it
+              Book a 15-minute walkthrough
               <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <p class="demo-foot">Free 15-min call. No deck.</p>
+            <p class="demo-foot">Live walkthrough &middot; no deck, no proposal cycle.</p>
           </div>
 
           <div class="demo-visual" aria-hidden="true">
@@ -366,8 +454,8 @@
     <section class="section section-tight section-alt" id="how">
       <div class="container">
         <div class="section-head-compact reveal">
-          <span class="section-marker">&sect; 04 &mdash; How we&rsquo;d work</span>
-          <h2 class="h-supporting">One bottleneck, fixed well in a fortnight. Then your team decides what&rsquo;s next.</h2>
+          <span class="section-marker">&sect; 04 &mdash; How rollout works</span>
+          <h2 class="h-supporting">Live on one workflow in a fortnight. Your team adds the rest at their own pace.</h2>
         </div>
 
         <div class="process-wrap reveal is-open">
@@ -401,11 +489,11 @@
 
           <div class="ps-detail-panel" id="ps-detail" role="region" aria-live="polite">
             <div class="ps-detail-inner">
-              <p data-detail="1">A short call to find where admin hurts most.</p>
-              <p data-detail="2" hidden>Document how the work actually moves today.</p>
-              <p data-detail="3" hidden>The smallest workflow that solves the problem.</p>
-              <p data-detail="4" hidden>Run it on real enquiries and real jobs.</p>
-              <p data-detail="5" hidden>Tweaks, short docs, and your team takes it on.</p>
+              <p data-detail="1">A short call to find which workflow is costing your team the most time.</p>
+              <p data-detail="2" hidden>Map how that work moves through your inbox, team and contractors today.</p>
+              <p data-detail="3" hidden>Configure the workflow &mdash; categories, owners, contractor companies, SLAs.</p>
+              <p data-detail="4" hidden>Run it on real enquiries and real jobs alongside your existing tools.</p>
+              <p data-detail="5" hidden>Your team owns it day-to-day. Add the next workflow whenever you&rsquo;re ready.</p>
             </div>
           </div>
         </div>
@@ -417,12 +505,12 @@
       <div class="container">
         <div class="contact-card reveal">
           <p class="eyebrow">&sect; 05 &mdash; Next step</p>
-          <h2>Send me one bottleneck. I&rsquo;ll tell you within a week if it&rsquo;s worth automating.</h2>
-          <p>One short reply. No deck, no proposal cycle &mdash; just a clear yes, no, or where to start.</p>
+          <h2>Book a 15-minute walkthrough on your real workflow.</h2>
+          <p>Tell us the workflow that&rsquo;s costing your team the most time. We&rsquo;ll show you, on a live board, exactly how it would run &mdash; no deck, no proposal cycle.</p>
 
           <div class="contact-actions">
             <!-- TODO: replace email below (used in both href and visible label) -->
-            <a class="btn btn-primary contact-cta" href="mailto:your@email.com?subject=Workflow%20bottleneck">
+            <a class="btn btn-primary contact-cta" href="mailto:your@email.com?subject=Walkthrough%20request">
               <span class="contact-cta-stack">
                 <span class="contact-cta-kicker">Email</span>
                 <span class="contact-cta-addr">your@email.com</span>
@@ -444,7 +532,7 @@
     <div class="container footer-inner">
       <div>
         <p class="footer-brand">Property Workflow Co.</p>
-        <p class="footer-tag">Workflow automation for small UK property businesses. Less admin. Faster follow-ups. Clearer visibility.</p>
+        <p class="footer-tag">Property workflow software for small UK estate and letting agents. One system for enquiries, maintenance, viewings and follow-ups.</p>
       </div>
       <div class="footer-links">
         <!-- TODO: replace email -->

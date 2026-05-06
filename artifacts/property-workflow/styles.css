@@ -1951,3 +1951,319 @@ em, i, blockquote {
   color: var(--muted);
   letter-spacing: 0.02em;
 }
+
+/* ========================================================
+   Landing-page additions: SaaS-style positioning
+   ======================================================== */
+
+/* ---------- Hero credibility line ---------- */
+.cred-line {
+  margin: 1.25rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--muted);
+  letter-spacing: 0.005em;
+  line-height: 1.5;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  max-width: 56ch;
+}
+.cred-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47,107,83,0.15);
+  flex: 0 0 auto;
+}
+
+/* ---------- Hero workflow card: live-queue rows ---------- */
+.wf-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.wf-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.78rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.wf-row:last-child { border-bottom: none; }
+.wf-row-faded { opacity: 0.7; }
+
+.wf-flag {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b3402b;
+  align-self: center;
+  margin-top: 1px;
+}
+.wf-flag-amber { background: #c98a2b; }
+.wf-flag-mute  { background: var(--rule-strong); }
+
+.wf-row-priority {
+  background: linear-gradient(90deg, rgba(179,64,43,0.05), transparent 60%);
+}
+.wf-row-active {
+  background: linear-gradient(90deg, rgba(47,107,83,0.06), transparent 60%);
+}
+.wf-row-active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent);
+}
+
+.wf-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.wf-row-title {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+}
+.wf-row-meta {
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-feature-settings: "tnum" 1;
+  line-height: 1.35;
+}
+
+.wf-row-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.22rem;
+  text-align: right;
+  white-space: nowrap;
+}
+.wf-row-side .chip,
+.wf-row-side .status {
+  font-size: 0.62rem;
+  padding: 0.18rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+.wf-owner {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* status pills (re-used + added so the hero card is self-contained) */
+.status {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.status-new       { background: #eef1ec; color: #2c4035; border-color: #d8ddd2; }
+.status-progress  { background: #e1ece4; color: #214f3d; border-color: #cadccf; }
+.status-followup  { background: #f5e7d3; color: #7a4515; border-color: #e3d2b6; }
+.status-done      { background: rgba(28,42,37,0.05); color: var(--muted); border-color: var(--rule); }
+
+/* progress strip (Inbox > Assigned > Reply drafted) */
+.wf-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.1rem;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+.wf-prog-step {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  color: var(--muted);
+}
+.wf-prog-step strong {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0;
+  text-transform: none;
+  font-feature-settings: "tnum" 1;
+}
+.wf-prog-step.is-done strong { color: var(--ink); }
+.wf-prog-step.is-active { color: var(--accent-strong); }
+.wf-prog-step.is-active strong { color: var(--accent-strong); }
+.wf-prog-arrow {
+  color: var(--rule-strong);
+  font-size: 0.95rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .wf-row { grid-template-columns: 6px 1fr; }
+  .wf-row-side { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; grid-column: 2; }
+  .wf-row-side .wf-owner { width: 100%; }
+}
+
+/* ---------- "Built for property workflows" intro section ---------- */
+.section-intro {
+  padding-top: clamp(2.5rem, 4.5vw, 4rem);
+  padding-bottom: clamp(2.75rem, 5vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.intro-head {
+  max-width: 62ch;
+  margin: 0 0 2.25rem;
+}
+.intro-head .section-marker { display: block; margin-bottom: 0.75rem; }
+.intro-head h2 { margin: 0; }
+
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--rule-strong);
+}
+.intro-card {
+  padding: 1.6rem 1.6rem 1.4rem;
+  border-right: 1px solid var(--rule);
+  position: relative;
+  transition: background 0.18s ease;
+}
+.intro-card:last-child { border-right: none; }
+.intro-card:hover { background: rgba(28,42,37,0.025); }
+
+.intro-num {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--accent-strong);
+  text-transform: none;
+  margin-bottom: 0.6rem;
+  display: inline-block;
+  font-feature-settings: "tnum" 1;
+}
+.intro-card h3 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+  font-variation-settings: "opsz" 60;
+}
+.intro-card p {
+  font-size: 0.94rem;
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  max-width: 36ch;
+}
+
+@media (max-width: 880px) {
+  .intro-grid { grid-template-columns: 1fr; }
+  .intro-card { border-right: none; border-bottom: 1px solid var(--rule); }
+  .intro-card:last-child { border-bottom: none; }
+}
+
+/* ---------- Differentiation section ---------- */
+.section-diff {
+  padding-top: clamp(3.5rem, 6vw, 5.5rem);
+  padding-bottom: clamp(3.5rem, 6vw, 5.5rem);
+}
+.diff-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+.diff-copy { max-width: 38ch; }
+.diff-copy .section-marker { display: block; margin-bottom: 0.85rem; }
+.diff-copy h2 { margin: 0 0 1rem; max-width: 22ch; }
+.diff-copy p { margin: 0; font-size: 1rem; color: var(--ink-soft); line-height: 1.6; }
+
+.diff-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+.diff-list li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  gap: 0.85rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.diff-list li:last-child { border-bottom: none; }
+.diff-list strong {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.005em;
+}
+.diff-list span {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.diff-x, .diff-plus {
+  display: inline-grid;
+  place-items: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.diff-x {
+  background: rgba(28,42,37,0.05);
+  color: var(--muted);
+  border: 1px solid var(--rule);
+}
+.diff-plus {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent);
+}
+
+@media (max-width: 880px) {
+  .diff-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .diff-copy { max-width: none; }
+}

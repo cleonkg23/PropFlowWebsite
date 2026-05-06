@@ -31,6 +31,8 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 ### `artifacts/property-workflow/` — marketing site
 Static HTML/CSS/JS editorial site for "Property Workflow Co." Built/served by `serve.mjs`. Cream + forest-green palette, Fraunces + Inter, hairline rules. Designed for GitHub Pages export from `dist/`.
 
+Positioned as SaaS-style product (not freelance/consultancy): hero "Handle every property request from inbox to resolution", live-queue mock in hero (`.wf-rows` with realistic tickets + `.wf-progress` Inbox › Assigned › Reply drafted strip), credibility line for UK estate/letting agents. Section flow: Hero → `#intro` (3-card "Built for property workflows" grid: Enquiries / Maintenance / Follow-ups) → `#problem` → `#workflows` (renamed from `#automate`, six workflow cards) → `#differs` (positioning vs Arthur/Fixflo/Front — "Not another full PMS") → proof strip → testimonial → `#demo` → `#how` → `#contact`. Nav: Problem / Workflows / Demo / How it works / Contact. Primary CTA "See the workflow demo", secondary "Book a 15-minute walkthrough".
+
 ### `artifacts/workflow-demo/` — FastAPI demo (Python 3.11)
 Standalone Python service that demonstrates the actual product the marketing site sells. Not registered as a workspace artifact (no Python artifact type exists), runs as a workflow on port 8000, accessible via the workflow's webview tab.
 
