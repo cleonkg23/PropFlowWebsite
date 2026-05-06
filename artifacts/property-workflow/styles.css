@@ -2421,3 +2421,121 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
 
 /* Proof honest section on plain bg */
 .section-proof-honest { background: var(--bg); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+
+/* ========================================================
+   Refinement pass 2: static workflow cards, how-list,
+   customise callout, mobile contrast
+   ======================================================== */
+
+/* Static workflow cards (no accordion toggle) */
+.automate-card-static {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.4rem 1.25rem 1.35rem;
+  cursor: default;
+}
+.automate-card-static .automate-icon {
+  margin-bottom: 0.2rem;
+}
+.automate-card-static h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ac-outcome {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* Customisation callout below workflow grid */
+.workflows-customise {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 2px solid var(--accent);
+  background: rgba(47,107,83,0.06);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+/* Always-visible How it works list */
+.how-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.how-item {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0 1.25rem;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: start;
+}
+.how-item:last-child { border-bottom: none; }
+.how-num {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding-top: 0.15rem;
+  font-style: italic;
+}
+.how-body strong {
+  display: block;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+.how-body p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* Mobile: how-list full-width */
+@media (max-width: 640px) {
+  .how-item {
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0 0.9rem;
+  }
+}
+
+/* Intro card labels — stronger contrast */
+.intro-num {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-strong) !important;
+  font-weight: 700;
+  font-family: var(--sans);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+/* Mobile: ensure intro cards text is readable */
+@media (max-width: 640px) {
+  .intro-card p {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+  .intro-num {
+    font-size: 0.7rem;
+  }
+  .workflows-customise {
+    font-size: 0.9rem;
+  }
+}
