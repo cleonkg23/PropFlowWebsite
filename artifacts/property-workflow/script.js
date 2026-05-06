@@ -81,7 +81,7 @@
           return c.classList.contains("reveal");
         });
         var idx = revealSiblings.indexOf(el);
-        var delay = Math.min(idx, 5) * 70;
+        var delay = Math.min(idx, 5) * 60;
         el.style.setProperty("--reveal-delay", delay + "ms");
       }
     });

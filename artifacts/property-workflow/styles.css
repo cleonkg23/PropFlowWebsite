@@ -2552,15 +2552,18 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
                 border-color 0.18s ease, transform 0.14s ease,
                 box-shadow 0.14s ease;
   }
-  .btn-primary:hover {
+  .btn-primary:hover,
+  .btn-primary:focus-visible {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px -6px rgba(33,79,61,0.40);
   }
-  .btn-outline:hover {
+  .btn-outline:hover,
+  .btn-outline:focus-visible {
     transform: translateY(-2px);
     box-shadow: 0 4px 14px -4px rgba(28,42,37,0.22);
   }
-  .btn-ghost:hover {
+  .btn-ghost:hover,
+  .btn-ghost:focus-visible {
     transform: translateY(-1px);
     box-shadow: 0 3px 10px -3px rgba(28,42,37,0.12);
   }
@@ -2722,4 +2725,68 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   font-size: 0.9rem;
   line-height: 1.45;
   color: rgba(244,238,216,0.85);
+}
+
+/* --- Hero incoming row: badge & owner state transition (motion-safe) --- */
+
+/* Badge wrap: overlap the two status pills in the same cell */
+.wf-badge-wrap {
+  display: inline-grid;
+  position: relative;
+}
+.wf-badge-state {
+  grid-area: 1 / 1;
+}
+
+/* Owner name stack */
+.wf-owner-state {
+  display: inline-grid;
+}
+.wf-owner-state > * {
+  grid-area: 1 / 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Timing matched to parent 9s wf-row-arrive loop:
+     0–9%  : row sliding in → both show "New/Unassigned"
+     9–44% : row fully visible → New badge / Unassigned visible
+     44–50%: crossfade New → Assigned
+     50–70%: Assigned badge / owner visible
+     70–80%: row fading out (all fade with parent opacity)
+  */
+
+  /* "New" badge — visible 0→44%, fade out by 50% */
+  .wf-badge-new {
+    animation: wf-badge-new-anim 9s cubic-bezier(0.4,0,0.2,1) infinite;
+  }
+  @keyframes wf-badge-new-anim {
+    0%   { opacity: 1; }
+    44%  { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  /* "Assigned" badge — hidden until 44%, visible by 50% */
+  .wf-badge-assigned {
+    animation: wf-badge-assigned-anim 9s cubic-bezier(0.4,0,0.2,1) infinite;
+    opacity: 0;
+  }
+  @keyframes wf-badge-assigned-anim {
+    0%   { opacity: 0; }
+    44%  { opacity: 0; }
+    50%  { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* "Unassigned" owner label mirrors the New badge timing */
+  .wf-owner-unassigned {
+    animation: wf-badge-new-anim 9s cubic-bezier(0.4,0,0.2,1) infinite;
+  }
+
+  /* "Acme Heating" owner label mirrors the Assigned badge timing */
+  .wf-owner-assigned {
+    animation: wf-badge-assigned-anim 9s cubic-bezier(0.4,0,0.2,1) infinite;
+    opacity: 0;
+  }
 }
