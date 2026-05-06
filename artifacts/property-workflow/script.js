@@ -98,58 +98,6 @@
     });
   }
 
-  // --- "What I do" cards: click-to-pin disclosure ---
-  // (CSS handles hover-preview on desktop. JS only manages the persistent open state.)
-  var acToggles = document.querySelectorAll(".ac-toggle");
-  acToggles.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var card = btn.closest(".automate-card");
-      if (!card) return;
-      var bodyId = btn.getAttribute("aria-controls");
-      var body = bodyId ? document.getElementById(bodyId) : null;
-      var isOpen = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", isOpen ? "false" : "true");
-      card.classList.toggle("is-open", !isOpen);
-      if (body) {
-        if (isOpen) body.setAttribute("hidden", "");
-        else body.removeAttribute("hidden");
-      }
-    });
-  });
-
-  // --- Process strip: single-open accordion with shared panel ---
-  var psSteps = document.querySelectorAll(".ps-step");
-  var psWrap = document.querySelector(".process-wrap");
-  var psPanel = document.getElementById("ps-detail");
-  var psDetails = psPanel ? psPanel.querySelectorAll("[data-detail]") : [];
-
-  function showPsDetail(stepNum) {
-    psDetails.forEach(function (p) {
-      if (p.getAttribute("data-detail") === stepNum) {
-        p.removeAttribute("hidden");
-      } else {
-        p.setAttribute("hidden", "");
-      }
-    });
-  }
-
-  psSteps.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var step = btn.getAttribute("data-step");
-      var isOpen = btn.getAttribute("aria-expanded") === "true";
-
-      psSteps.forEach(function (b) { b.setAttribute("aria-expanded", "false"); });
-
-      if (isOpen) {
-        if (psWrap) psWrap.classList.remove("is-open");
-      } else {
-        btn.setAttribute("aria-expanded", "true");
-        showPsDetail(step);
-        if (psWrap) psWrap.classList.add("is-open");
-      }
-    });
-  });
-
   // --- Footer year ---
   var year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
