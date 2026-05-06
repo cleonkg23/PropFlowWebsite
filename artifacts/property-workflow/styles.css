@@ -205,36 +205,27 @@ ul, ol { margin: 0; padding: 0; }
 
 .brand {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  color: var(--ink);
+  align-items: center;
   text-decoration: none;
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 1.18rem;
-  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
-.brand:hover { color: var(--accent-strong); text-decoration: none; }
+.brand:hover { opacity: 0.85; text-decoration: none; }
 
-.brand-mark {
-  width: 14px;
-  height: 14px;
-  background: var(--accent);
-  display: inline-block;
-  position: relative;
-  top: 1px;
-  transform: rotate(45deg);
+.brand-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+  /* prevent the image inheriting img max-width:100% shrinking it on narrow viewports */
+  max-width: none;
 }
 
-.brand-suffix {
-  font-family: var(--sans);
-  font-weight: 400;
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-left: 0.5rem;
-  align-self: center;
+.footer-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+  margin-bottom: 0.6rem;
+  /* slight opacity so it sits comfortably against the cream bg */
+  opacity: 0.92;
 }
 
 .primary-nav {
