@@ -218,6 +218,7 @@ ul, ol { margin: 0; padding: 0; }
   display: block;
   max-width: none;
   flex-shrink: 0;
+  mix-blend-mode: multiply;
 }
 
 .brand-wordmark {
@@ -247,6 +248,7 @@ ul, ol { margin: 0; padding: 0; }
   display: block;
   max-width: none;
   flex-shrink: 0;
+  mix-blend-mode: multiply;
 }
 
 .footer-brand-wordmark {
