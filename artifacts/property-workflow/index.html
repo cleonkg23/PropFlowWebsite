@@ -398,24 +398,24 @@
           <div class="demo-visual" aria-hidden="true">
 
             <!-- View tabs -->
-            <div class="demo-tabs" role="tablist" aria-label="Mock view">
-              <button class="demo-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
-              <button class="demo-tab" data-view="detail" role="tab" aria-selected="false">Item detail</button>
+            <div class="mock-tabs" role="tablist" aria-label="Mock view">
+              <button class="mock-tab is-active" data-view="dashboard" role="tab" aria-selected="true">Dashboard</button>
+              <button class="mock-tab" data-view="detail" role="tab" aria-selected="false">Item detail</button>
             </div>
 
             <!-- ===== DASHBOARD VIEW ===== -->
             <div class="mock-window" id="demo-view-dashboard">
               <div class="mock-bar">
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                <span class="label">Dashboard &mdash; today</span>
+                <span class="label">Workflow &mdash; Today</span>
               </div>
 
-              <!-- Summary stats row -->
+              <!-- Summary stats row (matches .summary in real app) -->
               <div class="mock-summary">
                 <div class="mock-stat">
                   <span class="stat-label">Open</span>
                   <span class="stat-value">12</span>
-                  <span class="stat-trend">&minus;3 since yesterday</span>
+                  <span class="stat-trend">2 need attention &rarr;</span>
                 </div>
                 <div class="mock-stat">
                   <span class="stat-label">Overdue</span>
@@ -423,91 +423,186 @@
                   <span class="stat-trend is-warn">Action needed</span>
                 </div>
                 <div class="mock-stat">
-                  <span class="stat-label">My items</span>
-                  <span class="stat-value">3</span>
-                  <span class="stat-trend">assigned to me</span>
+                  <span class="stat-label">Avg. response</span>
+                  <span class="stat-value">38m</span>
+                  <span class="stat-trend">4 resolved today</span>
                 </div>
               </div>
 
-              <!-- Filter pills -->
-              <div class="mock-filters">
-                <span class="mock-pill is-active">All <span class="mock-pill-count">12</span></span>
-                <span class="mock-pill">New <span class="mock-pill-count">4</span></span>
-                <span class="mock-pill">In progress <span class="mock-pill-count">6</span></span>
-                <span class="mock-pill">Awaiting reply <span class="mock-pill-count">2</span></span>
+              <!-- Filter bar: search + Mine / Overdue / New / In progress / Awaiting reply -->
+              <div class="mock-filter-bar">
+                <div class="mock-search-wrap">
+                  <input class="mock-search-q" type="text" placeholder="Search subject or sender&hellip;" readonly tabindex="-1">
+                </div>
+                <span class="mock-filter-pill is-on">Mine</span>
+                <span class="mock-filter-pill">Overdue</span>
+                <span class="mock-filter-pill">New</span>
+                <span class="mock-filter-pill">In progress</span>
+                <span class="mock-filter-pill">Awaiting reply</span>
               </div>
 
-              <!-- Items table -->
+              <!-- Items table (matches .items-table / .items-row in real app) -->
               <div class="mock-items-table">
                 <div class="mock-items-head">
                   <span>Item</span><span>Type</span><span>Status</span><span></span>
                 </div>
 
-                <!-- Row 1: overdue, maintenance, me -->
-                <div class="mock-irow mock-irow-overdue" id="mock-detail-trigger" title="Click to see item detail &rarr;">
+                <!-- Row 1: overdue, maintenance, action-needed me-pill -->
+                <div class="mock-irow mock-irow-overdue" id="mock-detail-trigger" title="Click to see item detail">
                   <div class="mock-iname">
-                    <strong>Boiler fault &mdash; Flat 12A <span class="mock-me-pill">Me</span></strong>
-                    <small>Mrs Ahmed &middot; Maintenance &middot; 09:14</small>
+                    <strong>Boiler fault &mdash; Flat 12A</strong>
+                    <small>Mrs Ahmed &middot; received 09:14
+                      &middot; <span class="mock-owner-init init-a" title="Maria A.">M</span> Maria A.
+                      &middot; <span class="mock-due-chip mock-due-overdue">Overdue &middot; was due Mon 13:14</span>
+                    </small>
                   </div>
                   <span class="chip chip-maint">Maintenance</span>
                   <div class="mock-irow-status">
-                    <span class="mock-due-chip mock-due-overdue">Overdue</span>
                     <span class="status status-progress">In progress</span>
+                    <span class="mock-me-pill"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>&nbsp;Action needed</span>
                   </div>
-                  <div class="mock-irow-arrow"><span class="mock-owner-init init-a">MA</span> &rsaquo;</div>
+                  <span class="mock-irow-arrow">&rarr;</span>
                 </div>
 
                 <!-- Row 2: viewing, new, due soon -->
                 <div class="mock-irow">
                   <div class="mock-iname">
-                    <strong>Viewing follow-up &mdash; 14 Park Rd</strong>
-                    <small>James W. &middot; Viewing &middot; due 14:00</small>
+                    <strong>Viewing follow-up &mdash; 14 Park Road</strong>
+                    <small>James W. &middot; received 08:52
+                      &middot; <span class="mock-owner-init init-p" title="Priya R.">P</span> Priya R.
+                      &middot; <span class="mock-due-chip mock-due-soon">Due in &lt;2h</span>
+                    </small>
                   </div>
                   <span class="chip chip-viewing">Viewing</span>
                   <div class="mock-irow-status">
-                    <span class="mock-due-chip mock-due-soon">Due 14:00</span>
                     <span class="status status-new">New</span>
                   </div>
-                  <div class="mock-irow-arrow"><span class="mock-owner-init init-p">PR</span> &rsaquo;</div>
+                  <span class="mock-irow-arrow">&rarr;</span>
                 </div>
 
-                <!-- Row 3: tenant, awaiting reply -->
+                <!-- Row 3: maintenance, awaiting reply, contractor assigned -->
                 <div class="mock-irow">
                   <div class="mock-iname">
                     <strong>Leaking tap &mdash; Flat 3B Oak House</strong>
-                    <small>Contractor assigned &middot; SLA 2h remaining</small>
+                    <small>Mr Okafor &middot; received 09:02
+                      &middot; <span class="mock-owner-init init-a" title="Alex C.">A</span> Alex C.
+                    </small>
                   </div>
                   <span class="chip chip-maint">Maintenance</span>
                   <div class="mock-irow-status">
                     <span class="status status-followup">Awaiting reply</span>
                   </div>
-                  <div class="mock-irow-arrow"><span class="mock-owner-init init-a">AC</span> &rsaquo;</div>
+                  <span class="mock-irow-arrow">&rarr;</span>
                 </div>
 
                 <!-- Row 4: landlord, in progress -->
                 <div class="mock-irow">
                   <div class="mock-iname">
                     <strong>Landlord statement Q4 &mdash; Mr Khan</strong>
-                    <small>Admin &middot; received 09:02</small>
+                    <small>Admin &middot; received 09:02
+                      &middot; <span class="mock-owner-init init-m" title="Maria R.">M</span> Maria R.
+                    </small>
                   </div>
                   <span class="chip chip-landlord">Landlord</span>
                   <div class="mock-irow-status">
                     <span class="status status-progress">In progress</span>
                   </div>
-                  <div class="mock-irow-arrow"><span class="mock-owner-init init-m">MR</span> &rsaquo;</div>
+                  <span class="mock-irow-arrow">&rarr;</span>
                 </div>
 
                 <!-- Row 5: tenant, new -->
                 <div class="mock-irow">
                   <div class="mock-iname">
                     <strong>Reference chase &mdash; Sarah J.</strong>
-                    <small>Tenant &middot; reminder 2 of 3 &middot; 10:38</small>
+                    <small>Tenant &middot; received 10:38
+                      &middot; <span class="mock-owner-init init-p" title="Alex L.">A</span> Alex L.
+                    </small>
                   </div>
                   <span class="chip chip-tenant">Tenant</span>
                   <div class="mock-irow-status">
                     <span class="status status-new">New</span>
                   </div>
-                  <div class="mock-irow-arrow"><span class="mock-owner-init init-p">AL</span> &rsaquo;</div>
+                  <span class="mock-irow-arrow">&rarr;</span>
+                </div>
+              </div>
+
+              <!-- Board strip (matches .board-strip / .board-col in real app) -->
+              <div class="mock-board-section">
+                <div class="mock-board-label">
+                  <span>This is what your team sees every morning.</span>
+                  <span style="font-weight:400;text-transform:none;letter-spacing:0;">Status across the team</span>
+                </div>
+                <div class="mock-board-strip">
+                  <!-- New column -->
+                  <div class="mock-board-col">
+                    <div class="mock-board-col-head">
+                      <span class="mock-board-col-eyebrow">New</span>
+                      <span class="mock-board-col-count">4</span>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Reference chase &mdash; Sarah J.</strong>
+                        <span class="chip-priority-normal">normal</span>
+                      </div>
+                      <div class="mock-board-card-meta">tenant</div>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Viewing follow-up &mdash; 14 Park Rd</strong>
+                        <span class="chip-priority-high">high</span>
+                      </div>
+                      <div class="mock-board-card-meta">viewing &middot; <span class="mock-board-overdue">● overdue</span></div>
+                    </div>
+                  </div>
+                  <!-- In progress column -->
+                  <div class="mock-board-col">
+                    <div class="mock-board-col-head">
+                      <span class="mock-board-col-eyebrow">In progress</span>
+                      <span class="mock-board-col-count">5</span>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Boiler fault &mdash; Flat 12A</strong>
+                        <span class="chip-priority-high">high</span>
+                      </div>
+                      <div class="mock-board-card-meta">maintenance &middot; <span class="mock-owner-init init-a" style="font-size:0.58rem;width:18px;height:18px;line-height:18px;">M</span> &middot; <span class="mock-board-overdue">● overdue</span></div>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Landlord Q4 statement</strong>
+                        <span class="chip-priority-normal">normal</span>
+                      </div>
+                      <div class="mock-board-card-meta">landlord &middot; <span class="mock-owner-init init-m" style="font-size:0.58rem;width:18px;height:18px;line-height:18px;">M</span></div>
+                    </div>
+                  </div>
+                  <!-- Awaiting reply column -->
+                  <div class="mock-board-col">
+                    <div class="mock-board-col-head">
+                      <span class="mock-board-col-eyebrow">Awaiting reply</span>
+                      <span class="mock-board-col-count">2</span>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Leaking tap &mdash; Flat 3B</strong>
+                        <span class="chip-priority-normal">normal</span>
+                      </div>
+                      <div class="mock-board-card-meta">maintenance &middot; <span class="mock-owner-init init-a" style="font-size:0.58rem;width:18px;height:18px;line-height:18px;">A</span></div>
+                    </div>
+                  </div>
+                  <!-- Done column -->
+                  <div class="mock-board-col">
+                    <div class="mock-board-col-head">
+                      <span class="mock-board-col-eyebrow">Done</span>
+                      <span class="mock-board-col-count">4</span>
+                    </div>
+                    <div class="mock-board-card">
+                      <div class="mock-board-card-top">
+                        <strong>Gas cert &mdash; 8 Station Rd</strong>
+                        <span class="chip-priority-normal">normal</span>
+                      </div>
+                      <div class="mock-board-card-meta">landlord</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -519,87 +614,169 @@
                 <span class="label">Item #14 &mdash; Boiler fault, Flat 12A</span>
               </div>
 
-              <div class="mock-detail-back">&larr; back to today</div>
+              <!-- Back link — wired by JS to return to dashboard tab -->
+              <button class="mock-back-link" id="mock-back-link">&larr; back to today</button>
 
               <div class="mock-detail-grid">
-                <!-- LEFT: message + draft reply -->
+                <!-- LEFT col: message + dispatch + draft reply -->
                 <div class="mock-detail-left">
-                  <!-- Inbound message -->
+
+                  <!-- Inbound message card -->
                   <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">Inbound message</span>
-                    <div class="mock-d-sender">Mrs Ahmed <span style="font-size:0.8rem;color:var(--muted);font-weight:400;">&lt;s.ahmed@email.co.uk&gt;</span></div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.4rem;">
+                      <span class="mock-d-eyebrow" style="margin-bottom:0;">Inbound message</span>
+                      <span>
+                        <span class="status status-progress">In progress</span>
+                        <span style="display:inline-flex;align-items:center;gap:0.45em;padding:0.3em 0.75em;border-radius:999px;font-size:0.78rem;margin-left:0.5em;border:1px solid #f3c9c4;background:#fbe9e7;color:#9b2c2c;font-weight:600;">Overdue &middot; was due Mon 13:14</span>
+                      </span>
+                    </div>
+                    <div class="mock-d-sender">Mrs Ahmed <span style="font-size:0.82rem;color:var(--muted);font-weight:400;">&lt;s.ahmed@email.co.uk&gt;</span></div>
                     <div class="mock-d-subject">Boiler fault &mdash; no heat in Flat 12A</div>
                     <div class="mock-d-meta">
                       <span class="chip chip-maint">Maintenance</span>
-                      Received today, 09:14
+                      Received Mon 6 May, 09:14
                       &middot; Dispatched to <strong style="color:var(--ink-soft);font-weight:500;">Acme Heating</strong>
+                    </div>
+                    <!-- Property row with Open in Maps -->
+                    <div class="mock-property-row">
+                      <span class="mock-property-label">Property</span>
+                      <span class="mock-property-addr">Flat 12A, Birch Court, Manchester M4 1AB</span>
+                      <span class="mock-map-link">Open in Maps &rarr;</span>
                     </div>
                     <div class="mock-d-body">Hi, our boiler stopped working overnight and we have no heat or hot water. We have a young child at home. Please can someone come urgently? Happy to provide access any time today.</div>
                   </div>
 
-                  <!-- Draft reply -->
+                  <!-- Dispatch picker card (maintenance only, client ops) -->
+                  <div class="mock-detail-card">
+                    <span class="mock-d-eyebrow">Dispatch to contractor company</span>
+                    <div style="font-family:var(--serif);font-size:0.98rem;font-weight:500;color:var(--ink);margin:0.35rem 0 0.4rem;">Acme Heating &amp; Plumbing</div>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Pick which contractor firm should pick this up. Only that firm&rsquo;s dispatcher and crew will see the handoff.</p>
+                    <select class="mock-dispatch-select">
+                      <option>Acme Heating &amp; Plumbing</option>
+                      <option>Sparkright Electricians</option>
+                    </select>
+                    <span class="mock-btn mock-btn-ghost">Save dispatch</span>
+                  </div>
+
+                  <!-- Task & draft reply card -->
                   <div class="mock-detail-card">
                     <span class="mock-d-eyebrow">Task &amp; draft reply</span>
-                    <div style="font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin-bottom:0.35rem;">Reply prepared automatically</div>
+                    <div style="font-family:var(--serif);font-size:0.98rem;font-weight:500;color:var(--ink);margin:0.35rem 0 0.25rem;">Reply prepared automatically</div>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">Drafted from the workflow decision &mdash; ready for review.</p>
+
+                    <!-- Task inset (card-inset style) -->
+                    <div style="background:var(--bg-deep);border:1px solid var(--rule);border-radius:var(--radius);padding:0.7rem 0.85rem;margin-bottom:1.1rem;">
+                      <span class="mock-d-eyebrow" style="margin-bottom:0.2rem;color:var(--ink);">Task created</span>
+                      <div style="font-family:var(--serif);font-size:1rem;font-weight:500;margin-top:0.3rem;color:var(--ink);">Arrange urgent boiler repair — attend Flat 12A</div>
+                      <div style="font-size:0.78rem;font-style:italic;color:var(--muted);margin-top:0.2rem;">Done when: Tenant confirms heat and hot water are restored.</div>
+                      <div style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;">Assigned to <strong style="color:var(--ink-soft);font-weight:500;">Acme Heating</strong> &middot; due Mon 6 May, 13:14</div>
+                    </div>
+
+                    <!-- Draft reply label -->
                     <div style="margin-bottom:0.6rem;">
-                      <span class="mock-draft-badge">AI &middot; workflow draft</span>
+                      <span class="mock-d-eyebrow" style="color:var(--ink);display:inline;">Draft reply</span>
+                      <span style="font-size:0.86rem;color:var(--muted);"> &mdash; prepared from the workflow decision</span>
                     </div>
-                    <!-- Task inset -->
-                    <div style="background:var(--bg-deep);border:1px solid var(--rule);border-radius:var(--radius);padding:0.6rem 0.75rem;margin-bottom:0.75rem;">
-                      <span class="mock-d-eyebrow" style="margin-bottom:0.2rem;">Task created</span>
-                      <div style="font-size:0.84rem;font-weight:500;color:var(--ink);">Arrange urgent boiler repair &mdash; attend Flat 12A</div>
-                      <div style="font-size:0.74rem;color:var(--muted);margin-top:0.18rem;">Assigned to <strong style="color:var(--ink-soft);font-weight:500;">Acme Heating</strong> &middot; due by 13:14</div>
-                    </div>
-                    <!-- Draft text -->
-                    <div class="mock-draft-inset">Dear Mrs Ahmed, thank you for letting us know. We&rsquo;ve logged this as urgent and assigned Acme Heating &mdash; they&rsquo;ll be in touch within 2 hours to arrange access. We&rsquo;ll keep you updated throughout.</div>
-                    <div class="mock-draft-actions">
-                      <span class="mock-btn mock-btn-primary">Send Reply</span>
-                      <span class="mock-btn mock-btn-ghost">Edit Draft</span>
-                      <span class="mock-btn mock-btn-ghost">Regenerate</span>
+                    <div class="mock-draft-inset">Dear Mrs Ahmed, thank you for letting us know. We&rsquo;ve logged this as urgent and assigned Acme Heating &amp; Plumbing &mdash; they&rsquo;ll be in touch within 2 hours to arrange access. We&rsquo;ll keep you updated throughout. Kind regards, Acme Lettings</div>
+
+                    <!-- Send / Regenerate / Edit -->
+                    <div style="margin-top:1.1rem;padding-top:1rem;border-top:1px solid var(--rule);">
+                      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                          <span style="font-family:var(--sans);font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);">Status</span>
+                          <span class="mock-btn mock-btn-primary">Send Reply</span>
+                        </div>
+                        <span class="mock-btn mock-btn-ghost">Regenerate Draft</span>
+                      </div>
+                      <div style="margin-top:0.85rem;">
+                        <span class="mock-complete-summary">Edit Draft</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- RIGHT: actions + timeline + assignment -->
+                <!-- RIGHT col: actions + timeline + assignment + all tasks -->
                 <div class="mock-detail-right">
-                  <!-- Actions -->
+
+                  <!-- Actions card -->
                   <div class="mock-detail-card">
                     <span class="mock-d-eyebrow">Actions</span>
-                    <div class="mock-action-status">In progress</div>
-                    <div class="mock-action-btns">
+                    <div class="mock-action-status" style="margin:0.35rem 0 0.8rem;">In progress</div>
+                    <div class="mock-action-btns" style="margin-bottom:0.5rem;">
+                      <span class="mock-btn mock-btn-ghost">Acknowledge receipt</span>
                       <span class="mock-btn mock-btn-ghost">&rarr; Awaiting reply</span>
-                      <span class="mock-btn mock-btn-ghost">Mark complete</span>
+                    </div>
+                    <div class="mock-complete-details">
+                      <span class="mock-complete-summary">Mark complete</span>
                     </div>
                   </div>
 
-                  <!-- Timeline -->
-                  <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">Timeline &middot; 3 events</span>
-                    <div class="mock-timeline" style="margin-top:0.6rem;">
+                  <!-- Timeline card -->
+                  <div class="mock-detail-card" id="timeline">
+                    <span class="mock-d-eyebrow">Timeline</span>
+                    <div style="font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin:0.35rem 0 0.8rem;">3 events on this item</div>
+                    <div class="mock-timeline">
                       <div class="mock-tl-row">
-                        <span class="mock-tl-when">09:14 &middot; system</span>
+                        <span class="mock-tl-when">May 06, 09:14 &middot; <strong style="color:var(--ink-soft);font-weight:500;">system</strong></span>
                         <span class="mock-tl-what"><b>Item created</b> &mdash; via inbox</span>
                       </div>
                       <div class="mock-tl-row">
-                        <span class="mock-tl-when">09:14 &middot; system</span>
+                        <span class="mock-tl-when">May 06, 09:14 &middot; <strong style="color:var(--ink-soft);font-weight:500;">system</strong></span>
                         <span class="mock-tl-what"><b>Classified</b> &mdash; Maintenance &middot; High urgency &middot; SLA 4h</span>
                       </div>
                       <div class="mock-tl-row">
-                        <span class="mock-tl-when">09:15 &middot; Maria A.</span>
-                        <span class="mock-tl-what"><b>Dispatched</b> &mdash; Acme Heating assigned</span>
+                        <span class="mock-tl-when">May 06, 09:15 &middot; <strong style="color:var(--ink-soft);font-weight:500;">Maria A.</strong></span>
+                        <span class="mock-tl-what"><b>Dispatched</b> &mdash; Acme Heating &amp; Plumbing assigned</span>
                       </div>
                     </div>
-                    <div style="margin-top:0.75rem;">
-                      <textarea placeholder="Add a note&hellip;" style="width:100%;font:inherit;font-size:0.78rem;padding:0.45rem 0.6rem;border:1px solid var(--rule);border-radius:var(--radius);background:var(--surface);resize:none;height:3rem;color:var(--muted);"></textarea>
+                    <!-- Add note textarea -->
+                    <div style="margin-top:0.9rem;">
+                      <label style="font-family:var(--sans);font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:0.3rem;">Add a note</label>
+                      <textarea placeholder="Called the contractor, they&rsquo;re booked for 2pm." style="width:100%;box-sizing:border-box;font:inherit;font-size:0.8rem;padding:0.5rem 0.65rem;border:1px solid var(--rule);border-radius:6px;resize:vertical;min-height:3rem;background:white;color:var(--muted);" readonly></textarea>
+                      <div style="display:flex;justify-content:flex-end;margin-top:0.4rem;">
+                        <span class="mock-btn mock-btn-ghost">Post note</span>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Assignment -->
+                  <!-- Assignment card (with reassign dropdown + Save) -->
                   <div class="mock-detail-card">
                     <span class="mock-d-eyebrow">Assignment</span>
-                    <div class="mock-assign-row" style="margin-top:0.4rem;">
-                      <span class="mock-owner-init init-a">MA</span>
-                      <span>Maria A. &middot; operator</span>
+                    <div style="font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin:0.35rem 0 0.8rem;">Maria A.</div>
+                    <label style="font-family:var(--sans);font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:0.2rem;">Reassign to</label>
+                    <select class="mock-assign-select">
+                      <option>— unassigned —</option>
+                      <option selected>Maria A. (operator)</option>
+                      <option>Priya R. (operator)</option>
+                      <option>Alex C. (admin)</option>
+                    </select>
+                    <span class="mock-btn-save">Save Assignment</span>
+                  </div>
+
+                  <!-- All tasks card -->
+                  <div class="mock-detail-card">
+                    <span class="mock-d-eyebrow">All tasks</span>
+                    <div style="font-family:var(--serif);font-size:0.95rem;font-weight:500;color:var(--ink);margin:0.35rem 0 0.8rem;">2 on this item</div>
+                    <!-- Task 1: open contractor task -->
+                    <div class="mock-task-row">
+                      <div class="mock-task-between">
+                        <div style="min-width:0;">
+                          <div class="mock-task-name">Arrange urgent boiler repair — attend Flat 12A</div>
+                          <div class="mock-task-done-when">Done when: Tenant confirms heat restored.</div>
+                          <div class="mock-task-meta">Acme Heating &middot; due Mon 6 May, 13:14</div>
+                        </div>
+                        <span class="chip-priority-normal">open</span>
+                      </div>
+                    </div>
+                    <!-- Task 2: completed ops triage task -->
+                    <div class="mock-task-row">
+                      <div class="mock-task-between">
+                        <div style="min-width:0;">
+                          <div class="mock-task-name">Triage and dispatch boiler fault</div>
+                          <div class="mock-task-meta">Maria A. &middot; completed Mon 09:15</div>
+                        </div>
+                        <span class="chip-priority-normal">done</span>
+                      </div>
                     </div>
                   </div>
                 </div>

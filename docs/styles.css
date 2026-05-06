@@ -2798,7 +2798,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
    ======================================================== */
 
 /* --- View tabs (Dashboard / Item detail) --- */
-.demo-tabs {
+.mock-tabs {
   display: flex;
   gap: 0;
   margin-bottom: 0.85rem;
@@ -2808,7 +2808,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   width: fit-content;
 }
 
-.demo-tab {
+.mock-tab {
   font-family: var(--sans);
   font-size: 0.78rem;
   font-weight: 500;
@@ -2821,9 +2821,9 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   transition: background 0.14s ease, color 0.14s ease;
   letter-spacing: 0.01em;
 }
-.demo-tab:last-child { border-right: none; }
-.demo-tab:hover { color: var(--ink); background: var(--surface); }
-.demo-tab.is-active {
+.mock-tab:last-child { border-right: none; }
+.mock-tab:hover { color: var(--ink); background: var(--surface); }
+.mock-tab.is-active {
   background: var(--surface);
   color: var(--ink);
   font-weight: 600;
@@ -3221,3 +3221,295 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
 
 /* Stat trend colour overrides in mock */
 .mock-stat .stat-trend.is-warn { color: #9b2c2c; }
+
+/* ================================================================
+   Demo mock additions: filter bar, board strip, dispatch, all-tasks
+   ================================================================ */
+
+/* --- Filter bar (search + pill row) — matches .filter-bar in real app --- */
+.mock-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.75rem 1rem 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.mock-search-wrap {
+  flex: 1 1 12rem;
+  min-width: 9rem;
+  position: relative;
+}
+.mock-search-q {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.38rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  background: var(--surface);
+  color: var(--ink);
+  pointer-events: none;
+}
+.mock-search-q::placeholder { color: var(--muted); }
+
+.mock-filter-pill {
+  display: inline-block;
+  padding: 0.26rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+  line-height: 1.25;
+  white-space: nowrap;
+  cursor: default;
+}
+.mock-filter-pill.is-on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* --- Board strip (kanban) — matches .board-strip / .board-col in real app --- */
+.mock-board-section {
+  padding: 1rem 1rem 0.5rem;
+  border-top: 1px solid var(--rule);
+}
+.mock-board-label {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mock-board-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+  padding-bottom: 0.75rem;
+}
+.mock-board-col { display: flex; flex-direction: column; gap: 0.4rem; }
+.mock-board-col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  border-bottom: 2px solid var(--rule);
+  margin-bottom: 0.25rem;
+}
+.mock-board-col-eyebrow {
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mock-board-col-count {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+.mock-board-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.74rem;
+  cursor: default;
+}
+.mock-board-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-bottom: 0.2rem;
+}
+.mock-board-card-top strong {
+  font-weight: 500;
+  color: var(--ink);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+.mock-board-card-meta {
+  font-size: 0.68rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.mock-board-overdue {
+  color: #9b2c2c;
+  font-weight: 600;
+}
+
+/* chip-priority (normal/high) — used in board cards */
+.chip-priority-normal {
+  background: #f1f1ef; color: var(--muted); border: 1px solid var(--rule);
+  font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.38rem;
+  border-radius: 999px; white-space: nowrap;
+}
+.chip-priority-high {
+  background: #fbe9e7; color: #9b2c2c; border: 1px solid #f3c9c4;
+  font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.38rem;
+  border-radius: 999px; white-space: nowrap;
+}
+
+/* --- Property row (Open in Maps) --- */
+.mock-property-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-deep);
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  font-size: 0.83rem;
+}
+.mock-property-label {
+  font-family: var(--sans);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.mock-property-addr {
+  font-weight: 500;
+  color: var(--ink);
+  flex: 1;
+}
+.mock-map-link {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 0.22rem 0.55rem;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* --- Dispatch picker card --- */
+.mock-dispatch-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.38rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  background: var(--surface);
+  color: var(--ink);
+  margin-bottom: 0.55rem;
+  pointer-events: none;
+}
+
+/* --- All tasks card --- */
+.mock-task-row {
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+.mock-task-row:first-child { border-top: none; }
+.mock-task-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.mock-task-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.mock-task-done-when {
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+.mock-task-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+/* --- Assignment form (reassign dropdown + Save Assignment) --- */
+.mock-assign-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.38rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  background: var(--surface);
+  color: var(--ink);
+  margin-bottom: 0.55rem;
+  margin-top: 0.35rem;
+  pointer-events: none;
+}
+.mock-btn-save {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.38rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+/* Back link in detail view */
+.mock-back-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-deep);
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+.mock-back-link:hover { color: var(--ink); }
+
+/* Mark complete details/summary look */
+.mock-complete-details {
+  margin-top: 0.5rem;
+}
+.mock-complete-summary {
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--muted);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 0.3rem 0.65rem;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+}
