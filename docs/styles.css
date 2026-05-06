@@ -206,26 +206,56 @@ ul, ol { margin: 0; padding: 0; }
 .brand {
   display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
   text-decoration: none;
   flex-shrink: 0;
 }
-.brand:hover { opacity: 0.85; text-decoration: none; }
+.brand:hover { opacity: 0.88; text-decoration: none; }
 
-.brand-logo {
-  height: 40px;
+.brand-icon {
+  height: 42px;
   width: auto;
   display: block;
-  /* prevent the image inheriting img max-width:100% shrinking it on narrow viewports */
   max-width: none;
+  flex-shrink: 0;
 }
 
-.footer-logo {
-  height: 34px;
+.brand-wordmark {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variation-settings: "opsz" 72;
+}
+.brand-property { color: var(--ink); }
+.brand-flow     { color: var(--terracotta); }
+
+/* Footer brand */
+.footer-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  margin-bottom: 0.55rem;
+}
+.footer-brand-link:hover { opacity: 0.82; }
+
+.footer-icon {
+  height: 28px;
   width: auto;
   display: block;
-  margin-bottom: 0.6rem;
-  /* slight opacity so it sits comfortably against the cream bg */
-  opacity: 0.92;
+  max-width: none;
+  flex-shrink: 0;
+}
+
+.footer-brand-wordmark {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.08rem;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  font-variation-settings: "opsz" 72;
 }
 
 .primary-nav {
