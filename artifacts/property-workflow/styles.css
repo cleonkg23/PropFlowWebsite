@@ -2213,6 +2213,12 @@ em, i, blockquote {
 .diff-copy .section-marker { display: block; margin-bottom: 0.85rem; }
 .diff-copy h2 { margin: 0 0 1rem; max-width: 22ch; }
 .diff-copy p { margin: 0; font-size: 1rem; color: var(--ink-soft); line-height: 1.6; }
+.diff-copy p + p { margin-top: 0.75rem; }
+.diff-tools-note {
+  font-size: 0.9rem !important;
+  color: var(--muted) !important;
+  font-style: italic;
+}
 
 .diff-list {
   list-style: none;
@@ -2245,14 +2251,17 @@ em, i, blockquote {
   line-height: 1.55;
 }
 .diff-x, .diff-plus {
-  display: inline-grid;
-  place-items: center;
-  width: 22px; height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
   border-radius: 50%;
   font-family: var(--sans);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   line-height: 1;
+  flex-shrink: 0;
+  align-self: center;
 }
 .diff-x {
   background: rgba(28,42,37,0.05);

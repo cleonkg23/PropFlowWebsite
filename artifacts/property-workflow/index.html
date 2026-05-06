@@ -73,14 +73,13 @@
         <aside class="workflow-card reveal" aria-label="Today's workflow queue">
           <header class="wf-header">
             <span class="wf-dot" aria-hidden="true"></span>
-            <span class="wf-title">Workflow &middot; Today</span>
+            <span class="wf-title">My Task List</span>
             <span class="wf-meta">Updated 10:42</span>
           </header>
 
-          <!-- Filter pill strip (static, decorative — matches real app) -->
           <div class="wf-filter-pills" aria-hidden="true">
-            <span class="wf-filter-pill">Mine</span>
-            <span class="wf-filter-pill is-on">Overdue</span>
+            <span class="wf-filter-pill is-on">Mine</span>
+            <span class="wf-filter-pill">Overdue</span>
             <span class="wf-filter-pill">New</span>
             <span class="wf-filter-pill">In progress</span>
             <span class="wf-filter-pill">Awaiting reply</span>
@@ -107,20 +106,7 @@
               <span class="wf-flag" aria-label="High priority"></span>
               <div class="wf-row-main">
                 <span class="wf-row-title">Boiler out at 14 Park Road</span>
-                <span class="wf-row-meta">Mr Patel &middot; received 18:42 &middot; <span class="owner-init" title="Maria">M</span> Maria &middot; <span class="due-chip overdue">Overdue &middot; was due Wed 06 May, 20:42</span></span>
-              </div>
-              <div class="wf-row-side">
-                <span class="chip chip-maint">Maintenance</span>
-                <span class="status status-progress">In progress</span>
-                <span class="wf-arrow">&rarr;</span>
-              </div>
-            </li>
-
-            <li class="wf-row">
-              <span class="wf-flag wf-flag-amber" aria-label="Medium priority"></span>
-              <div class="wf-row-main">
-                <span class="wf-row-title">Lights flickering 22 Elm Crescent</span>
-                <span class="wf-row-meta">Ms Deaton &middot; received 18:42 &middot; <span class="owner-init" title="Priya">P</span> Priya &middot; <span class="due-chip soon">Due Thu 20:42</span></span>
+                <span class="wf-row-meta">Mr Patel &middot; received 18:42 &middot; <span class="owner-init" title="Maria">M</span> Maria &middot; <span class="due-chip overdue">Overdue</span></span>
               </div>
               <div class="wf-row-side">
                 <span class="chip chip-maint">Maintenance</span>
@@ -138,19 +124,6 @@
               <div class="wf-row-side">
                 <span class="chip chip-viewing">Viewing</span>
                 <span class="status status-followup">Awaiting reply</span>
-                <span class="wf-arrow">&rarr;</span>
-              </div>
-            </li>
-
-            <li class="wf-row">
-              <span class="wf-flag wf-flag-mute" aria-hidden="true"></span>
-              <div class="wf-row-main">
-                <span class="wf-row-title">Q4 statement request</span>
-                <span class="wf-row-meta">Mrs Holloway &middot; received 18:42 &middot; <span class="owner-init" title="Sarah">S</span> Sarah</span>
-              </div>
-              <div class="wf-row-side">
-                <span class="chip chip-landlord">Landlord</span>
-                <span class="status status-new">New</span>
                 <span class="wf-arrow">&rarr;</span>
               </div>
             </li>
@@ -274,40 +247,70 @@
         </div>
 
         <div class="grid grid-3 grid-tight">
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Tenant and landlord messages</h3>
-            <p class="ac-outcome">Inbox email &rarr; named task with owner and draft reply. No thread digging.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-1">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="ac-name">Tenant and landlord messages</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-1" hidden><div class="ac-body-inner"><p>Inbox email &rarr; named task with owner and draft reply. No thread digging.</p></div></div>
           </article>
 
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
-            <h3>Maintenance jobs</h3>
-            <p class="ac-outcome">Repair request &rarr; task assigned to team member or contractor, tracked to completion.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-2">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
+                <span class="ac-name">Maintenance jobs</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-2" hidden><div class="ac-body-inner"><p>Repair request &rarr; task assigned to team member or contractor, tracked to completion.</p></div></div>
           </article>
 
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Viewing follow-ups</h3>
-            <p class="ac-outcome">Each viewing gets a follow-up task. The board flags it before the applicant has to chase.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-3">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="ac-name">Viewing follow-ups</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-3" hidden><div class="ac-body-inner"><p>Each viewing gets a follow-up task. The board flags it before the applicant has to chase.</p></div></div>
           </article>
 
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <h3>Document chasing</h3>
-            <p class="ac-outcome">References, ID, deposits, signed agreements &mdash; all tracked in one place until everything is in.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-4">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="ac-name">Document chasing</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-4" hidden><div class="ac-body-inner"><p>References, ID, deposits, signed agreements &mdash; all tracked in one place until everything is in.</p></div></div>
           </article>
 
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
-            <h3>Contractor updates</h3>
-            <p class="ac-outcome">Jobs waiting on a contractor are visible at a glance. No ringing around to check.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-5">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
+                <span class="ac-name">Contractor updates</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-5" hidden><div class="ac-body-inner"><p>Jobs waiting on a contractor are visible at a glance. No ringing around to check.</p></div></div>
           </article>
 
-          <article class="automate-card automate-card-static reveal">
-            <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
-            <h3>Manager visibility</h3>
-            <p class="ac-outcome">Open, overdue and completed &mdash; one view for the whole team. No status meetings needed.</p>
+          <article class="automate-card reveal">
+            <h3 class="ac-title">
+              <button class="ac-toggle" aria-expanded="false" aria-controls="ac-body-6">
+                <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+                <span class="ac-name">Manager visibility</span>
+                <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg></span>
+              </button>
+            </h3>
+            <div class="ac-body" id="ac-body-6" hidden><div class="ac-body-inner"><p>Open, overdue and completed &mdash; one view for the whole team. No status meetings needed.</p></div></div>
           </article>
         </div>
 
@@ -323,11 +326,12 @@
             <span class="section-marker">&sect; 02b &mdash; Where this fits</span>
             <h2 class="h-supporting">This does not replace your existing property software.</h2>
             <p>Keep Arthur, Re-Leased, Fixflo, Alto or whatever you use. PropertyFlow handles the work that falls between them: emails, follow-ups, contractor updates and internal handovers.</p>
+            <p class="diff-tools-note">Works alongside your existing tools &mdash; email, WhatsApp, Google Sheets, your CRM or any property management system you already rely on.</p>
           </div>
           <ul class="diff-list">
             <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Arthur / Re-Leased / Alto</strong><span>Property records, tenancies and management &mdash; keep using them.</span></div></li>
             <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Fixflo</strong><span>Maintenance reporting &mdash; keep using it. PropertyFlow handles what happens after the report.</span></div></li>
-            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Front / Help Scout</strong><span>Shared inbox &mdash; not built around properties, contractors or repair timelines.</span></div></li>
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Email, WhatsApp &amp; Google Sheets</strong><span>Still your channels of choice &mdash; PropertyFlow gives every message a task, owner and status without changing how you communicate.</span></div></li>
             <li><span class="diff-plus" aria-hidden="true">+</span><div><strong>PropertyFlow</strong><span>Turns property work into assigned tasks with draft replies, owners and status tracking. Shaped around the work small property teams already do every day.</span></div></li>
           </ul>
         </div>
@@ -399,15 +403,14 @@
             <div class="mock-window" id="demo-view-dashboard">
               <div class="mock-bar">
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                <span class="label">Workflow &mdash; Today</span>
+                <span class="label">My Task List &mdash; Today</span>
               </div>
 
-              <!-- 3-column metric strip (matches .summary in real app) -->
               <div class="mock-summary">
                 <div class="mock-stat">
                   <span class="stat-label">Open</span>
-                  <span class="stat-value">5</span>
-                  <span class="stat-trend">2 need attention &rarr;</span>
+                  <span class="stat-value">3</span>
+                  <span class="stat-trend">1 needs attention</span>
                 </div>
                 <div class="mock-stat">
                   <span class="stat-label">Overdue</span>
@@ -416,73 +419,20 @@
                 </div>
                 <div class="mock-stat">
                   <span class="stat-label">Avg. response</span>
-                  <span class="stat-value">0m</span>
+                  <span class="stat-value">38m</span>
                   <span class="stat-trend">1 resolved today</span>
                 </div>
               </div>
 
-              <!-- Filter bar: search + Mine / Overdue / New / In progress / Awaiting reply -->
-              <div class="mock-filter-bar">
-                <div class="mock-search-wrap">
-                  <input class="mock-search-q" type="text" placeholder="Search subject or sender&hellip;" readonly tabindex="-1">
-                </div>
-                <span class="mock-filter-pill">Mine</span>
-                <span class="mock-filter-pill">Overdue</span>
-                <span class="mock-filter-pill">New</span>
-                <span class="mock-filter-pill">In progress</span>
-                <span class="mock-filter-pill">Awaiting reply</span>
-              </div>
-
-              <!-- Items table (exact spec rows) -->
               <div class="mock-items-table">
                 <div class="mock-items-head">
                   <span>Item</span><span>Type</span><span>Status</span><span></span>
                 </div>
 
-                <!-- Row 1: Q4 statement — Mrs Holloway · S Sarah · Landlord · New -->
-                <div class="mock-irow">
-                  <div class="mock-iname">
-                    <strong>Q4 statement request</strong>
-                    <small>Mrs Holloway &middot; received 18:42 &middot; <span class="mock-owner-init init-p" title="Sarah">S</span> Sarah</small>
-                  </div>
-                  <span class="chip chip-landlord">Landlord</span>
-                  <div class="mock-irow-status">
-                    <span class="status status-new">New</span>
-                  </div>
-                  <span class="mock-irow-arrow">&rarr;</span>
-                </div>
-
-                <!-- Row 2: Deposit return — Daniel Brooks · Unassigned · Overdue · Tenant · New -->
-                <div class="mock-irow mock-irow-overdue">
-                  <div class="mock-iname">
-                    <strong>Deposit return chase</strong>
-                    <small>Daniel Brooks &middot; received 18:42 &middot; <span class="mock-owner-init" style="background:#f1f1ef;color:var(--muted);" title="Unassigned">&middot;</span> Unassigned &middot; <span class="mock-due-chip mock-due-overdue">Overdue</span></small>
-                  </div>
-                  <span class="chip chip-tenant">Tenant</span>
-                  <div class="mock-irow-status">
-                    <span class="status status-new">New</span>
-                  </div>
-                  <span class="mock-irow-arrow">&rarr;</span>
-                </div>
-
-                <!-- Row 3: Lights flickering — Ms Deaton · P Priya · Due Thu 20:42 · Maintenance · In progress -->
-                <div class="mock-irow">
-                  <div class="mock-iname">
-                    <strong>Lights flickering 22 Elm Crescent</strong>
-                    <small>Ms Deaton &middot; received 18:42 &middot; <span class="mock-owner-init init-p" title="Priya">P</span> Priya &middot; <span class="mock-due-chip mock-due-soon">Due Thu 20:42</span></small>
-                  </div>
-                  <span class="chip chip-maint">Maintenance</span>
-                  <div class="mock-irow-status">
-                    <span class="status status-progress">In progress</span>
-                  </div>
-                  <span class="mock-irow-arrow">&rarr;</span>
-                </div>
-
-                <!-- Row 4: Boiler out — Mr Patel · M Maria · Overdue · Maintenance · In progress (click → detail) -->
                 <div class="mock-irow mock-irow-overdue" id="mock-detail-trigger" title="Click to see item detail">
                   <div class="mock-iname">
                     <strong>Boiler out at 14 Park Road</strong>
-                    <small>Mr Patel &middot; received 18:42 &middot; <span class="mock-owner-init init-m" title="Maria">M</span> Maria &middot; <span class="mock-due-chip mock-due-overdue">Overdue &middot; was due Wed 06 May, 20:42</span></small>
+                    <small>Mr Patel &middot; <span class="mock-owner-init init-m" title="Maria">M</span> Maria &middot; <span class="mock-due-chip mock-due-overdue">Overdue</span></small>
                   </div>
                   <span class="chip chip-maint">Maintenance</span>
                   <div class="mock-irow-status">
@@ -491,87 +441,28 @@
                   <span class="mock-irow-arrow">&rarr;</span>
                 </div>
 
-                <!-- Row 5: Viewing — James Wright · P Priya · Awaiting reply + Action needed -->
+                <div class="mock-irow">
+                  <div class="mock-iname">
+                    <strong>Lights flickering 22 Elm Crescent</strong>
+                    <small>Ms Deaton &middot; <span class="mock-owner-init init-p" title="Priya">P</span> Priya &middot; <span class="mock-due-chip mock-due-soon">Due Thu</span></small>
+                  </div>
+                  <span class="chip chip-maint">Maintenance</span>
+                  <div class="mock-irow-status">
+                    <span class="status status-progress">In progress</span>
+                  </div>
+                  <span class="mock-irow-arrow">&rarr;</span>
+                </div>
+
                 <div class="mock-irow">
                   <div class="mock-iname">
                     <strong>Re: viewing at 22 Elm</strong>
-                    <small>James Wright &middot; received 18:42 &middot; <span class="mock-owner-init init-p" title="Priya">P</span> Priya</small>
+                    <small>James Wright &middot; <span class="mock-owner-init init-p" title="Priya">P</span> Priya</small>
                   </div>
                   <span class="chip chip-viewing">Viewing</span>
                   <div class="mock-irow-status">
                     <span class="status status-followup">Awaiting reply</span>
-                    <span class="mock-me-pill"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>&nbsp;Action needed</span>
                   </div>
                   <span class="mock-irow-arrow">&rarr;</span>
-                </div>
-              </div>
-
-              <div class="mock-board-section">
-                <div class="mock-board-label">
-                  <span>This is what your team sees every morning.</span>
-                  <span class="mock-board-label-sub">Status across the team</span>
-                </div>
-                <div class="mock-board-strip">
-                  <div class="mock-board-col">
-                    <div class="mock-board-col-head">
-                      <span class="mock-board-col-eyebrow">New</span>
-                      <span class="mock-board-col-count">2</span>
-                    </div>
-                    <div class="mock-board-card">
-                      <div class="mock-board-card-top">
-                        <strong>Q4 statement request</strong>
-                        <span class="mock-chip-priority-normal">normal</span>
-                      </div>
-                      <div class="mock-board-card-meta">landlord &middot; <span class="mock-board-init">S</span></div>
-                    </div>
-                    <div class="mock-board-card">
-                      <div class="mock-board-card-top">
-                        <strong>Deposit return chase</strong>
-                        <span class="mock-chip-priority-high">high</span>
-                      </div>
-                      <div class="mock-board-card-meta">tenant &middot; <span class="mock-board-overdue">● overdue</span></div>
-                    </div>
-                  </div>
-                  <div class="mock-board-col">
-                    <div class="mock-board-col-head">
-                      <span class="mock-board-col-eyebrow">Acknowledged</span>
-                      <span class="mock-board-col-count">0</span>
-                    </div>
-                    <span class="mock-board-empty">—</span>
-                  </div>
-                  <div class="mock-board-col">
-                    <div class="mock-board-col-head">
-                      <span class="mock-board-col-eyebrow">In progress</span>
-                      <span class="mock-board-col-count">2</span>
-                    </div>
-                    <div class="mock-board-card">
-                      <div class="mock-board-card-top">
-                        <strong>Boiler out at 14 Park Rd</strong>
-                        <span class="mock-chip-priority-high">high</span>
-                      </div>
-                      <div class="mock-board-card-meta">maintenance &middot; <span class="mock-board-init">M</span> &middot; <span class="mock-board-overdue">● overdue</span></div>
-                    </div>
-                    <div class="mock-board-card">
-                      <div class="mock-board-card-top">
-                        <strong>Lights flickering 22 Elm</strong>
-                        <span class="mock-chip-priority-normal">normal</span>
-                      </div>
-                      <div class="mock-board-card-meta">maintenance &middot; <span class="mock-board-init">P</span></div>
-                    </div>
-                  </div>
-                  <div class="mock-board-col">
-                    <div class="mock-board-col-head">
-                      <span class="mock-board-col-eyebrow">Awaiting reply</span>
-                      <span class="mock-board-col-count">1</span>
-                    </div>
-                    <div class="mock-board-card">
-                      <div class="mock-board-card-top">
-                        <strong>Re: viewing at 22 Elm</strong>
-                        <span class="mock-chip-priority-normal">normal</span>
-                      </div>
-                      <div class="mock-board-card-meta">viewing &middot; <span class="mock-board-init">P</span></div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -614,41 +505,14 @@
                   </div>
 
                   <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">Dispatch to contractor company</span>
-                    <div class="mock-d-card-h2-lg">Acme Heating &amp; Plumbing</div>
-                    <p class="mock-d-card-p">Pick which contractor firm should pick this up. Only that firm&rsquo;s dispatcher and crew will see the handoff.</p>
-                    <select class="mock-dispatch-select">
-                      <option selected>Acme Heating &amp; Plumbing</option>
-                      <option>Sparkright Electricians</option>
-                    </select>
-                    <span class="mock-btn mock-btn-ghost">Save dispatch</span>
-                  </div>
-
-                  <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">Task &amp; draft reply</span>
+                    <span class="mock-d-eyebrow">Draft reply</span>
                     <div class="mock-d-card-h2-lg">Reply prepared automatically</div>
-                    <p class="mock-d-card-p-lg">Drafted from the workflow decision &mdash; ready for review.</p>
-                    <div class="mock-task-inset">
-                      <span class="mock-d-eyebrow">Task created</span>
-                      <div class="mock-task-inset-title">Triage fault and dispatch contractor</div>
-                      <div class="mock-task-inset-when">Done when: Contractor on site and tenant confirms heat is restored.</div>
-                      <div class="mock-task-inset-meta">Assigned to <strong class="mock-strong-muted">Acme Heating &amp; Plumbing</strong> &middot; due Wed 06 May, 22:42</div>
-                    </div>
-                    <div class="mock-d-draft-label-row">
-                      <span class="mock-d-eyebrow">Draft reply</span>
-                      <span class="mock-d-draft-aside"> &mdash; prepared from the workflow decision</span>
-                    </div>
-                    <div class="mock-draft-inset">Hi Mr Patel, sorry to hear that — we&rsquo;ve logged this as urgent and assigned Acme Heating &amp; Plumbing. They&rsquo;ll be in touch within 2 hours to arrange access. We&rsquo;ll keep you updated. Kind regards, Acme Lettings</div>
+                    <p class="mock-d-card-p">Ready to review and send.</p>
+                    <div class="mock-draft-inset">Hi Mr Patel, sorry to hear that — we&rsquo;ve logged this as urgent and Acme Heating &amp; Plumbing will be in touch within 2 hours to arrange access. We&rsquo;ll keep you updated. Kind regards, Acme Lettings</div>
                     <div class="mock-d-send-footer">
                       <div class="mock-d-send-row">
-                        <div class="mock-d-send-left">
-                          <span class="mock-d-send-label">Status</span>
-                          <span class="mock-btn mock-btn-primary">Send Reply</span>
-                        </div>
-                        <span class="mock-btn mock-btn-ghost">Regenerate Draft</span>
-                      </div>
-                      <div class="mock-d-edit-row">
-                        <span class="mock-complete-summary">Edit Draft</span>
+                        <span class="mock-btn mock-btn-primary">Send Reply</span>
+                        <span class="mock-btn mock-btn-ghost">Regenerate</span>
                       </div>
                     </div>
                   </div>
@@ -668,60 +532,14 @@
                   </div>
 
                   <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">Timeline</span>
-                    <div class="mock-d-card-h2">0 events on this item</div>
-                    <p class="mock-d-card-p">No events yet.</p>
-                    <label class="mock-d-field-label">Add a note</label>
-                    <textarea class="mock-d-textarea" placeholder="Called the contractor, they&rsquo;re booked for 2pm." readonly></textarea>
-                    <div class="mock-d-post-note-row">
-                      <span class="mock-btn mock-btn-ghost">Post note</span>
-                    </div>
-                  </div>
-
-                  <div class="mock-detail-card">
                     <span class="mock-d-eyebrow">Assignment</span>
                     <div class="mock-d-card-h2">Maria Operator</div>
-                    <label class="mock-d-field-label mock-d-field-label-sm">Reassign to</label>
                     <select class="mock-assign-select">
                       <option>— unassigned —</option>
-                      <option selected>Maria Operator (operator)</option>
-                      <option>Priya R. (operator)</option>
-                      <option>Alex C. (admin)</option>
+                      <option selected>Maria (operator)</option>
+                      <option>Priya (operator)</option>
                     </select>
-                    <span class="mock-btn-save">Save Assignment</span>
-                  </div>
-
-                  <div class="mock-detail-card">
-                    <span class="mock-d-eyebrow">All tasks</span>
-                    <div class="mock-d-card-h2">2 on this item</div>
-                    <div class="mock-task-row">
-                      <div class="mock-task-between">
-                        <div class="mock-task-inner">
-                          <div class="mock-task-name">Triage fault and dispatch contractor</div>
-                          <div class="mock-task-done-when">Done when: Contractor on site, tenant confirms heat restored.</div>
-                          <div class="mock-task-meta">Acme Heating &amp; Plumbing &middot; due Wed 22:42</div>
-                        </div>
-                        <span class="mock-chip-priority-normal">open</span>
-                      </div>
-                      <div class="mock-task-btns">
-                        <span class="mock-btn mock-btn-ghost mock-btn-sm">Mark task complete</span>
-                        <span class="mock-btn mock-btn-ghost mock-btn-sm">Reassign task</span>
-                      </div>
-                    </div>
-                    <div class="mock-task-row">
-                      <div class="mock-task-between">
-                        <div class="mock-task-inner">
-                          <div class="mock-task-name">Follow up with tenant after repair</div>
-                          <div class="mock-task-done-when">Done when: Tenant confirms issue resolved.</div>
-                          <div class="mock-task-meta">Maria Operator &middot; due Thu 06 May</div>
-                        </div>
-                        <span class="mock-chip-priority-normal">open</span>
-                      </div>
-                      <div class="mock-task-btns">
-                        <span class="mock-btn mock-btn-ghost mock-btn-sm">Mark task complete</span>
-                        <span class="mock-btn mock-btn-ghost mock-btn-sm">Reassign task</span>
-                      </div>
-                    </div>
+                    <span class="mock-btn-save">Save</span>
                   </div>
                 </div>
               </div>

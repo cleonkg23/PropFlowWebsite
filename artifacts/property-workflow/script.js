@@ -121,6 +121,33 @@
     });
   }
 
+  // --- Workflow card accordion (§ 02 grid) ---
+  var acToggles = document.querySelectorAll(".grid-tight .ac-toggle");
+  acToggles.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var isOpen = btn.getAttribute("aria-expanded") === "true";
+      var bodyId = btn.getAttribute("aria-controls");
+      var body   = bodyId ? document.getElementById(bodyId) : null;
+      var card   = btn.closest(".automate-card");
+
+      // Collapse all others
+      acToggles.forEach(function (other) {
+        if (other === btn) return;
+        other.setAttribute("aria-expanded", "false");
+        var otherId = other.getAttribute("aria-controls");
+        var otherBody = otherId ? document.getElementById(otherId) : null;
+        if (otherBody) otherBody.hidden = true;
+        var otherCard = other.closest(".automate-card");
+        if (otherCard) otherCard.classList.remove("is-open");
+      });
+
+      // Toggle this one
+      btn.setAttribute("aria-expanded", isOpen ? "false" : "true");
+      if (body) body.hidden = isOpen;
+      if (card) card.classList.toggle("is-open", !isOpen);
+    });
+  });
+
   // --- Demo view tabs (Dashboard / Item detail) ---
   var demoTabs = document.querySelectorAll(".mock-tab[data-view]");
   if (demoTabs.length) {
