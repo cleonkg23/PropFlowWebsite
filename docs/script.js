@@ -121,6 +121,43 @@
     });
   }
 
+  // --- Demo view tabs (Dashboard / Item detail) ---
+  var demoTabs = document.querySelectorAll(".demo-tab[data-view]");
+  if (demoTabs.length) {
+    demoTabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var view = tab.getAttribute("data-view");
+        // Update tab states
+        demoTabs.forEach(function (t) {
+          t.classList.toggle("is-active", t === tab);
+          t.setAttribute("aria-selected", t === tab ? "true" : "false");
+        });
+        // Show / hide panels
+        var dashboard = document.getElementById("demo-view-dashboard");
+        var detail    = document.getElementById("demo-view-detail");
+        if (dashboard && detail) {
+          if (view === "dashboard") {
+            dashboard.removeAttribute("hidden");
+            detail.setAttribute("hidden", "");
+          } else {
+            detail.removeAttribute("hidden");
+            dashboard.setAttribute("hidden", "");
+          }
+        }
+      });
+    });
+
+    // Clicking the first overdue row also switches to detail view
+    var detailTrigger = document.getElementById("mock-detail-trigger");
+    if (detailTrigger) {
+      detailTrigger.addEventListener("click", function () {
+        var detailTab = document.querySelector(".demo-tab[data-view='detail']");
+        if (detailTab) detailTab.click();
+      });
+      detailTrigger.style.cursor = "pointer";
+    }
+  }
+
   // --- Footer year ---
   var year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();

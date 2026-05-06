@@ -1,8 +1,20 @@
-# Workspace
+# Property Workflow Application
 
-## Overview
+A monorepo for a property workflow management application, encompassing a marketing site, a guided demo, and a multi-tenant SaaS application.
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+## Run & Operate
+
+- `pnpm run typecheck` — Type-check all packages.
+- `pnpm run build` — Type-check and build all packages.
+- `pnpm --filter @workspace/api-spec run codegen` — Regenerate API hooks and Zod schemas from the OpenAPI spec.
+- `pnpm --filter @workspace/db run push` — Push database schema changes (development only).
+- `pnpm --filter @workspace/api-server run dev` — Run the API server locally.
+
+**Environment Variables:**
+- `PROPERTYFLOW_URL_PREFIX`: (for `artifacts/propertyflow`) Sets the URL prefix for the app when mounted.
+- `PROPERTYFLOW_DB_URL`: (for `artifacts/propertyflow`) Overrides the default SQLite database URL.
+- `PROPERTYFLOW_DEV`: (for `artifacts/propertyflow`) Enables development-specific features like test-domain bypass for authentication.
+- `SESSION_SECRET`: (for `artifacts/propertyflow`) Required for signed-cookie authentication.
 
 ## Stack
 
@@ -10,97 +22,66 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
+- **API framework**: Express 5 (for `api-server`), FastAPI (for Python apps)
+- **Database**: PostgreSQL + Drizzle ORM (Node.js), SQLAlchemy with SQLite (Python)
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **Build tool**: esbuild (CJS bundle)
+- **AI**: Ollama (local LLM)
 
-## Key Commands
+## Where things live
 
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/api-server run dev` — run API server locally
+- `pnpm-workspace.yaml`: Defines the monorepo structure.
+- `artifacts/property-workflow/`: Marketing site.
+    - `docs/`: Deployed output for GitHub Pages.
+- `artifacts/workflow-demo/`: Standalone Python FastAPI demo.
+    - `data/store.json`: JSON file persistence for the demo.
+- `artifacts/propertyflow/`: Multi-tenant FastAPI SaaS application.
+    - `app/db.py`: Database setup and session management.
+    - `app/models.py`: SQLAlchemy ORM models and schema.
+    - `app/auth.py`: Authentication logic.
+    - `app/services/ai_service.py`: AI integration for classification and draft generation.
+    - `app/services/workflow_service.py`: Core workflow engine.
+    - `templates/`: Jinja2 templates.
+    - `static/`: Static assets.
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+## Architecture decisions
 
-## Apps in this repo
+- **Multi-tenancy via FKs**: The `propertyflow` app enforces multi-tenancy by including a `tenant_id` foreign key on all operational database rows.
+- **Role-based access**: Granular role definitions (`owner`, `admin`, `operator`, `viewer`, `contractor_admin`, `contractor`) are enforced at the API and UI level.
+- **Local-first AI with graceful degradation**: The `propertyflow` app uses a local Ollama instance for AI classification and draft generation, silently falling back to deterministic keyword rules if the AI service is unavailable or fails.
+- **Prefix-aware FastAPI app**: The `propertyflow` app uses custom middleware to dynamically adjust URLs (`href`, `src`, `action`, `Location` headers) when deployed under a URL prefix, ensuring correct routing without hardcoding paths.
+- **Single-use magic links**: Authentication in `propertyflow` uses single-use magic links with nonce rotation to prevent token reuse and enhance security.
 
-### `artifacts/property-workflow/` — marketing site
-Static HTML/CSS/JS editorial site for "Property Workflow Co." Built/served by `serve.mjs`. Cream + forest-green palette, Fraunces + Inter, hairline rules. Designed for GitHub Pages export from `dist/`.
+## Product
 
-Positioned as SaaS-style product (not freelance/consultancy): hero "Handle every property request from inbox to resolution", live-queue mock in hero (`.wf-rows` with realistic tickets + `.wf-progress` Inbox › Assigned › Reply drafted strip), credibility line for UK estate/letting agents. Section flow: Hero → `#intro` (3-card "Built for property workflows" grid: Enquiries / Maintenance / Follow-ups) → `#problem` → `#workflows` (renamed from `#automate`, six workflow cards) → `#differs` (positioning vs Arthur/Fixflo/Front — "Not another full PMS") → proof strip → testimonial → `#demo` → `#how` → `#contact`. Nav: Problem / Workflows / Demo / How it works / Contact. Primary CTA "See the workflow demo", secondary "Book a 15-minute walkthrough".
+- A marketing website for "Property Workflow Co." showcasing product features.
+- A guided, interactive demo of the property workflow system.
+- A multi-tenant SaaS application for managing property requests and workflows, featuring:
+    - User authentication and role management.
+    - Item ingestion, classification, and assignment.
+    - AI-powered draft response generation.
+    - Task management and status transitions.
+    - Multi-company contractor management.
+    - Admin and owner dashboards for oversight.
 
-### `artifacts/workflow-demo/` — FastAPI demo (Python 3.11)
-Standalone Python service that demonstrates the actual product the marketing site sells. Not registered as a workspace artifact (no Python artifact type exists), runs as a workflow on port 8000, accessible via the workflow's webview tab.
+## User preferences
 
-**Layered architecture per spec:**
-- `main.py` — FastAPI app, routes (`/`, `/ingest`, `/demo/{key}`, `/api/state`, `/api/reset`)
-- `workflow.py` — pure functions: `classify_input` (rules over keywords), `determine_workflow` (owner + SLA), `generate_draft_response` (templated), `create_task`, top-level `ingest()` orchestrator
-- `store.py` — JSON-file persistence at `data/store.json` with a thread lock; functions: `add_item`, `add_task`, `update_item`, `get_state`, `reset`
-- `scenarios.py` — 4 pre-baked scenarios (tenant_enquiry, maintenance, viewing, landlord_admin) + `PRESSURE_ITEMS` (chasers seeded into the inbox so the demo never starts empty)
-- `templates/index.html` + `static/app.js` — Tailwind CDN single-page UI: hero with before/after framing, 5-step indicator (Received → Classified → Assigned → Reply ready → Tracked), inbox / classification / action panels, 4-column workflow board, value caption beneath. Polls `/api/state` every 4s when idle; polling is paused during the guided flow.
+_Populate as you build_
 
-**Guided flow (the "demo story"):**
-Triggered by a scenario button. `runGuidedFlow(key)` in `app.js`:
-1. POST `/demo/{key}`, capture returned `item_id`, pull state.
-2. **Inbox** highlighted, new row flashes + scrolls into view.
-3. Sibling inbox rows dim, selected row stays prominent.
-4. **Classification** panel goes active; the four fields (category → urgency → owner → next action) reveal in sequence via `.stage` → `.stage.show`, each with a one-line "why" caption.
-5. **Task** card fades in; **draft reply** fades in after; status buttons last.
-6. **Workflow board** highlights, the new card appears in its destination column with a soft rise animation + ring.
-7. Italic value line ("Nothing gets missed…") fades in beneath the board. Section dimming clears, polling resumes.
+## Gotchas
 
-Only one flow runs at a time (`flowRunning` flag); polling skipped while a flow is active so the staged reveal isn't clobbered.
+- **Resend Email Sending**: Until a sending domain is verified with Resend, emails sent to non-test addresses will fail; in dev mode, the magic link will be surfaced inline.
+- **Ollama setup**: Ensure Ollama is installed and the `gemma3n:e4b` model is pulled for AI features to function correctly in `propertyflow`. The app will silently fall back to rules-based classification otherwise.
 
-**Endpoints:**
-- `GET /` — page
-- `GET /api/state` — full state (polled)
-- `POST /api/reset` — wipe store
-- `POST /api/seed-pressure` — idempotent: adds PRESSURE_ITEMS only if store is empty (called on first load + after reset)
-- `POST /ingest` — generic ingest `{from_name, message, property, type?}`
-- `POST /demo/{key}` — run a named scenario through ingest
-- `POST /api/items/{id}/status` — transition with validation in `workflow.update_status`
+## Pointers
 
-**Visual language:** cream `#f3eee4`, ink `#1f2a24`, forest green `#2f6b53`, rule `#dcd3c0`. Fraunces (serif headings) + Inter (UI). Tasteful animation only: fade, slide-up, soft glow ring, staggered stage reveals — no bouncing/neon/spinners. Section emphasis = `.section.active` (green ring + soft shadow) and `.section.dim` (opacity 0.42).
-
-**Extending:**
-- Swap rule-based classifier for an LLM by replacing the body of `workflow.classify_input` — nothing else changes
-- Swap JSON store for SQLite by replacing `store.py` functions; signatures stay the same
-- Add input connectors (Gmail, webhooks) by hitting `POST /ingest` with `{from_name, message, property, type?}`
-- Add a new scenario by adding an entry to `SCENARIOS` in `scenarios.py` — the guided flow code is scenario-agnostic and will pick it up automatically
-
-### `artifacts/propertyflow/` — multi-tenant FastAPI app (Python 3.11)
-Production-leaning version of the workflow-demo. Real persistence, real auth, real local AI, real role separation. Registered as a `web` artifact (id `artifacts/propertyflow`, library `previewPath="/app"`, port **8008**) so it appears in the workspace library alongside the marketing site and api-server. Because templates use root-relative URLs (`/login`, `/dashboard`, …), `app/middleware/prefix.PrefixMiddleware` transparently makes the app prefix-aware when mounted at `/app`: it sets `scope["root_path"]` so Starlette's `get_route_path` strips the prefix during routing, rewrites HTML `href`/`action`/`src`/`formaction` attributes to prepend `/app`, and rewrites `Location` headers on redirects. The middleware is enabled by `PROPERTYFLOW_URL_PREFIX=/app` (set in the artifact toml); when that env var is empty the middleware is a no-op so direct port access still works for local dev.
-
-**Layout:**
-- `app/db.py` — SQLAlchemy engine, `SessionLocal`, `Base`, `get_db()`, `init_db()`. SQLite at `data/propertyflow.db`, override via `PROPERTYFLOW_DB_URL`.
-- `app/models.py` — `Tenant`, `User` (roles: `owner|admin|operator|viewer|contractor_admin|contractor`), `Item` (status: `new|in_progress|awaiting_reply|done`, urgency: `low|medium|high`), `Task`, `AuditLog`, `ContractorCompany`. Multi-tenant by `tenant_id` FK on every operational row; `owner` users have `tenant_id = NULL` and cross tenants.
-- **Multi-company contractor model:** each tenant can register many `ContractorCompany` rows (e.g. "Acme Heating & Plumbing", "Sparkright Electricians"). `User.contractor_company_id` (nullable) ties dispatcher/contractor users to one firm; `Item.contractor_company_id` (nullable, set via `POST /items/{id}/dispatch`) records which firm an operator picked. Routing rules: (a) `workflow_service.send_reply` routes the maintenance handoff strictly to a `contractor_admin` in the item's chosen firm — if none exists the task stays unassigned rather than leaking cross-firm; tenant-wide fallback applies only when no company was picked. (b) Dashboard + `_load_item_for` show a company-bound contractor or contractor_admin only items dispatched to that exact company; undispatched items are invisible to them. (c) `POST /tasks/{id}/assign` rejects cross-company assignments and rejects dispatchers touching tickets outside their own firm. Independent users (NULL `contractor_company_id`) keep tenant-wide visibility, so legacy single-firm tenants still work. ContractorCompany CRUD lives on `/admin` for client admins only; deletion detaches users and items rather than cascading.
-- `app/auth.py` — Starlette `SessionMiddleware` signed-cookie auth keyed off `SESSION_SECRET`. Magic-link login via Resend (15-min `itsdangerous` tokens). **Single-use enforced**: each token embeds the user's current `auth_nonce`; `consume_magic_token` rotates the nonce on success, invalidating the token and any siblings. Test-domain bypass (`@test.test` → instant login) is **gated behind `PROPERTYFLOW_DEV=1`** so it cannot accidentally activate in production. Raises if `SESSION_SECRET` is missing. `current_user` (optional), `require_user`, `require_role(*roles)` deps. `owner` passes every role check.
-- `app/services/email_service.py` — Resend client; fetches API key + from_email from the Replit connector API per-send (never cached). Never logs full magic URLs/tokens (bearer credentials). On send failure: in dev mode (`PROPERTYFLOW_DEV=1`) the route surfaces the link inline; in prod it shows a generic "try again" message.
-- `app/seed.py` — runs once on first boot when DB is empty. Creates two tenants (Acme Lettings, Beech Property Group), one user per role plus a system owner, and a handful of pre-classified items + open tasks so the board never starts empty.
-- `app/services/ai_service.py` — `AIService` with `classify_item()` and `generate_draft()`. Calls local Ollama (`gemma3n:e4b`, default `http://localhost:11434`) via `httpx` non-streaming; on any failure (connection, timeout, malformed JSON) falls back to deterministic keyword rules. Returns the `mode` it used (`ollama` or `fallback`) which is recorded on the item and surfaced in the UI. `status()` is a 2s health probe used by the owner panel.
-- `app/services/workflow_service.py` — single engine. `ingest_item` runs the full pipeline (classify → assign → draft → task) inside one DB transaction and writes an audit log line. Routing rule = category → role; SLA hours = urgency → due_at offset. `update_status` enforces a transition table (`new→in_progress`, `in_progress→awaiting_reply|done`, `awaiting_reply→in_progress|done`, `done→∅`) and auto-closes open tasks on completion. `assign_user` mirrors the assignment onto the open task. `regenerate_draft` reruns the model only.
-- `app/services/connectors/` — adapter interface (`Connector` Protocol over `IngestPayload`) + `google_sheets.py` and `email_inbox.py` stubs, ready to wire real polling against the `ingest_item` entrypoint.
-- `app/routes/` —
-  - `public.py`: `/`, `/login` (GET+POST, email lookup, redirect by role), `/logout`
-  - `dashboard.py`: `/dashboard` (board grouped by status, "my open tasks", manual create form — contractors only see items they're assigned to), `/items/{id}` (subject/body, classification, draft + Regenerate, assignment dropdown, status transition buttons; contractors see a focused "Your assignment" panel and can mark their own tasks complete with a note), plus form-post handlers for status/assign/regenerate, per-task complete (`POST /tasks/{id}/complete`, auto-closes the parent item when no open tasks remain; auto-spawns a contractor handoff task when ops completes a maintenance triage), and reopen (`POST /items/{id}/reopen`, ops-only)
-  - `admin.py`: `/admin` — tenant users + recent items + tenant audit log (admin/owner only; owner without tenant falls back to first tenant)
-  - `owner.py`: `/owner` — cross-tenant counts + AI health card + system audit log (owner only)
-  - `api.py`: `POST /api/items` (JSON ingest, scoped to caller's tenant), `POST /demo/{key}` (4 demo scenarios — boiler/viewing/landlord/chase — that go through the full real pipeline)
-- `app/main.py` — FastAPI factory + `lifespan` (init_db + seed_if_empty), `SessionMiddleware`, static mount at `/static`, all routers included.
-- `templates/` — server-rendered Jinja2 with Tailwind CDN. `base.html`, `_components/{nav,board}.html`, `login.html`, `dashboard.html`, `item_detail.html`, `admin.html`, `owner.html`. Role-aware nav, status-tone badges, AI-mode badge on every item card.
-- `static/app.js` — small vanilla JS for quick-login buttons and the manual-create JSON post.
-
-**Demo logins:** `owner@propertyflow.dev`, `admin@acme.dev`, `maria@acme.dev`, `priya@acme.dev`, `viewer@acme.dev`, `admin@beech.dev`. No password — type/click and you're in.
-
-**Local AI:** Ollama is installed under `~/.local/bin/ollama` and serves on `:11434`. Model is `gemma3n:e4b` (~4.5 GB). Service is the Ollama daemon, started in the background; install/pull logs at `/tmp/ollama_setup.log`. The app uses real AI when Ollama+model are present and silently degrades to deterministic rules otherwise — the owner panel surfaces which mode is live.
-
-**Extending:**
-- Add a connector: implement `Connector.fetch_new()` (yield `IngestPayload`s), then call `workflow_service.ingest_item(...)` for each — that's the entire integration point.
-- Add a category/route: extend `ROUTING`, `NEXT_ACTION`, `CATEGORY_KEYWORDS` and the AI prompt's enum in `ai_service.py`.
-- Swap SQLite for Postgres: set `PROPERTYFLOW_DB_URL` — no other changes.
-- Magic-link auth via Resend is wired up. To send to *any* recipient (not just the Resend account owner), the user must verify a sending domain at https://resend.com/domains and set the matching `from_email` in Replit's Resend connector settings. Until then, sends to non-test emails will hit Resend's "domain not verified" error and the app falls back to showing the link inline.
+- `pnpm-workspace` skill: For workspace structure, TypeScript setup, and package details.
+- [Drizzle ORM Documentation](https://orm.drizzle.team/docs/overview)
+- [Zod Documentation](https://zod.dev/)
+- [Orval Documentation](https://orval.dev/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Starlette Documentation](https://www.starlette.io/)
+- [SQLAlchemy Documentation](https://www.sqlalchemy.org/)
+- [Ollama Documentation](https://ollama.com/)
+- [Resend API Documentation](https://resend.com/docs)
