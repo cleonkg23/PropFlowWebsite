@@ -61,10 +61,6 @@
 
           <p class="lede">PropertyFlow turns incoming emails and requests into clear tasks, draft replies and status updates &mdash; so your team can see what is open, who owns it and what needs chasing.</p>
 
-          <p class="flow-line" aria-label="Product flow">
-            <span>Email comes in</span><span class="flow-arrow" aria-hidden="true">&rarr;</span><span>Task created</span><span class="flow-arrow" aria-hidden="true">&rarr;</span><span>Owner assigned</span><span class="flow-arrow" aria-hidden="true">&rarr;</span><span>Reply drafted</span><span class="flow-arrow" aria-hidden="true">&rarr;</span><span>Status tracked</span>
-          </p>
-
           <div class="cta-row">
             <a class="btn btn-primary" href="#demo">
               See the workflow demo
@@ -73,13 +69,7 @@
             <a class="btn btn-outline" href="#contact">Book a 15-minute walkthrough</a>
           </div>
 
-          <ul class="trust-chips" aria-label="Product facts">
-            <li>Early product</li>
-            <li>Human-reviewed replies</li>
-            <li>No blind automation</li>
-            <li>Works with existing software</li>
-            <li>Built for small UK teams</li>
-          </ul>
+          <p class="cred-line"><span class="cred-dot" aria-hidden="true"></span>Built for small UK property teams using email, spreadsheets, contractors and existing CRMs.</p>
         </div>
 
         <aside class="workflow-card reveal" aria-label="Today's workflow queue">
@@ -210,7 +200,6 @@
           <div class="problem-copy">
             <p class="inline-marker"><span>&sect; 01</span> The problem</p>
             <h2 class="h-supporting">The work is not hard to understand. It is just too easy to lose.</h2>
-            <p class="urgency-line">Missed follow-ups lead to tenant chases, landlord complaints, delayed repairs and lost applicants.</p>
             <ol class="inline-list">
               <li><span class="il-num">i.</span><span class="il-body">A tenant reports a repair, then chases three days later.</span></li>
               <li><span class="il-num">ii.</span><span class="il-body">A viewing happens, but nobody follows up.</span></li>
@@ -377,7 +366,7 @@
         <div class="section-head-row">
           <span class="section-marker">&sect; 03 &mdash; The demo</span>
           <h2>See the workflow in action.</h2>
-          <p class="section-intro-line"><strong>Email comes in &rarr; Task created &rarr; Owner assigned &rarr; Reply drafted &rarr; Status tracked.</strong></p>
+          <p class="section-intro-line">Watch a property request move from email to task, owner and status.</p>
         </div>
 
         <div class="demo-card reveal">
@@ -456,19 +445,49 @@
     <!-- HOW IT WORKS -->
     <section class="section section-tight section-alt" id="how">
       <div class="container">
-        <div class="offer-grid reveal">
-          <div class="offer-copy">
-            <span class="section-marker">&sect; 04 &mdash; How it works</span>
-            <h2 class="h-supporting">Start with one workflow.</h2>
-            <p>Pick the process causing the most admin. Run it on a shared board. Add more when it is working.</p>
+        <div class="section-head-compact reveal">
+          <span class="section-marker">&sect; 04 &mdash; How it works</span>
+          <h2 class="h-supporting">How it works</h2>
+        </div>
+
+        <div class="process-wrap reveal is-open">
+          <ol class="process-strip">
+            <li><button class="ps-step" type="button" aria-expanded="true" aria-controls="ps-detail" data-step="1">
+              <span class="ps-num">01</span>
+              <span class="ps-name">Pick one messy workflow</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="2">
+              <span class="ps-num">02</span>
+              <span class="ps-name">Map how it works today</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="3">
+              <span class="ps-num">03</span>
+              <span class="ps-name">Configure the board</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="4">
+              <span class="ps-num">04</span>
+              <span class="ps-name">Run it on real work</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="5">
+              <span class="ps-num">05</span>
+              <span class="ps-name">Add more workflows later</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+          </ol>
+
+          <div class="ps-detail-panel" id="ps-detail" role="region" aria-live="polite">
+            <div class="ps-detail-inner">
+              <p data-detail="1">Choose the process causing the most admin: repairs, viewings, landlord updates or document chasing.</p>
+              <p data-detail="2" hidden>We look at where the work currently lives: inboxes, spreadsheets, WhatsApp, CRMs and contractors.</p>
+              <p data-detail="3" hidden>Set up categories, owners, statuses, reminders and draft reply templates around your real process.</p>
+              <p data-detail="4" hidden>Use it alongside your current tools before expanding it. No big switchover required.</p>
+              <p data-detail="5" hidden>Start small. Add the next workflow when the first one is working.</p>
+            </div>
           </div>
-          <ul class="offer-steps">
-            <li><span class="offer-num">1</span><span>Pick one messy process &mdash; repairs, viewing follow-ups, landlord admin or document chasing</span></li>
-            <li><span class="offer-num">2</span><span>Set up a shared board with your categories and owners</span></li>
-            <li><span class="offer-num">3</span><span>Assign owners and statuses to every open item</span></li>
-            <li><span class="offer-num">4</span><span>Add draft replies and reminders so nothing gets missed</span></li>
-            <li><span class="offer-num">5</span><span>Run it on real work &mdash; no big switchover required</span></li>
-          </ul>
         </div>
       </div>
     </section>
@@ -480,8 +499,6 @@
           <p class="eyebrow">&sect; 05 &mdash; Next step</p>
           <h2>Want to see this on your own workflow?</h2>
           <p>Pick one &mdash; repairs, viewing follow-ups, landlord updates or document chasing &mdash; and we will show you how it looks on a live board.</p>
-
-          <p class="on-the-call">On the call: pick one workflow, see the demo, map your process, decide if a pilot makes sense.</p>
 
           <div class="contact-actions">
             <!-- TODO: replace email below (used in both href and visible label) -->
