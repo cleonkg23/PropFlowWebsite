@@ -213,7 +213,7 @@ ul, ol { margin: 0; padding: 0; }
 .brand:hover { opacity: 0.88; text-decoration: none; }
 
 .brand-icon {
-  height: 42px;
+  height: 54px;
   width: auto;
   display: block;
   max-width: none;
@@ -224,8 +224,8 @@ ul, ol { margin: 0; padding: 0; }
 .brand-wordmark {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: 1.35rem;
-  letter-spacing: -0.02em;
+  font-size: 1.65rem;
+  letter-spacing: -0.025em;
   line-height: 1;
   font-variation-settings: "opsz" 72;
 }
