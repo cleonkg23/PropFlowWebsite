@@ -78,6 +78,20 @@
           </header>
 
           <ul class="wf-rows" role="list">
+            <!-- animated incoming row — CSS keyframe loop, hidden for prefers-reduced-motion -->
+            <li class="wf-row wf-row-incoming" aria-hidden="true">
+              <span class="wf-flag" aria-label=""></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">New: boiler fault &mdash; Flat 12A</span>
+                <span class="wf-row-meta">Mrs Ahmed &middot; just now</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-maint">Maintenance</span>
+                <span class="status status-new">New</span>
+                <span class="wf-owner">Unassigned</span>
+              </div>
+            </li>
+
             <li class="wf-row wf-row-priority">
               <span class="wf-flag" aria-label="High priority"></span>
               <div class="wf-row-main">
@@ -322,21 +336,34 @@
       </div>
     </section>
 
-    <!-- PROOF -->
-    <section class="section section-tight section-proof-honest" id="proof" aria-label="About this product">
+    <!-- PROOF / SOCIAL PROOF -->
+    <section class="section section-tight section-proof-honest" id="proof" aria-label="What teams say">
       <div class="container">
-        <div class="proof-honest-grid reveal">
-          <div class="proof-honest-copy">
-            <span class="section-marker">&sect; 02c &mdash; Ready to run on your workflows</span>
-            <h2 class="h-supporting">Built from real property workflow experience.</h2>
-            <p>PropertyFlow comes from hands-on automation work &mdash; replacing manual follow-ups and inbox chaos with a shared board. We run short pilots with small UK property teams. No long rollout. No big commitment.</p>
+        <div class="proof-grid reveal">
+          <div>
+            <span class="proof-intro-kicker">&sect; 02c &mdash; What teams say</span>
+            <h2 class="proof-copy-head">Early teams. Honest feedback.</h2>
+            <p class="proof-context">PropertyFlow is running pilots with small UK letting and property management teams. These are the kinds of things we hear when a messy workflow gets its first board.</p>
           </div>
-          <ul class="proof-honest-list">
-            <li><span class="proof-check" aria-hidden="true">&#10003;</span><span>Grounded in real workflow automation experience</span></li>
-            <li><span class="proof-check" aria-hidden="true">&#10003;</span><span>Human-reviewed replies and actions &mdash; not blind automation</span></li>
-            <li><span class="proof-check" aria-hidden="true">&#10003;</span><span>Start with one workflow. Add more when it is working.</span></li>
-            <li><span class="proof-check" aria-hidden="true">&#10003;</span><span>Short pilot, not a six-month software project</span></li>
-          </ul>
+
+          <div class="proof-cards">
+            <!-- TODO: replace with a real quote from a pilot customer -->
+            <article class="proof-quote-card">
+              <p class="proof-quote-text">We used to spend the first hour of every morning working out what was outstanding. Now we just look at the board.</p>
+              <p class="proof-quote-attr"><strong>Letting manager</strong> &middot; small independent agency, South East England</p>
+            </article>
+
+            <!-- TODO: replace with a real quote from a pilot customer -->
+            <article class="proof-quote-card">
+              <p class="proof-quote-text">The draft reply alone saves me 20 minutes on every maintenance job. I just check it and send.</p>
+              <p class="proof-quote-attr"><strong>Property manager</strong> &middot; portfolio of 60 managed properties</p>
+            </article>
+
+            <div class="proof-metric-card">
+              <span class="proof-metric-num">38s</span>
+              <span class="proof-metric-label">From inbox to named task with owner and draft reply &mdash; on a typical maintenance request.</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -64,8 +64,27 @@
       if (s) navObs.observe(s);
     });
 
-    // --- Scroll reveal with light stagger ---
+    // --- Scroll reveal with stagger ---
     var reveals = document.querySelectorAll(".reveal");
+
+    // Pre-compute stagger index for items inside a .grid parent.
+    // Each grid child gets a --reveal-delay CSS custom property so CSS
+    // can also apply transition-delay without extra JS callbacks.
+    reveals.forEach(function (el) {
+      var parent = el.parentElement;
+      if (!parent) return;
+      var isGridChild = parent.classList.contains("grid") ||
+                        parent.classList.contains("intro-grid") ||
+                        parent.classList.contains("proof-cards");
+      if (isGridChild) {
+        var revealSiblings = Array.prototype.filter.call(parent.children, function (c) {
+          return c.classList.contains("reveal");
+        });
+        var idx = revealSiblings.indexOf(el);
+        var delay = Math.min(idx, 5) * 70;
+        el.style.setProperty("--reveal-delay", delay + "ms");
+      }
+    });
 
     // If page loaded with a hash (anchor jump) or user prefers reduced motion,
     // skip the staged reveal — show everything immediately.
@@ -78,14 +97,18 @@
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             var el = entry.target;
-            var parent = el.parentElement;
-            var siblings = parent ? Array.prototype.indexOf.call(parent.children, el) : 0;
-            var delay = Math.min(siblings, 6) * 70;
+            var delay = parseInt(el.style.getPropertyValue("--reveal-delay") || "0", 10);
+            if (!delay) {
+              // Non-grid reveals: stagger by DOM order among visible siblings
+              var parent = el.parentElement;
+              var idx = parent ? Array.prototype.indexOf.call(parent.children, el) : 0;
+              delay = Math.min(idx, 4) * 60;
+            }
             setTimeout(function () { el.classList.add("is-visible"); }, delay);
             revealObs.unobserve(el);
           }
         });
-      }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+      }, { threshold: 0.10, rootMargin: "0px 0px -8% 0px" });
 
       reveals.forEach(function (el) { revealObs.observe(el); });
     }
