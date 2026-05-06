@@ -3155,9 +3155,9 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   white-space: nowrap;
 }
 .mock-btn-primary {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
+  background: var(--terracotta);
+  color: var(--ink);
+  border-color: var(--terracotta);
 }
 .mock-btn-ghost {
   background: transparent;
