@@ -1,0 +1,87 @@
+Improve the existing PropertyFlow landing page for conversion readiness.
+
+Do not redesign layout.
+Do not change demo screenshots or demo UI.
+Do not remove or edit the testimonial section.
+Focus on clarity, persuasion, structure, and visual feel only.
+
+Goals:
+- Instantly understandable to a non-technical property business owner
+- Reduce wordiness and improve scanability
+- Increase buyer confidence and urgency
+- Make the page feel like a practical product, not a concept
+
+Content:
+- Reduce total copy by ~30%
+- Max 1–2 lines per paragraph
+- Replace abstract SaaS language with plain English
+- Prefer concrete words: email, repair, tenant, landlord, task, owner, reply, contractor, overdue
+- Remove any sentence that doesn’t make the product clearer
+
+Structure:
+- Ensure each section can be understood by scanning headings + first line
+- Use bullets instead of paragraphs where possible
+- Add spacing between blocks
+- Simplify section headings (no editorial or “clever” phrasing)
+
+Add missing conversion elements:
+
+1. Pain / urgency
+Add a short section or lines highlighting cost of missed work:
+"Missed follow-ups lead to tenant chases, landlord complaints, delayed repairs and lost applicants."
+
+2. Simple offer block
+Add a section:
+Title: "Start with one workflow"
+
+Content:
+- Pick one messy process: repairs, viewing follow-ups, landlord admin or document chasing
+- Set up a shared board
+- Assign owners and statuses
+- Add draft replies and reminders
+- Run it on real work
+
+3. Trust signals (no fake proof)
+Add small credibility chips:
+- Early product
+- Human-reviewed replies
+- No blind automation
+- Works with existing software
+- Built for small UK property teams
+
+4. CTA clarity
+Keep CTAs but strengthen context:
+Primary: "See the workflow demo"
+Secondary: "Book a 15-minute walkthrough"
+
+Add near CTA:
+"On the call: pick one workflow, see the demo, map your process, decide if a pilot makes sense."
+
+5. Product clarity
+Add a simple flow line near hero or demo:
+"Email comes in → Task created → Owner assigned → Reply drafted → Status tracked"
+
+Visual:
+- Add subtle section contrast (light background variation)
+- Strengthen CTA contrast
+- Introduce light functional colour only:
+  red/coral = urgent/overdue
+  amber = waiting/due
+  blue = new/in progress
+  green = done
+- Do not add heavy colours or clutter
+
+Typography:
+- Slightly increase body text size
+- Increase line height
+- Ensure strong contrast (avoid thin/light text)
+
+Tone:
+- Practical, simple, confident
+- Not abstract, not technical, not salesy
+
+Definition of done:
+- Product understood in under 10 seconds
+- Easy to scan without reading everything
+- Clear what the user gets and what happens next
+- Feels like a real, useful tool worth a call
