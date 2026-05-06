@@ -3513,3 +3513,77 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   display: inline-flex;
   align-items: center;
 }
+
+/* ================================================================
+   Hero card: filter pill strip + owner-init / due-chip in meta row
+   ================================================================ */
+.wf-filter-pills {
+  display: flex;
+  gap: 0.32rem;
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid rgba(28,42,37,0.1);
+  flex-wrap: wrap;
+}
+.wf-filter-pill {
+  display: inline-block;
+  padding: 0.16rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(28,42,37,0.14);
+  font-family: var(--sans);
+  font-size: 0.64rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: rgba(28,42,37,0.03);
+  white-space: nowrap;
+}
+.wf-filter-pill.is-on {
+  background: var(--accent);
+  color: #fbf7ee;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Owner-init badge inside hero row meta */
+.wf-row-meta .wf-owner-init {
+  display: inline-grid;
+  place-items: center;
+  width: 1.45em;
+  height: 1.45em;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 600;
+  vertical-align: middle;
+}
+.wf-row-meta .wf-owner-init.is-unassigned {
+  background: #f1f1ef;
+  color: var(--muted);
+}
+
+/* Due chip in hero row meta */
+.wf-row-meta .wf-due {
+  display: inline-block;
+  font-size: 0.64rem;
+  padding: 0.06em 0.42em;
+  border-radius: 999px;
+  vertical-align: middle;
+  font-weight: 600;
+}
+.wf-row-meta .wf-due.is-overdue {
+  background: #fbe9e7;
+  color: #9b2c2c;
+  border: 1px solid #f3c9c4;
+}
+.wf-row-meta .wf-due.is-soon {
+  background: #fff7e0;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+/* Simplify wf-row-side: hide old wf-owner when arrow is shown instead */
+.wf-row-side .wf-arrow {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding-left: 0.2rem;
+}
