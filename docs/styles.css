@@ -23,6 +23,14 @@
   --accent-ink:   #f4eed8;   /* warm cream that pops on emerald */
   --highlight:    #c97a3f;   /* burnt ochre — used very sparingly */
 
+  --terracotta:       #D47A40;   /* burnt-orange CTA & large numbers */
+  --terracotta-dark:  #963c14;   /* darker terracotta for text (WCAG AA on cream) */
+  --terracotta-soft:  #fceee4;   /* pale terracotta wash */
+
+  --teal:         #005f6b;   /* cool teal for icons & symbols (WCAG AA on cream) */
+  --teal-dark:    #004a55;
+  --teal-soft:    #e0f4f6;
+
   --radius:       4px;
   --radius-lg:    10px;
 
@@ -781,10 +789,10 @@ ul, ol { margin: 0; padding: 0; }
   height: 36px;
   display: grid;
   place-items: center;
-  background: var(--accent-soft);
-  border: 1px solid rgba(47,107,83,0.2);
+  background: var(--teal-soft);
+  border: 1px solid rgba(0,95,107,0.2);
   border-radius: var(--radius);
-  color: var(--accent-strong);
+  color: var(--teal);
   margin-bottom: 0.4rem;
 }
 .automate-icon svg { width: 18px; height: 18px; }
@@ -1465,13 +1473,13 @@ ul, ol { margin: 0; padding: 0; }
   display: inline-grid;
   place-items: center;
   width: 16px; height: 16px;
-  color: var(--muted);
+  color: var(--teal);
   transition: transform 0.16s ease, color 0.16s ease;
 }
 .ac-plus svg { width: 12px; height: 12px; }
 .ac-toggle[aria-expanded="true"] .ac-plus {
   transform: rotate(45deg);
-  color: var(--accent-strong);
+  color: var(--teal-dark);
 }
 
 /* body is hidden via [hidden] when collapsed (semantic + visual).
@@ -2269,9 +2277,9 @@ em, i, blockquote {
   border: 1px solid var(--rule);
 }
 .diff-plus {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border: 1px solid var(--accent);
+  background: var(--teal);
+  color: #fff;
+  border: 1px solid var(--teal);
 }
 
 @media (max-width: 880px) {
@@ -2369,16 +2377,17 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
    Refinement pass: clarity, contrast, warmth
    ======================================================== */
 
-/* Stronger primary CTA — forest green instead of near-black */
+/* Stronger primary CTA — terracotta so it pops on the cream page */
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  background: var(--terracotta);
+  color: var(--ink);
+  border-color: var(--terracotta);
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: var(--accent-strong);
-  border-color: var(--accent-strong);
+  background: var(--terracotta-dark);
+  border-color: var(--terracotta-dark);
+  color: #fff;
 }
 
 /* Outline button — cleaner contrast on cream */
@@ -2494,7 +2503,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
 .how-num {
   font-family: var(--serif);
   font-size: 0.85rem;
-  color: var(--accent);
+  color: var(--terracotta-dark);
   font-weight: 600;
   letter-spacing: 0.04em;
   padding-top: 0.15rem;
@@ -2564,7 +2573,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   .btn-primary:hover,
   .btn-primary:focus-visible {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px -6px rgba(33,79,61,0.40);
+    box-shadow: 0 6px 20px -6px rgba(150,60,20,0.38);
   }
   .btn-outline:hover,
   .btn-outline:focus-visible {
@@ -2655,6 +2664,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   font-size: clamp(1.5rem, 2.8vw, 2rem);
   margin-bottom: 1rem;
   line-height: 1.22;
+  color: var(--teal);
 }
 
 .proof-context {
@@ -2702,7 +2712,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
 
 .proof-quote-attr {
   font-family: var(--sans);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--muted);
   font-weight: 500;
   padding-left: 1rem;
@@ -2713,8 +2723,8 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
 }
 
 .proof-metric-card {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: var(--terracotta);
+  color: var(--ink);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.4rem;
   display: flex;
@@ -2727,7 +2737,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   font-size: 2.4rem;
   font-weight: 500;
   line-height: 1;
-  color: var(--accent-ink);
+  color: var(--ink);
   white-space: nowrap;
 }
 
@@ -2735,7 +2745,7 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   font-family: var(--sans);
   font-size: 0.9rem;
   line-height: 1.45;
-  color: rgba(244,238,216,0.85);
+  color: rgba(28,42,37,0.78);
 }
 
 /* --- Hero incoming row: badge & owner state transition (motion-safe) --- */
@@ -3798,4 +3808,12 @@ p:not(.lede):not(.hero-eyebrow):not(.section-marker):not(.inline-marker):not(.de
   font-size: 0.85rem;
   color: var(--muted);
   padding-left: 0.2rem;
+}
+
+/* ========================================================
+   Task #11: Mobile heading size lift (~10% at ≤600px)
+   ======================================================== */
+@media (max-width: 600px) {
+  h1 { font-size: clamp(2.4rem, 7vw, 3rem); }
+  h2 { font-size: clamp(2rem, 5.5vw, 2.6rem); }
 }
