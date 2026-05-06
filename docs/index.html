@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="One system that handles tenant, landlord, maintenance and viewing requests from inbox to resolution. Built for small UK estate agents, letting agents and property managers." />
+  <meta name="theme-color" content="#1c2a25" />
+
+  <title>Property Workflow Co. | Handle every property request from inbox to resolution</title>
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Handle every property request from inbox to resolution" />
+  <meta property="og:description" content="One system for tenant, landlord, maintenance and viewing workflows. Captures requests, drafts replies, assigns owners, tracks resolution — without replacing your CRM." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c2a25'/%3E%3Crect x='10' y='10' width='12' height='12' fill='%232f6b53' transform='rotate(45 16 16)'/%3E%3C/svg%3E" />
+
+  <link rel="stylesheet" href="./styles.css" />
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <!-- TODO: replace brand name -->
+        <span>Property Workflow Co.</span>
+        <span class="brand-suffix">UK</span>
+      </a>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Primary">
+        <a href="#problem">Problem</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#demo">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#contact" class="nav-cta">Contact</a>
+      </nav>
+
+      <button class="menu-toggle" id="menu-toggle" aria-controls="primary-nav" aria-expanded="false" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="reveal">
+          <p class="hero-eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            Property workflow software &middot; UK
+          </p>
+
+          <h1>Handle every property request from inbox to resolution.</h1>
+
+          <p class="lede">One system for tenant, landlord, maintenance and viewing workflows. Incoming requests are captured, categorised, assigned and replied to &mdash; and your team, contractors and managers all see the same status.</p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#demo">
+              See the workflow demo
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn-outline" href="#contact">Book a 15-minute walkthrough</a>
+          </div>
+
+          <p class="cred-line"><span class="cred-dot" aria-hidden="true"></span>Designed for small UK estate agents, letting agents and property managers.</p>
+        </div>
+
+        <aside class="workflow-card reveal" aria-label="Today's workflow queue">
+          <header class="wf-header">
+            <span class="wf-dot" aria-hidden="true"></span>
+            <span class="wf-title">Workflow &middot; today</span>
+            <span class="wf-meta">Updated 10:42</span>
+          </header>
+
+          <ul class="wf-rows" role="list">
+            <li class="wf-row wf-row-priority">
+              <span class="wf-flag" aria-label="High priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Leaking tap reported</span>
+                <span class="wf-row-meta">Flat 3B &middot; Oak House &middot; 09:14</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-maint">Maintenance</span>
+                <span class="status status-progress">Contractor assigned</span>
+                <span class="wf-owner">Acme Heating</span>
+              </div>
+            </li>
+
+            <li class="wf-row">
+              <span class="wf-flag wf-flag-amber" aria-label="Medium priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Viewing follow-up due</span>
+                <span class="wf-row-meta">James W. &middot; 14 Park Road &middot; due 14:00</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-viewing">Lettings</span>
+                <span class="status status-followup">Follow-up due</span>
+                <span class="wf-owner">Priya &middot; internal</span>
+              </div>
+            </li>
+
+            <li class="wf-row wf-row-active">
+              <span class="wf-flag wf-flag-mute" aria-label="Standard priority"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Draft reply ready &mdash; needs review</span>
+                <span class="wf-row-meta">Sarah J. &middot; viewing request &middot; 10:38</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-tenant">Tenant</span>
+                <span class="status status-new">Awaiting review</span>
+                <span class="wf-owner">Alex &middot; internal</span>
+              </div>
+            </li>
+
+            <li class="wf-row">
+              <span class="wf-flag wf-flag-mute" aria-hidden="true"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Landlord document request</span>
+                <span class="wf-row-meta">Mr Khan &middot; statement Q4 &middot; 09:02</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-landlord">Admin</span>
+                <span class="status status-progress">In progress</span>
+                <span class="wf-owner">Maria &middot; internal</span>
+              </div>
+            </li>
+
+            <li class="wf-row wf-row-faded">
+              <span class="wf-flag wf-flag-mute" aria-hidden="true"></span>
+              <div class="wf-row-main">
+                <span class="wf-row-title">Boiler repair &mdash; awaiting update</span>
+                <span class="wf-row-meta">Mrs Patel &middot; SLA in 2h &middot; 08:21</span>
+              </div>
+              <div class="wf-row-side">
+                <span class="chip chip-maint">Maintenance</span>
+                <span class="status status-followup">Awaiting reply</span>
+                <span class="wf-owner">Sparkright Ltd</span>
+              </div>
+            </li>
+          </ul>
+
+          <div class="wf-progress" aria-hidden="true">
+            <span class="wf-prog-step is-done">Inbox <strong>17</strong></span>
+            <span class="wf-prog-arrow">&rsaquo;</span>
+            <span class="wf-prog-step is-done">Assigned <strong>14</strong></span>
+            <span class="wf-prog-arrow">&rsaquo;</span>
+            <span class="wf-prog-step is-active">Reply drafted <strong>9</strong></span>
+          </div>
+
+          <footer class="wf-foot">
+            <span class="wf-stat"><strong>38s</strong><span>inbox &rarr; assigned</span></span>
+            <span class="wf-stat"><strong>0</strong><span>overdue</span></span>
+          </footer>
+        </aside>
+      </div>
+    </section>
+
+    <!-- BUILT FOR PROPERTY WORKFLOWS (intro) -->
+    <section class="section section-tight section-intro" id="intro" aria-label="Built for property workflows">
+      <div class="container">
+        <div class="intro-head reveal">
+          <span class="section-marker">&sect; 00 &mdash; Built for property workflows</span>
+          <h2 class="h-supporting">A single operational layer for the work that lives between your CRM, your inbox and your contractors.</h2>
+        </div>
+        <div class="intro-grid reveal">
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">01</span>
+            <h3>Enquiries</h3>
+            <p>Turn tenant, landlord and applicant messages into tracked tasks &mdash; categorised, owned and replied to.</p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">02</span>
+            <h3>Maintenance</h3>
+            <p>Route issues to the right person or contractor company with status visibility from report to resolution.</p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-num" aria-hidden="true">03</span>
+            <h3>Follow-ups</h3>
+            <p>Keep viewings, documents and landlord admin from slipping &mdash; reminders run on a schedule, not on memory.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="section section-tight" id="problem">
+      <div class="container">
+        <div class="problem-grid reveal">
+          <div class="problem-copy">
+            <p class="inline-marker"><span>&sect; 01</span> The problem</p>
+            <h2 class="h-supporting">Most small property teams aren&rsquo;t short on effort. They&rsquo;re short on visibility.</h2>
+            <ol class="inline-list">
+              <li><span class="il-num">i.</span><span class="il-body"><strong>Enquiries</strong> answered in an hour, or in three days &mdash; nobody knows which.</span></li>
+              <li><span class="il-num">ii.</span><span class="il-body"><strong>Maintenance</strong> drifts down the inbox until a tenant chases.</span></li>
+              <li><span class="il-num">iii.</span><span class="il-body"><strong>Follow-ups</strong> get quietly forgotten.</span></li>
+            </ol>
+          </div>
+
+          <aside class="problem-visual" aria-label="What it looks like today">
+            <div class="chaos-window">
+              <div class="chaos-bar">
+                <span class="chaos-tab is-active">Inbox <span class="chaos-badge">23</span></span>
+                <span class="chaos-tab">Sent</span>
+                <span class="chaos-tab">Drafts <span class="chaos-badge chaos-badge-mute">4</span></span>
+              </div>
+              <ul class="chaos-list">
+                <li class="chaos-row chaos-row-urgent">
+                  <span class="chaos-flag" aria-hidden="true"></span>
+                  <span class="chaos-from">Mrs Patel</span>
+                  <span class="chaos-snippet">Re: re: re: boiler still not fixed</span>
+                  <span class="chaos-time">3d</span>
+                </li>
+                <li class="chaos-row">
+                  <span class="chaos-flag chaos-flag-amber" aria-hidden="true"></span>
+                  <span class="chaos-from">James W.</span>
+                  <span class="chaos-snippet">Did anyone follow up on the viewing?</span>
+                  <span class="chaos-time">2d</span>
+                </li>
+                <li class="chaos-row">
+                  <span class="chaos-flag" aria-hidden="true"></span>
+                  <span class="chaos-from">Landlord &mdash; 14 Park Rd</span>
+                  <span class="chaos-snippet">URGENT: tenant says no hot water</span>
+                  <span class="chaos-time">1d</span>
+                </li>
+                <li class="chaos-row chaos-row-faded">
+                  <span class="chaos-flag chaos-flag-mute" aria-hidden="true"></span>
+                  <span class="chaos-from">Sarah J.</span>
+                  <span class="chaos-snippet">Reference docs &mdash; sending again</span>
+                  <span class="chaos-time">4h</span>
+                </li>
+                <li class="chaos-row chaos-row-faded">
+                  <span class="chaos-flag chaos-flag-mute" aria-hidden="true"></span>
+                  <span class="chaos-from">Alex (team)</span>
+                  <span class="chaos-snippet">FYI &mdash; can someone pick this up?</span>
+                  <span class="chaos-time">1h</span>
+                </li>
+              </ul>
+              <p class="chaos-caption">Today, 4:42 pm &middot; nobody quite sure what&rsquo;s overdue</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKFLOWS -->
+    <section class="section section-alt" id="workflows">
+      <div class="container">
+        <div class="section-head-compact reveal">
+          <span class="section-marker">&sect; 02 &mdash; Workflows</span>
+          <h2>Six workflows that cover the operational work a small property team does every day.</h2>
+        </div>
+
+        <div class="grid grid-3 grid-tight">
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-1">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6l9 7 9-7M3 6v12a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6M3 6l1.5-1h15L21 6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Enquiry triage</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-1" hidden><div class="ac-body-inner"><p>Capture enquiries from every channel into one queue, categorised and routed.</p></div></div>
+          </article>
+
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-2">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Viewing follow-ups</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-2" hidden><div class="ac-body-inner"><p>Automatic follow-up tasks after every viewing, with reminders when nothing happens.</p></div></div>
+          </article>
+
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-3">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 1 5 5l-9 9-5 1 1-5 8-10z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 8l3 3" stroke-linecap="round"/></svg></span>
+              <span class="ac-name">Maintenance tracking</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-3" hidden><div class="ac-body-inner"><p>Turn a tenant message into a tracked job with owner, status and SLA.</p></div></div>
+          </article>
+
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-4">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3.5-7.1" stroke-linecap="round"/><path d="M21 4v5h-5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ac-name">Document chasing</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-4" hidden><div class="ac-body-inner"><p>References, ID, deposits and signed agreements &mdash; chased on a schedule until returned.</p></div></div>
+          </article>
+
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-5">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="14" r="3"/><path d="M9 11v3a2 2 0 0 0 2 2h3" stroke-linecap="round"/></svg></span>
+              <span class="ac-name">Internal handoffs</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-5" hidden><div class="ac-body-inner"><p>The next person gets a clean task &mdash; not a forwarded email thread.</p></div></div>
+          </article>
+
+          <article class="automate-card reveal">
+            <h3 class="ac-title"><button class="ac-toggle" type="button" aria-expanded="false" aria-controls="ac-body-6">
+              <span class="automate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg></span>
+              <span class="ac-name">Status &amp; pipeline</span>
+              <span class="ac-plus" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M7 1.5v11M1.5 7h11"/></svg></span>
+            </button></h3>
+            <div class="ac-body" id="ac-body-6" hidden><div class="ac-body-inner"><p>One shared view of every job, updated automatically as the work moves.</p></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIFFERENTIATION -->
+    <section class="section section-tight section-diff" id="differs" aria-label="Where this fits">
+      <div class="container">
+        <div class="diff-grid reveal">
+          <div class="diff-copy">
+            <span class="section-marker">&sect; 02b &mdash; Where this fits</span>
+            <h2 class="h-supporting">Not another full property management system.</h2>
+            <p>This isn&rsquo;t trying to replace your CRM or your accounting software. It sits between your inbox, your spreadsheets, your team and your contractors &mdash; handling the operational work that usually gets lost.</p>
+          </div>
+          <ul class="diff-list">
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not as heavy as a full PMS</strong><span>You keep Arthur, Re-Leased or whatever you use for tenancies and ledgers.</span></div></li>
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not only maintenance</strong><span>Fixflo handles repairs. This handles every category, including viewings, landlord admin and follow-ups.</span></div></li>
+            <li><span class="diff-x" aria-hidden="true">&minus;</span><div><strong>Not a generic shared inbox</strong><span>Front and Help Scout aren&rsquo;t shaped for properties, contractors or SLAs.</span></div></li>
+            <li><span class="diff-plus" aria-hidden="true">+</span><div><strong>Built specifically around property team workflows</strong><span>Roles, contractor companies, categories and SLAs are the primitives &mdash; not bolt-ons.</span></div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROOF STRIP -->
+    <section class="proof-strip-wrap" aria-label="Built around real property workflows">
+      <div class="container">
+        <div class="proof-strip reveal">
+          <p class="proof-line">Built around how small UK property teams actually work.</p>
+          <ul class="proof-icons" aria-hidden="true">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1-3.5 4-5 7-5s6 1.5 7 5" stroke-linecap="round"/></svg></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 21V9l8-6 8 6v12" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21v-7h6v7" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="14" r="4"/><path d="M12 11l8-8M16 7l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 8l9 6 9-6" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19V5M4 19h16" stroke-linecap="round"/><path d="M8 16l4-5 3 3 5-7" stroke-linecap="round" stroke-linejoin="round"/></svg></li>
+          </ul>
+          <p class="proof-aside">Independent UK operator &middot; teams of 1&ndash;25</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIAL -->
+    <!-- TODO: replace the quote, name, role and company below with a real client.
+         Delete this entire <section> if you don't have one yet (better than fake proof). -->
+    <section class="section section-quote" aria-label="Client quote">
+      <div class="container">
+        <figure class="quote reveal">
+          <blockquote class="quote-text">
+            &ldquo;A short pilot, no slide deck, and within a fortnight our viewing follow-ups stopped slipping. The team can finally see what&rsquo;s open without asking each other.&rdquo;
+          </blockquote>
+          <figcaption class="quote-meta">
+            <span class="quote-name">[Client name]</span>
+            <span class="quote-role">[Role] &middot; [Agency name], [City]</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section class="section" id="demo">
+      <div class="container">
+        <div class="section-head-row">
+          <span class="section-marker">&sect; 03 &mdash; The demo</span>
+          <h2>The shared view your team has been missing.</h2>
+        </div>
+
+        <div class="demo-card reveal">
+          <div class="demo-copy">
+            <p class="demo-lead">What your team sees, every morning.</p>
+            <p class="demo-sub">Every open job, who owns it, what&rsquo;s overdue &mdash; on one screen.</p>
+
+            <!-- TODO: when you have a hosted live demo, replace href with that URL and change copy to "Open the live demo" -->
+            <a class="btn btn-primary" href="#contact">
+              Book a 15-minute walkthrough
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <p class="demo-foot">Live walkthrough &middot; no deck, no proposal cycle.</p>
+          </div>
+
+          <div class="demo-visual" aria-hidden="true">
+            <div class="mock-window">
+              <div class="mock-bar">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="label">Workflow &mdash; Today</span>
+              </div>
+
+              <div class="mock-summary">
+                <div class="mock-stat">
+                  <span class="stat-label">Open</span>
+                  <span class="stat-value">17</span>
+                  <span class="stat-trend">&minus;4 vs. yesterday</span>
+                </div>
+                <div class="mock-stat">
+                  <span class="stat-label">Overdue</span>
+                  <span class="stat-value">2</span>
+                  <span class="stat-trend">Action needed</span>
+                </div>
+                <div class="mock-stat">
+                  <span class="stat-label">Avg. response</span>
+                  <span class="stat-value">38m</span>
+                  <span class="stat-trend">&minus;1h 12m</span>
+                </div>
+              </div>
+
+              <div class="mock-body">
+                <div class="mock-row mock-row-head">
+                  <span>Item</span><span>Type</span><span>Status</span>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-cell-name">Sarah J. &mdash; 14 Park Road<small>Enquiry &middot; received 09:42</small></div>
+                  <span class="chip chip-tenant">Tenant</span>
+                  <span class="status status-new">New</span>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-cell-name">Boiler issue &mdash; Flat 3B<small>Maintenance &middot; SLA 4h</small></div>
+                  <span class="chip chip-maint">Maintenance</span>
+                  <span class="status status-progress">In progress</span>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-cell-name">Viewing &mdash; James W.<small>Follow-up due today</small></div>
+                  <span class="chip chip-viewing">Viewing</span>
+                  <span class="status status-followup">Follow-up due</span>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-cell-name">Landlord statement Q4<small>Sent &middot; 15:18</small></div>
+                  <span class="chip chip-landlord">Landlord</span>
+                  <span class="status status-done">Completed</span>
+                </div>
+                <div class="mock-row">
+                  <div class="mock-cell-name">Reference chase &mdash; M. Patel<small>Auto-chase &middot; reminder 2 of 3</small></div>
+                  <span class="chip chip-tenant">Tenant</span>
+                  <span class="status status-progress">In progress</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section section-tight section-alt" id="how">
+      <div class="container">
+        <div class="section-head-compact reveal">
+          <span class="section-marker">&sect; 04 &mdash; How rollout works</span>
+          <h2 class="h-supporting">Live on one workflow in a fortnight. Your team adds the rest at their own pace.</h2>
+        </div>
+
+        <div class="process-wrap reveal is-open">
+          <ol class="process-strip">
+            <li><button class="ps-step" type="button" aria-expanded="true" aria-controls="ps-detail" data-step="1">
+              <span class="ps-num">01</span>
+              <span class="ps-name">Identify</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="2">
+              <span class="ps-num">02</span>
+              <span class="ps-name">Map</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="3">
+              <span class="ps-num">03</span>
+              <span class="ps-name">Build</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="4">
+              <span class="ps-num">04</span>
+              <span class="ps-name">Test</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+            <li><button class="ps-step" type="button" aria-expanded="false" aria-controls="ps-detail" data-step="5">
+              <span class="ps-num">05</span>
+              <span class="ps-name">Hand over</span>
+              <span class="ps-chev" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 5l3 3 3-3"/></svg></span>
+            </button></li>
+          </ol>
+
+          <div class="ps-detail-panel" id="ps-detail" role="region" aria-live="polite">
+            <div class="ps-detail-inner">
+              <p data-detail="1">A short call to find which workflow is costing your team the most time.</p>
+              <p data-detail="2" hidden>Map how that work moves through your inbox, team and contractors today.</p>
+              <p data-detail="3" hidden>Configure the workflow &mdash; categories, owners, contractor companies, SLAs.</p>
+              <p data-detail="4" hidden>Run it on real enquiries and real jobs alongside your existing tools.</p>
+              <p data-detail="5" hidden>Your team owns it day-to-day. Add the next workflow whenever you&rsquo;re ready.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section section-contact" id="contact">
+      <div class="container">
+        <div class="contact-card reveal">
+          <p class="eyebrow">&sect; 05 &mdash; Next step</p>
+          <h2>Book a 15-minute walkthrough on your real workflow.</h2>
+          <p>Tell us the workflow that&rsquo;s costing your team the most time. We&rsquo;ll show you, on a live board, exactly how it would run &mdash; no deck, no proposal cycle.</p>
+
+          <div class="contact-actions">
+            <!-- TODO: replace email below (used in both href and visible label) -->
+            <a class="btn btn-primary contact-cta" href="mailto:your@email.com?subject=Walkthrough%20request">
+              <span class="contact-cta-stack">
+                <span class="contact-cta-kicker">Email</span>
+                <span class="contact-cta-addr">your@email.com</span>
+              </span>
+              <svg class="btn-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+
+            <!-- TODO: replace LinkedIn URL below -->
+            <a class="btn btn-ghost" href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">Or message on LinkedIn</a>
+          </div>
+
+          <p class="contact-meta"><span class="contact-meta-dot" aria-hidden="true"></span>Replies within 1 working day &middot; UK hours</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <p class="footer-brand">Property Workflow Co.</p>
+        <p class="footer-tag">Property workflow software for small UK estate and letting agents. One system for enquiries, maintenance, viewings and follow-ups.</p>
+      </div>
+      <div class="footer-links">
+        <!-- TODO: replace email -->
+        <a href="mailto:your@email.com">Email</a>
+        <!-- TODO: replace LinkedIn URL -->
+        <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <p class="footer-copy">&copy; <span id="year"></span> Property Workflow Co. &middot; Made in the UK.</p>
+    </div>
+  </footer>
+
+  <script src="./script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found | Property Workflow Co.</title>
+  <meta name="description" content="The page you were looking for couldn't be found." />
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .nf-wrap {
+      min-height: 70vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+    .nf-code {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+      margin-bottom: 0.85rem;
+    }
+    .nf-wrap h1 { max-width: 18ch; margin-inline: auto; }
+    .nf-wrap p  { max-width: 46ch; margin-inline: auto; color: var(--ink-soft); }
+    .nf-actions { margin-top: 1.5rem; display: inline-flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+  </style>
+</head>
+<body>
+  <main class="nf-wrap">
+    <div>
+      <p class="nf-code">404 &middot; Page not found</p>
+      <h1>That page isn&rsquo;t here.</h1>
+      <p>It might have moved, or the link might be wrong. Head back to the homepage and you&rsquo;ll find what you need.</p>
+      <div class="nf-actions">
+        <a class="btn btn-primary" href="./index.html">Back to home</a>
+        <!-- TODO: replace email -->
+        <a class="btn btn-ghost" href="mailto:your@email.com">Email me</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
